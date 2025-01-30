@@ -24,5 +24,5 @@ report <- add(report, density_transitivity(institution))
 report <- add(report, centrality(institution))
 
 # Save report
-save(report, "test_report.md")
+save(report, "Report.md")
 # render("test_report.md", output_format = "pdf_document")
