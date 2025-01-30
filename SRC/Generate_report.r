@@ -1,4 +1,4 @@
-library("rmarkdown")
+# library("rmarkdown")
 
 source("src/Report_class.r")
 source("src/Report_text.r")
@@ -25,4 +25,4 @@ report <- add(report, centrality(institution))
 
 # Save report
 save(report, "test_report.md")
-render("test_report.md", output_format = "pdf_document")
+# render("test_report.md", output_format = "pdf_document")
