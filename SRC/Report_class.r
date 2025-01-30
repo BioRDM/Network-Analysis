@@ -1,11 +1,11 @@
 source("src/Report_text.r")
 
 Report <- function() {
-    report <- list(text = introduction())
-  
+  report <- list(text = introduction())
+
   # Assign the class name
   class(report) <- "Report"
-  
+
   return(report)
 }
 
@@ -15,12 +15,12 @@ print.Report <- function(report) {
 }
 
 add.Report <- function(report, section) {
-  report$text <- paste(report$text, section, sep="\n")
+  report$text <- paste(report$text, section, sep = "\n")
   return(report)
 }
 
 add <- function(report, section) {
-    UseMethod("add", report)
+  UseMethod("add", report)
 }
 
 save.Report <- function(report, filename) {
@@ -28,5 +28,5 @@ save.Report <- function(report, filename) {
 }
 
 save <- function(report, filename) {
-    UseMethod("save", report)
+  UseMethod("save", report)
 }
