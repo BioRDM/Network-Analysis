@@ -23,13 +23,13 @@ list.files() # Check what's in the working directory
 
 ```{r}
 library(igraph)
-#library(statnet)
+library(statnet)
 library(intergraph)
 
 ```
 
 ```{r}
-institution.graph <- read.graph("SBS_Direct_Andrew_Data.net", format="pajek")
+institution.graph <- read.graph("E:\\Daniel\\Network-Analysis\\data\\SBS_Direct_Andrew_Data.net", format="pajek")
 
 institution.net <- asNetwork(institution.graph)  # Convert igraph to network object
 
