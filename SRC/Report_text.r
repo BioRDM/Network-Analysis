@@ -55,7 +55,7 @@ density_transitivity <- function(graph) {
   return(text)
 }
 
-centrality <- function(graph) {
+centrality_metrics <- function(graph) {
   centrality <- get_centrality(graph)
   betweenness <- get_betweenness(graph)
   closeness <- get_closeness(graph)

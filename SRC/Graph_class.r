@@ -1,7 +1,3 @@
-library(igraph)
-library(intergraph)
-library(statnet)
-
 Graph <- function(file_path) {
   data <- load_graph(file_path)
   network <- asNetwork(data)
@@ -60,7 +56,7 @@ get_transitivity <- function(graph) {
 }
 
 get_centrality.Graph <- function(graph) {
-  return(degree(graph$data))
+  return(igraph::degree(graph$data))
 }
 
 get_centrality <- function(graph) {
@@ -68,7 +64,7 @@ get_centrality <- function(graph) {
 }
 
 get_betweenness.Graph <- function(graph) {
-  return(betweenness(graph$data))
+  return(igraph::betweenness(graph$data))
 }
 
 get_betweenness <- function(graph) {
@@ -76,7 +72,7 @@ get_betweenness <- function(graph) {
 }
 
 get_closeness.Graph <- function(graph) {
-  return(closeness(graph$data))
+  return(igraph::closeness(graph$data))
 }
 
 get_closeness <- function(graph) {
@@ -84,7 +80,7 @@ get_closeness <- function(graph) {
 }
 
 get_diameter.Graph <- function(graph) {
-  return(diameter(graph$data, directed = FALSE, weights = NA))
+  return(igraph::diameter(graph$data, directed = FALSE, weights = NA))
 }
 
 get_diameter <- function(graph) {
