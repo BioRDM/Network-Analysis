@@ -1,4 +1,11 @@
+<<<<<<< HEAD
+
 # library("rmarkdown")
+=======
+library(igraph)
+library(intergraph)
+library(statnet)
+>>>>>>> 3bab69e29d63a8e1997e5b264d97a9d0d144eb9a
 
 source("src/Report_class.r")
 source("src/Report_text.r")
@@ -21,8 +28,7 @@ report <- add(report, cohesion_metrics(institution))
 report <- add(report, density_transitivity(institution))
 
 # Add centrality metrics
-report <- add(report, centrality(institution))
+report <- add(report, centrality_metrics(institution))
 
 # Save report
 save(report, "Report.md")
-# render("test_report.md", output_format = "pdf_document")
