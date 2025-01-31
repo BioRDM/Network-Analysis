@@ -1,0 +1,545 @@
+---
+title: "Full Run"
+output: html_document
+date: "2025-01-30"
+---
+```{r}
+library(dplyr)
+
+data <- read.csv("SynthSysFinal_Direct_CSV.csv", stringsAsFactors = FALSE)
+
+class(data$Key)
+# Count unique papers
+num_papers <- n_distinct(data$Key)
+cat("Number of papers:", num_papers, "\n")
+
+
+```
+```{r}
+
+
+# Split the authors column by ";" and count the number of authors per paper
+data$num_authors <- sapply(strsplit(data$Author, ";"), length)
+
+# Calculate the mean (average), median, min, and max number of authors per paper
+avg_authors <- mean(data$num_authors)  # Average (mean)
+median_authors <- median(data$num_authors)  # Median
+min_authors <- min(data$num_authors)  # Minimum
+max_authors <- max(data$num_authors)  # Maximum
+
+# Print results
+cat("Number of authors per paper:\n")
+print(data[, c("Key", "num_authors")])  # Show each paper and its author count
+cat("\nAverage number of authors per paper:", avg_authors, "\n")
+cat("Median number of authors per paper:", median_authors, "\n")
+cat("Minimum number of authors per paper:", min_authors, "\n")
+cat("Maximum number of authors per paper:", max_authors, "\n")
+
+
+```
+
+#Switch the CSV file to iGraph file format
+
+```{r}
+library(igraph)
+library(statnet)
+library(intergraph)
+
+```
+
+
+##Trying to build .net
+
+
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(tidyverse)
+library(igraph)
+
+df_authors <- data %>%
+  mutate(Authors = str_split(Author, "; ")) %>%
+  select(Authors)
+
+df_authors <- df_authors %>%
+  filter(map_int(Authors, length) > 1)
+
+# Create edges: pairwise combinations of co-authors
+edges <- df_authors %>%
+  mutate(pairs = map(Authors, ~combn(.x, 2, simplify = FALSE))) %>%
+  unnest(pairs) %>%
+  unnest_wider(pairs, names_sep = "_") %>%
+  rename(Author1 = pairs_1, Author2 = pairs_2)
+
+# Remove duplicate edges (undirected network)
+edges <- edges %>%
+  distinct(Author1, Author2) %>%
+  filter(Author1 != Author2)
+
+
+# Create the graph
+institution.graph <- graph_from_data_frame(edges, directed = FALSE)
+
+# Save as Pajek (.net format)
+write.graph(institution.graph, file = "author_network.net", format = "pajek")
+
+institution.net <- asNetwork(institution.graph)  # Convert igraph to network object
+
+#you should modify here to .net or .graph and use .net for the function that require network files and .grah for the function that require igraph files
+```
+
+
+
+```{r}
+# 2.2 Extract Vertices from graph
+  V(institution.graph)
+  
+# 2.3 Extract Edges from graph
+  E(institution.graph)
+  
+```
+###################################
+# 3. Calculate Network Descriptives
+###################################
+```{r}
+ # Some functions have the same names in statnet and igraph, so we detach igraph to use statnet functions
+  
+detach(package:igraph)
+
+library(statnet)
+```
+
+# 3.1 Describing the network data:
+```{r}
+class(institution.graph)
+library(igraph)
+is.directed(institution.graph)  # Check if the graph is directed
+is.weighted(institution.graph) 
+
+##What the information reflects:
+###Is the Network Directed (is.directed(institution.graph)):
+####Possible Outcomes:
+#####TRUE: The network is directed, meaning edges have a direction (e.g., A → B but not necessarily B → A). Examples include citation networks or hierarchical structures.
+#####FALSE: The network is undirected, meaning edges are bidirectional (e.g., co-authorship networks where relationships are mutual).
+#Current Outcome: FALSE: The network is undirected, meaning all connections are mutual. This is typical in co-authorship or collaboration networks.
+
+###Is the Network Weighted (is.weighted(institution.graph)):
+####Possible Outcomes:
+#####TRUE: Edges have weights representing the strength or frequency of connections (e.g., the number of co-authored papers).
+#####FALSE: Edges are unweighted and represent only the presence or absence of connections.
+
+#Current Outcome: TRUE: The network is weighted, meaning that connections vary in strength or intensity. For instance, institutions that collaborate on more projects will have higher weights.
+
+```
+#3.2 Exploring network cohesion
+```{r}
+
+#You need to convert the igraph object (institution.net) to a network object, which can be done using the intergraph package. Here's how you can modify the code:
+
+library(intergraph)
+
+# 3.2 Exploring network cohesion
+  # basic exploration of networks
+library(statnet)
+  network.dyadcount(institution.net) # How many dyads? (n*n-1)
+#Dyads are pairs of nodes.This value represents all possible pairs of nodes in the network, calculated as (n*n-1)
+  
+  network.edgecount(institution.net) # How many edges?
+#This is the count of actual connections (edges) present in the network, indicating how interconnected the nodes are.
+  
+  network.size(institution.net) # How large is the network?
+#This is the number of nodes (vertices) in the network, representing the total entities (e.g., authors, institutions) being analyzed.
+```
+# 3.3 Density, reciprocity & transitiviy
+```{r}
+gden(institution.net)  # Density
+#Density measures the proportion of realized connections compared to all possible connections. It is calculated as:
+#Density=Number of Edges/(Number of Possible Edges)=Edges/[n×(n−1)/2]
+#Network density measures how connected the network is. 
+##Values range from 0 to 1. #High Density: Close to 1, meaning most nodes are connected. This indicates a highly cohesive network. # Low Density: Close to 0, meaning most nodes are not connected. Sparse networks are common in real-world systems. 
+
+#A density of ~4.25% indicates that only a small fraction of all possible connections (edges) are present in the network. This is typical for real-world networks, which are often sparse.
+
+gtrans(institution.net)  # Transitivity
+#ransitivity, or the clustering coefficient, measures the tendency of nodes to form triangles (e.g., if A → B and B → C, then A → C). It is calculated as:
+#Transitivity=Number of Triangles/Number of Connected Triplets
+#i.e., if two nodes are connected to a common third node, they are also likely to be connected to each other 
+
+#A value of ~64% indicates a high level of clustering in the network.
+
+ grecip(institution.net) # Dyadic reciprocity / Relevant for directed networks, e.g.: co-citations (not this case, but useful to know)
+#This metric is not meaningful here as the network is undirected, meaning all edges are inherently reciprocal. However, this shows that any directed analysis would indicate full reciprocity.
+ 
+###Possible outcomes:
+#High Reciprocity (close to 1): Indicates strong mutual relationships between nodes. Common in social networks where relationships like friendships or collaborations are mutual.[Irrelevant Measure: In an undirected network, connections do not have a direction (e.g., if A is connected to B, then B is also connected to A by definition). This makes reciprocity meaningless or always trivially equal to 1.]
+#Low Reciprocity (close to 0): Indicates unidirectional relationships dominate. Examples include hierarchical structures like citation networks or supply chains.
+ #[If Your Network Were Directed Reciprocity Could Indicate: How collaborative the network is. For example, in a directed co-authorship network, it shows whether contributions are mutual or one-sided.The level of symmetry in relationships, such as mutual citations in a citation network.]
+ 
+  grecip(institution.net, measure="edgewise") # Edgewise reciprocity / Idem: directed networks
+#  This confirms that all edges are reciprocated, as expected in an undirected network.
+  
+```
+
+#######################################
+# 4. Node Centrality and Centralization
+#######################################
+
+# 4.1 Degree centrality
+
+```{r}
+# Raw degree centrality (igraph)
+degree_centrality <- degree(institution.graph)
+
+# Normalized degree centrality
+degree_norm <- degree_centrality / (vcount(institution.graph) - 1)  # vcount() gives the number of vertices
+
+# Summary of raw degree centrality
+summary(degree_centrality)
+
+# Indegree and Outdegree (not relevant for undirected networks, but useful to know)
+indeg <- degree(institution.graph, mode = "in")    # For directed graphs
+outdeg <- degree(institution.graph, mode = "out")  # For directed graphs
+
+##Interpretation
+###Degree centrality measures how many direct connections each node has in the network.
+#Min (1): The least connected node has 1 connection.
+#Max (147): The most connected node has 147 connections, meaning this node is highly influential in the network.
+#Mean (16.88): On average, nodes have about 17 connections.
+#Median (12): Half of the nodes have more than 12 connections, and the other half have fewer.
+
+```
+#4.2 Betweenness Centrality
+```{r}
+bet <- betweenness(institution.graph)
+summary(bet)
+
+#What It Means:
+#Betweenness centrality measures how often a node acts as a bridge between other nodes in the shortest paths.
+#Min (0): Some nodes do not act as bridges at all.
+#Max (17873.587): The node with the highest value is a critical bridge in the network, controlling the flow of information.
+#Mean (351.841): The average betweenness centrality is skewed by a few nodes with very high values.
+```
+#4.3 Closeness Centrality
+```{r}
+clo <- closeness(institution.graph)
+summary(clo)
+
+#What It Means:
+#Closeness centrality measures how quickly a node can access other nodes in the network.
+#Min (0.0005149): The least central node has a very long average path to reach other nodes.
+#Max (1.0000000): The most central node can reach every other node most efficiently.
+#Mean (0.0128052): The average closeness is very low, indicating a relatively sparse or disconnected network
+```
+#4.4 Centralization
+```{r}
+# Now, you can calculate centralization
+library(statnet)
+degree_centrality <- degree(institution.graph)
+betweenness_centrality <- betweenness(institution.graph)
+closeness_centrality <- closeness(institution.graph)
+
+```
+
+#4.5 Table of Centrality Scores
+```{r}
+Institution_centrality.df <- data.frame(
+  degree = degree(institution.graph),
+  closeness = closeness(institution.graph),
+  betweenness = betweenness(institution.graph)
+)
+
+Institution_centrality.df.sorted <- Institution_centrality.df[order(-Institution_centrality.df$degree),]
+library(gridExtra)
+grid.table(Institution_centrality.df.sorted)
+
+print(Institution_centrality.df.sorted)
+
+# Save the sorted table to a CSV file
+write.csv(Institution_centrality.df.sorted, file = "institution_centrality_data.csv", row.names = TRUE)
+
+
+#Nodes with higher degree centrality (e.g., "ghazal, p." with 147 connections) are likely to be influential or well-connected individuals/entities.[This can indicate hubs or key players in the network.]
+#Nodes with high betweenness (like "millar, a. j." with 17873.9 betweeness score) are critical connectors in the network. Removing them could significantly disrupt the flow of information.
+#Nodes with high closeness centrality are in advantageous positions to disseminate information quickly.
+```
+
+#############################################
+# 5. Community (cohesive subgroups) detection
+#############################################
+
+#5.1 Connectivity: 
+#5.1.1 Strong/week Connection
+
+```{r}
+# Check if the network is strongly connected
+is_connected(institution.graph) # graph
+#This function checks if the network is strongly connected. A network is strongly connected if there is a path from any node to every other node, meaning every node can reach every other node directly or through other nodes.
+##Interpretation:
+###The result FALSE means that the network is not strongly connected. There are one or more nodes in the network that cannot be reached from others. Essentially, there are disconnected components in the network, where some nodes are isolated from others or not reachable by any path.
+###Possibility: If you had a strongly connected network, the result would be TRUE, indicating that all nodes in the network are reachable from each other, forming a single cohesive structure.
+
+# Check if the network is weakly connected
+is.connected(institution.graph, mode = "weak") # graph
+#This function checks if the network is weakly connected. A network is weakly connected if, by ignoring the direction of edges (in the case of a directed graph), there is a path between every pair of nodes. This means if we reverse all edges, is the network still connected?
+
+###Interpretation:
+####The result FALSE here means that the network is also not weakly connected. There are still some disconnected components, even when ignoring the direction of the edges.
+####Possibility: If the network were weakly connected, you would see TRUE, indicating that all nodes in the network are part of one large connected group, if we consider the edges to be undirected.
+
+```
+
+#5.1.2 the geodesic distance (shortest path)
+```{r}
+# Get information on geodesics (shortest paths) between all pairs of nodes
+geodist(institution.net) # graph
+# This function calculates the geodesic distance (shortest path) between every pair of nodes in the network. The geodesic distance is the smallest number of steps (edges) needed to travel from one node to another.
+#f the network was connected, this matrix would show finite distances between all nodes. If the network is disconnected, some distances would be infinite (Inf) because no path exists between those nodes.
+#Geodist helps you understand how far apart nodes are in terms of the number of edges, and whether any nodes are unreachable from others.
+
+# Calculate the shortest path between all pairs of nodes
+shortest_paths <- distances(institution.graph)
+
+# Print the shortest paths matrix
+shortest_paths
+
+##The shortest path matrix will have values like 0 (a node to itself), values between nodes that indicate how far apart they are, and Inf for nodes that are not connected.
+
+
+# Find the longest shortest path
+longest_shortest_path <- max(shortest_paths[shortest_paths != Inf])
+
+# Print the longest shortest path
+longest_shortest_path
+
+##The longest shortest path helps you understand the "diameter" of the network.
+
+# Calculate the average shortest path length
+average_shortest_path <- mean(shortest_paths[shortest_paths != Inf])
+
+# Print the average shortest path length
+average_shortest_path
+#The average shortest path length tells you how efficiently information can be spread in the network.
+
+
+net_diameter <- diameter(institution.graph, directed = FALSE, weights = NA)
+cat("Network diameter (longest shortest path):", net_diameter, "\n")
+
+
+```
+#5.1.3 reachability between pairs
+```{r}
+reachability_matrix <- reachability(institution.net)
+
+# Print the reachability matrix to see which nodes can reach others
+#print(reachability_matrix)
+
+# Get the number of nodes (N)
+num_nodes <- nrow(reachability_matrix)
+
+# Total number of possible pairs (excluding self-pairs)
+total_pairs <- num_nodes * (num_nodes - 1)
+
+# Count the number of unreachable pairs by excluding the diagonal (self-reachability)
+num_unreachable_pairs <- sum(reachability_matrix == 0) - num_nodes
+
+# Calculate the percentage of unreachable pairs
+unreachable_percentage <- (num_unreachable_pairs / total_pairs) * 100
+
+# Print the percentage of unreachable pairs
+print(paste("Percentage of unreachable pairs:", round(unreachable_percentage, 2), "%"))
+
+ 
+#This function calculates the reachability matrix, which tells you which nodes can reach other nodes (i.e., which nodes are accessible from other nodes). A value of TRUE means one node can reach another, and FALSE means it cannot.
+#Reachability shows you whether one node can access another, regardless of the path length.
+```
+
+
+```{r}
+library(sna)
+```
+
+
+# 5.2 Several ways to detect relatively cohesive groups
+```{r}
+#First kno these terms:
+
+#Clique is a subset of vertices (nodes) in a graph such that every two distinct vertices in the clique are adjacent, meaning there is an edge between every pair of nodes within that subset. Essentially, it is a completely connected subset of nodes.
+#Types of Cliques:
+##Maximal Clique: A clique that cannot be expanded by adding any adjacent vertex from the graph. It is not necessarily the largest clique in the graph, but it's the largest clique you can get from that subset.
+###Maximum Clique: A clique that contains the most nodes in the entire graph. It's the "biggest" clique, unlike the maximal clique, which refers to the largest possible clique in a particular subset, not necessarily the whole graph.
+#####################################
+
+# A maximal clique is a subgroup of nodes where every pair of nodes is directly connected, and it is "maximal" in the sense that no additional nodes can be added to the group without breaking this property.
+clique_count <- clique.census(institution.net) #printing this will give you the metrix of the network which usually hard to interpret if you have a lot of nodes in your network
+
+# Extract the frequency of clique sizes (this will be a numeric vector)
+clique_frequencies <- clique_count[[1]]  # The first part of the list contains the frequencies
+
+# Find the size of the largest clique (the size with the highest count)
+max_clique_size <- which.max(clique_frequencies)  # This returns the index of the largest clique size
+cat("The largest clique in the network has", max_clique_size, "nodes.\n")
+##interpretation: 
+###If it prints 5 nodes, that means cliques of size 5 nodes are the most common in your network, i.e., there are the most cliques of 5 nodes connected in a fully connected subgraph.
+
+#######Then
+# Maximal cliques with no enumeration (only a count of cliques)
+clique.census(institution.net, tabulate.by.vertex = FALSE, enumerate = FALSE)
+#this code will return a summary of the clique counts for each clique size in the network, but it does not enumerate the specific nodes within each clique. It will give you the number of cliques of each size.
+
+##Interpretation: 
+####This means: There is 1 clique with 28 nodes, 0 cliques with 29 nodes, and so on.
+####If you have many cliques with a small number of nodes (like 2 or 3), this suggests that your network has many smaller tightly connected groups, whereas if you have cliques with more nodes (e.g., 15+), it suggests that the network has a few large, tightly connected groups.
+```
+```{r}
+#Break the functions:
+##A k-core is a subgraph of the network where each node in that subgraph has at least k neighbors within the same subgraph. Essentially, it's a way to find the "core" of the network where nodes are well-connected.
+##In simpler terms, k-cores help identify tightly-knit clusters within a network, where each node has sufficient connections to others in that cluster. The concept is useful for identifying dense parts of the network.
+
+
+# Detect k-cores, subgraphs where each node has at least 'k' neighbors
+kcore_result <- kcores(institution.net)
+#if you print this you will get a number for each node in your network indicate the connection with the neighbors not its subgroups
+
+#####Interpretation:
+####A high k-core (e.g., 15-core) suggests a central and cohesive group in the network where all members are well-connected.
+####A network with several small k-cores might indicate that there are pockets of highly connected subgroups, but they may not be highly connected to other parts of the network.
+####The numbers will vary depending on your network, but in general, you can expect fewer nodes as the k-value increases (since it's harder for nodes to have more neighbors the higher k gets).
+
+##To get the useful information:
+
+# Find the lowest and highest k-core values
+min_kcore <- min(kcore_result)
+max_kcore <- max(kcore_result)
+
+# Calculate the average k-core value
+average_kcore <- mean(kcore_result)
+
+# Get the top 10 nodes (nodes with the highest k-core values)
+top_10_nodes <- sort(kcore_result, decreasing = TRUE)[1:10]
+
+# Print results
+cat("Lowest k-core value:", min_kcore, "\n")
+cat("Highest k-core value:", max_kcore, "\n")
+cat("Average k-core value:", average_kcore, "\n")
+cat("Top 10 nodes:", top_10_nodes, "\n")
+
+#to get the names of teh top 20 nodes:
+# Perform k-core decomposition
+kcore_result <- kcores(institution.net)
+
+# Get the names of the nodes (assuming the node names are stored as 'vertex names')
+node_names <- V(institution.graph)$name
+
+# Combine k-core values and node names into a data frame
+kcore_df <- data.frame(node = node_names, kcore = kcore_result)
+
+# Sort the data frame by k-core values in descending order
+sorted_kcore_df <- kcore_df[order(-kcore_df$kcore), ]
+
+# Get the top 20 nodes with the highest k-core values
+top_20_nodes <- head(sorted_kcore_df, 20)
+
+# Print the top 20 nodes
+print(top_20_nodes)  
+
+```
+
+#5.3 Show the Nesting of Cores
+```{r}
+# 5.3 Show the nesting of cores
+
+# Compute k-cores using indegree
+kc <- kcores(institution.net, cmode = "indegree")
+
+# Plot the graph with nodes colored according to their k-core membership
+gplot(institution.net, displaylabels = TRUE, vertex.col = rainbow(max(kc) + 1)[kc + 1])
+#Visualizing k-core membership allows for an intuitive representation of how tightly knit different parts of the network are. It can also help reveal clusters or communities in the network.
+
+# Showing only the 2-core (k-core with degree > 1)
+gplot(institution.net[kc > 1, kc > 1], displaylabels = TRUE, vertex.col = rainbow(max(kc) + 1)[kc[kc > 1] + 1])
+#Focusing on the 2-core provides insights into the core structure of the network, highlighting the most connected and robust components.
+
+####Note; VOSviewers provide better visualisation - So you can skip this
+
+```
+
+#Step 5.4: Find and Visualize the Largest Component
+```{r}
+
+library(intergraph)
+# Get the strong components of the network
+components(institution.graph)
+##Identifies the strongly connected components of the network
+
+# Get the weak components of the network
+# Compute the weak component distribution
+cd <- component.dist(institution.net, connected = "weak")
+cd
+##Identifies the weakly connected components of the network.
+
+
+# Plot the component size distribution
+plot(1:length(cd$cdist), cd$cdist, xlab = "Size", ylab = "Frequency")
+
+##This line plots a distribution of the sizes of weakly connected components.
+##The x-axis represents the size of the weak components (i.e., how many nodes each component has).
+##The y-axis represents the frequency, or how many components have that particular size.
+##This plot gives you a sense of how the network's weak components are distributed. Are there many small components? Or just a few large ones?
+
+
+# Find the largest weak component
+cl <- component.largest(institution.net, connected = "weak")
+cl
+
+# Plot the largest weak component
+gplot(institution.net[cl, cl], boxed.lab = FALSE, label = network.vertex.names(institution.net)[cl])
+
+
+```
+
+
+
+#Step 5.6: Find Cutpoints (Critical Nodes)
+```{r}
+##A cutpoint (or articulation point) is a node in a graph whose removal causes the graph to become disconnected, meaning that the removal of this node splits the graph into two or more disconnected subgraphs. These nodes are critical for the connectivity of the network. Identifying cutpoints is useful for understanding the vulnerabilities or central nodes in a network.
+
+# Find cutpoints (articulation points)
+cutpoints_result <- cutpoints(institution.net)
+
+# Print cutpoints result
+cutpoints_result
+institution.net <- read.graph("SBS_Direct_Andrew_Data.net", format="pajek")
+# Visualize the network with cutpoints highlighted
+# Highlight the cutpoints in a different color
+V(institution.net)$color <- ifelse(V(institution.net) %in% cutpoints_result, "red", "lightblue") ##the nodes identified as cutpoints are colored red
+
+# Adjust margins
+par(mar = c(5, 5, 5, 5))  # Increase margins (bottom, left, top, right)
+
+# Plot the graph
+plot(institution.net, vertex.label = NA, vertex.size = 10, vertex.color = V(institution.net)$color)
+
+# Save as PNG with a larger size
+png("institution_network_plot.png", width = 1200, height = 1200)  # Adjust width and height
+plot(institution.net, vertex.label = NA, vertex.size = 10, vertex.color = V(institution.net)$color)
+dev.off()  # Close the PNG device
+
+```
+```{r}
+institution.net <- asNetwork(institution.net)
+# Find the nodes with red color (assuming red corresponds to a particular group or centrality)
+# Example: Nodes are red if they are cutpoints
+institution_cp <- cutpoints(institution.net, mode = "graph", return.indicator = TRUE)
+
+# Retrieve the nodes that are red (in this case, the cutpoints)
+red_nodes <- which(institution_cp == 1)  # Assuming red is assigned to cutpoints
+
+# Print the names of these red nodes
+node_names <- network.vertex.names(institution.net)[red_nodes]
+print(node_names)
+
+#List of Cutpoints: The last part of the code (node_names) prints the names of the nodes that are cutpoints. This can help you identify the specific entities that are central to maintaining the structure of the network.
+
+```
+
+
