@@ -1,6 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 # library("rmarkdown")
+=======
+library(igraph)
+library(intergraph)
+library(statnet)
+>>>>>>> 3bab69e29d63a8e1997e5b264d97a9d0d144eb9a
 =======
 library(igraph)
 library(intergraph)
