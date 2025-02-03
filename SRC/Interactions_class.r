@@ -51,7 +51,7 @@ make_graph_from_csv <- function(file_path, delimiter = ";", column_name = "Autho
     rowwise() %>%
     mutate(Author1 = min(pairs_1, pairs_2), Author2 = max(pairs_1, pairs_2)) %>%  # Order author pairs alphabetically
     ungroup() %>%
-    distinct(Author1, Author2)  # Remove duplicate author pairs
+    count(Author1, Author2, name = "weight")  # Count the frequency of each pair
 
   graph <- graph_from_data_frame(edges, directed = FALSE)
   return(graph)
