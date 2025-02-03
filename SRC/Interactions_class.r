@@ -1,9 +1,19 @@
 library(dplyr)
 library(tidyverse)
+library(igraph)
+library(intergraph)
+library(statnet)
 
-Interactions <- function(file_path) {
-  graph <- load_graph(file_path)
+Interactions <- function(file_path, csv_delimiter = ";", csv_column_name = "Author") {
+  if (grepl(".csv", file_path)) {
+    graph <- make_graph_from_csv(file_path, delimiter = csv_delimiter, column_name = csv_column_name)
+  } else if (grepl(".net", file_path)) {
+    graph <- load_graph(file_path)
+  } else {
+    stop("File type not supported.")
+  }
   network <- asNetwork(graph)
+
   interactions <- list(file_path = file_path, graph = graph, network = network)
 
   # Assign the class name
@@ -22,13 +32,19 @@ load_graph <- function(file_path) {
 }
 
 make_graph_from_csv <- function(file_path, delimiter = ";", column_name = "Author") {
-  data <- read.csv(file_path, stringsAsFactor = FALSE)
+  if (!file.exists(file_path)) {
+    stop("File not found.")
+  } else {
+    data <- read.csv(file_path, stringsAsFactor = FALSE)
+  }
+
+  col_sym <- sym(column_name)
 
   # Create edges: pairwise combinations of co-authors
   edges <- data %>%
-    mutate(Authors = str_split(Author, delimiter)) %>%
+    mutate(Authors = str_split(!!col_sym, delimiter)) %>%
     filter(map_int(Authors, length) > 1) %>%  # Remove papers with less than 2 authors (no interaction can be inferred from them)
-    mutate(pairs = map(strsplit(Author, delimiter), ~combn(.x, 2, simplify = FALSE))) %>%  # Generate all pairs of authors
+    mutate(pairs = map(strsplit(!!col_sym, delimiter), ~combn(.x, 2, simplify = FALSE))) %>%  # Generate all pairs of authors
     unnest(pairs) %>%
     unnest_wider(pairs, names_sep = "_") %>%
     mutate(pairs_1 = trimws(pairs_1), pairs_2 = trimws(pairs_2)) %>%  # Remove leading/trailing whitespaces
@@ -36,6 +52,9 @@ make_graph_from_csv <- function(file_path, delimiter = ";", column_name = "Autho
     mutate(Author1 = min(pairs_1, pairs_2), Author2 = max(pairs_1, pairs_2)) %>%  # Order author pairs alphabetically
     ungroup() %>%
     distinct(Author1, Author2)  # Remove duplicate author pairs
+
+  graph <- graph_from_data_frame(edges, directed = FALSE)
+  return(graph)
 }
 
 get_network_description.Interactions <- function(interactions) {
