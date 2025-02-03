@@ -1,4 +1,4 @@
-source("src/Graph_class.r")
+source("src/Interactions_class.r")
 
 introduction <- function() {
   text <- "# Network analysis report\n
@@ -7,20 +7,20 @@ This report presents an analysis of a network dataset, focusing on key structura
   return(text)
 }
 
-network_type <- function(graph) {
-  graph <- get_network_description(graph)
+network_type <- function(interactions) {
+  interactions <- get_network_description(interactions)
   text <- "\n## Network Description
 ### Network Type"
-  if (graph$directed == TRUE) {
+  if (interactions$directed == TRUE) {
     text <- paste(text, "\n- **Directed**: The network is directed, meaning ... TO BE FILLED.", sep = "")
-  } else if (graph$directed == FALSE) {
+  } else if (interactions$directed == FALSE) {
     text <- paste(text, "\n- **Undirected**: The network is undirected, meaning all connections are mutual. This is common in co-authorship or collaboration networks. In an undirected network, connections do not have a direction (e.g., if A is connected to B, then B might also be connected to A by definition).", sep = "")
   } else  {
     text <- paste(text, "\n- **Unknown directionnality**: This could be due to an error in the data or the data is not available.", sep = "")
   }
-  if (graph$weighted == TRUE) {
+  if (interactions$weighted == TRUE) {
     text <- paste(text, "\n- **Weighted**: The network is weighted, meaning that connections between the nodes (authors) vary in strength or intensity. This result indicates that the network has weighted edges, meaning that the relationships between nodes are assigned numerical values. These weights could represent the strength or frequency of interactions, such as the number of co-authored papers.", sep = "")
-  } else if (graph$weighted == FALSE) {
+  } else if (interactions$weighted == FALSE) {
     text <- paste(text, "\n- **Unweighted**: The network is unweighted, meaning ... TO BE FILLED.", sep = "")
   } else {
     text <- paste(text, "\n- **Unknown weighting**: This could be due to an error in the data or the data is not available.", sep = "")
@@ -28,18 +28,18 @@ network_type <- function(graph) {
   return(text)
 }
 
-cohesion_metrics <- function(graph) {
-  graph <- get_cohesion(graph)
+cohesion_metrics <- function(interactions) {
+  interactions <- get_cohesion(interactions)
   text <- paste("\n### Cohesion Metrics",
-                "\n - **Total Dyads**: Dyads, representing all possible pairs of nodes (authors connection), were calculated as (n*n-1) = ", graph$dyadcount,
-                "\n - **Actual Edges**: The network contains ", graph$edgecount, " actual connections (edges), showing the level of interconnectedness among nodes (authors).",
-                "\n - **Number of Nodes**: The network consists of ", graph$size, " nodes (authors), representing the total entities analysed.", sep = "")
+                "\n - **Total Dyads**: Dyads, representing all possible pairs of nodes (authors connection), were calculated as (n*n-1) = ", interactions$dyadcount,
+                "\n - **Actual Edges**: The network contains ", interactions$edgecount, " actual connections (edges), showing the level of interconnectedness among nodes (authors).",
+                "\n - **Number of Nodes**: The network consists of ", interactions$size, " nodes (authors), representing the total entities analysed.", sep = "")
   return(text)
 }
 
-density_transitivity <- function(graph) {
-  density <- get_density(graph)
-  transitivity <- get_transitivity(graph)
+density_transitivity <- function(interactions) {
+  density <- get_density(interactions)
+  transitivity <- get_transitivity(interactions)
   text <- paste("\n## Density and Transitivity",
                 "\n### Density",
                 "\nDensity measures the proportion of realised connections compared to all possible connections. It is calculated as:",
@@ -55,11 +55,11 @@ density_transitivity <- function(graph) {
   return(text)
 }
 
-centrality_metrics <- function(graph) {
-  centrality <- get_centrality(graph)
-  betweenness <- get_betweenness(graph)
-  closeness <- get_closeness(graph)
-  diameter <- get_diameter(graph)
+centrality_metrics <- function(interactions) {
+  centrality <- get_centrality(interactions)
+  betweenness <- get_betweenness(interactions)
+  closeness <- get_closeness(interactions)
+  diameter <- get_diameter(interactions)
   text <- paste("\n## Node Centrality and Centralization",
                 "\n### Degree Centrality",
                 "\nDegree centrality measures the number of direct connections each node has in the network. ",
@@ -87,7 +87,7 @@ centrality_metrics <- function(graph) {
   return(text)
 }
 
-community_detection <- function(graph) {
+community_detection <- function(interactions) {
   text <- paste("\n## Community (cohesive subgroups) Detection",
                 "\n### Strong and Weak Connectivity",
                 "\n- **Strongly connected**: ",
