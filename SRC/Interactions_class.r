@@ -6,15 +6,17 @@ library(statnet)
 
 Interactions <- function(file_path, csv_delimiter = ";", csv_column_name = "Author") {
   if (grepl(".csv", file_path)) {
+    data <- read.csv(file_path, stringsAsFactor = FALSE)
     graph <- make_graph_from_csv(file_path, delimiter = csv_delimiter, column_name = csv_column_name)
   } else if (grepl(".net", file_path)) {
+    data <- NA
     graph <- load_graph(file_path)
   } else {
     stop("File type not supported.")
   }
   network <- asNetwork(graph)
 
-  interactions <- list(file_path = file_path, graph = graph, network = network)
+  interactions <- list(file_path = file_path, graph = graph, network = network, data = data)
 
   # Assign the class name
   class(interactions) <- "Interactions"
