@@ -48,7 +48,7 @@ density_transitivity <- function(interactions) {
                  "\n\n`Density = Number of Edges/(Number of Possible Edges) = Actual Edges/[nx(n-1)/2]`",
                  "\n\n- **Value**: ", round(density * 100, digits = 2), "%",
                  "\n- **Interpretation**: TO BE DEFINED (what are the possible cases?)",
-                 "\n\n### Transitivity",
+                 "\n\n## Transitivity",
                  "\nTransitivity, or the clustering coefficient, measures the tendency of nodes to form triangles (e.g., if A → B and B → C, then A → C). (In other words, if two nodes are connected to a common third node, they are also likely to be connected to each other). It is calculated as:",
                  "\n\n`Transitivity = Number of Triangles/Number of Connected Triplets`",
                  "\n\n- **Value**: ", round(transitivity * 100, digits = 0), "%",
