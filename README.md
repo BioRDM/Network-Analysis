@@ -1,4 +1,4 @@
-# Network-Analysis
+# NetworkAnalysis
 
 This code computes metrics about a network of publications.
 

@@ -1,9 +1,9 @@
-source("src/Report_class.r")
-source("src/Report_text.r")
-source("src/Interactions_class.r")
+library(devtools)
+
+load_all()
 
 # Load data
-graph_path <- "E:\\Daniel\\Network-Analysis\\data\\SynthsysFinal_Direct_v2.csv"
+graph_path <- "E:\\Daniel\\NetworkAnalysis\\data\\SynthsysFinal_Direct_v2.csv"
 institution <- Interactions(file_path = graph_path)
 
 # Initiate report

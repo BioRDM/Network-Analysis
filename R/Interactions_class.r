@@ -4,6 +4,7 @@ library(igraph)
 library(intergraph)
 library(statnet)
 
+#' @export
 Interactions <- function(file_path, csv_delimiter = ";", csv_column_name = "Author") {
   if (grepl(".csv", file_path)) {
     data <- read.csv(file_path, stringsAsFactor = FALSE)
@@ -24,6 +25,7 @@ Interactions <- function(file_path, csv_delimiter = ";", csv_column_name = "Auth
   return(interactions)
 }
 
+#' @export
 load_graph <- function(file_path) {
   if (!file.exists(file_path)) {
     stop("File not found.")
@@ -33,6 +35,7 @@ load_graph <- function(file_path) {
   return(graph)
 }
 
+#' @export
 make_graph_from_csv <- function(file_path, delimiter = ";", column_name = "Author") {
   if (!file.exists(file_path)) {
     stop("File not found.")
@@ -59,6 +62,7 @@ make_graph_from_csv <- function(file_path, delimiter = ";", column_name = "Autho
   return(graph)
 }
 
+#' @export
 get_network_description.Interactions <- function(interactions) {
   interactions$directed <- is_directed(interactions$graph)
   interactions$weighted <- is_weighted(interactions$graph)
@@ -69,6 +73,7 @@ get_network_description <- function(interactions) {
   UseMethod("get_network_description", interactions)
 }
 
+#' @export
 get_cohesion.Interactions <- function(interactions) {
   interactions$dyadcount <- network.dyadcount(interactions$network) # How many dyads? (n*n-1)
   interactions$edgecount <- network.edgecount(interactions$network) # How many edges?
@@ -80,6 +85,7 @@ get_cohesion <- function(interactions) {
   UseMethod("get_cohesion", interactions)
 }
 
+#' @export
 get_density.Interactions <- function(interactions) {
   return(gden(interactions$network))
 }
@@ -88,6 +94,7 @@ get_density <- function(interactions) {
   UseMethod("get_density", interactions)
 }
 
+#' @export
 get_transitivity.Interactions <- function(interactions) {
   return(gtrans(interactions$network))
 }
@@ -96,6 +103,7 @@ get_transitivity <- function(interactions) {
   UseMethod("get_transitivity", interactions)
 }
 
+#' @export
 get_centrality.Interactions <- function(interactions) {
   return(igraph::degree(interactions$graph))
 }
@@ -104,6 +112,7 @@ get_centrality <- function(interactions) {
   UseMethod("get_centrality", interactions)
 }
 
+#' @export
 get_betweenness.Interactions <- function(interactions) {
   return(igraph::betweenness(interactions$graph))
 }
@@ -112,6 +121,7 @@ get_betweenness <- function(interactions) {
   UseMethod("get_betweenness", interactions)
 }
 
+#' @export
 get_closeness.Interactions <- function(interactions) {
   return(igraph::closeness(interactions$graph))
 }
@@ -120,6 +130,7 @@ get_closeness <- function(interactions) {
   UseMethod("get_closeness", interactions)
 }
 
+#' @export
 get_diameter.Interactions <- function(interactions) {
   return(igraph::diameter(interactions$graph, directed = FALSE, weights = NA))
 }
