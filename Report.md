@@ -18,6 +18,7 @@ This report presents an analysis of a network dataset, focusing on key structura
 Density measures the proportion of realised connections compared to all possible connections. It is calculated as:
 
 `Density = Number of Edges/(Number of Possible Edges) = Actual Edges/[nx(n-1)/2]`
+
 - **Value**: 4.25%
 - **Interpretation**: TO BE DEFINED (what are the possible cases?)
 
@@ -25,12 +26,14 @@ Density measures the proportion of realised connections compared to all possible
 Transitivity, or the clustering coefficient, measures the tendency of nodes to form triangles (e.g., if A → B and B → C, then A → C). (In other words, if two nodes are connected to a common third node, they are also likely to be connected to each other). It is calculated as:
 
 `Transitivity = Number of Triangles/Number of Connected Triplets`
+
 - **Value**: 64%
 - **Interpretation**: TO BE DEFINED (what are the possible cases?)
 
 ## Node Centrality and Centralization
 ### Degree Centrality
 Degree centrality measures the number of direct connections each node has in the network. 
+
 - **Min**: 1
 - **Max**: 147
 - **Mean**: 17
@@ -38,6 +41,7 @@ Degree centrality measures the number of direct connections each node has in the
 
 ### Betweenness Centrality
 Betweenness centrality quantifies how often a node acts as a bridge in the shortest paths between other nodes.
+
 - **Min**: 0
 - **Max**: 17874
 - **Mean**: 352
@@ -45,6 +49,7 @@ Betweenness centrality quantifies how often a node acts as a bridge in the short
 
 ### Closeness Centrality
 Closeness centrality measures how quickly a node can access other nodes in the network.
+
 - **Min**: 0.00051
 - **Max**: 1
 - **Mean**: 0.01281
@@ -52,5 +57,6 @@ Closeness centrality measures how quickly a node can access other nodes in the n
 
 ### Network diameter
 The network diameter is the maximum distance (in terms of edges or steps) required to connect any two nodes in the network through the shortest possible path. 
+
 - In our network: **the diameter is 5**, it indicates that the farthest two nodes in your co-authorship network can be linked by the shortest path of 5 steps. 
 - In practical terms, if two authors in the network are the most distantly connected, they are separated by 5 intermediaries (co-authors).

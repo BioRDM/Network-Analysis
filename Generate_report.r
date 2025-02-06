@@ -21,5 +21,8 @@ report <- add(report, density_transitivity(institution))
 # Add centrality metrics
 report <- add(report, centrality_metrics(institution))
 
-# Save report
+# Save report as markdown
 save(report, "Report.md")
+
+# Convert the report to pdf
+export_pdf(report, "Report.md")
