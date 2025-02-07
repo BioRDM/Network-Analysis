@@ -25,6 +25,8 @@ jobs:
         r-version: ['4.2.2']
 
     steps:
+      - name: Install Ubuntu deps
+        run: sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev
       - uses: actions/checkout@v4
       - name: Set up R ${{ matrix.r-version }}
         uses: r-lib/actions/setup-r@f57f1301a053485946083d7a45022b278929a78a
