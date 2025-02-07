@@ -36,7 +36,7 @@ save <- function(report, filename) {
 }
 
 #' @export
-export_pdf.Report <- function(report, report_path = "Report.md") {
+export_pdf.Report <- function(report, report_path = "Report.md", output_file = "Report.pdf") {
   header <- "---
 title: 'Network Analysis Report'
 date: \\today
@@ -45,16 +45,16 @@ output:
     latex_engine: xelatex
     extra_dependencies: ['fontspec']
 fontsize: 12pt
-mainfont: 'Calibri Light'
+mainfont: 'Times New Roman'
 toc: TRUE
 ---
 "
   write(header, "tmp_report.md")
   write(report$text, "tmp_report.md", append = TRUE)
-  rmarkdown::render("tmp_report.md", output_file = "Report.pdf", output_format = "pdf_document")
+  rmarkdown::render("tmp_report.md", output_file = output_file, output_format = "pdf_document")
   file.remove("tmp_report.md")
 }
 
-export_pdf <- function(report, filename) {
+export_pdf <- function(report, report_path, output_file) {
   UseMethod("export_pdf", report)
 }
