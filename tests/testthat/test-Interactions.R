@@ -1,0 +1,50 @@
+file_path <- test_path("../data/SynthSysFinal_Direct_v2.csv")
+institution <- Interactions(file_path = file_path)
+
+test_that("Interactions is created", {
+    institution <- Interactions(file_path = file_path)
+    expect_type(institution, "list")
+})
+
+test_that("graph is correct", {
+    graph <- make_graph_from_csv(file_path)
+    expect_equal(vcount(graph), 398)
+    expect_equal(ecount(graph), 3359)
+})
+
+test_that("network description works", {
+    institution <- get_network_description(institution)
+    expect_false(institution$directed)
+    expect_true(institution$weighted)
+})
+
+test_that("network cohesion works", {
+    institution <- get_cohesion(institution)
+    expect_equal(institution$dyadcount, 79003)
+    expect_equal(institution$edgecount, 3359)
+    expect_equal(institution$size, 398)
+})
+
+test_that("interaction density works", {
+    expect_equal(round(get_density(institution), digits=3), 0.043)
+})
+
+test_that("transitivity works", {
+    expect_equal(round(get_transitivity(institution), digits=3), 0.64)
+})
+
+test_that("centrality works", {
+    expect_equal(round(mean(get_centrality(institution)), digits=3), 16.879)
+})
+
+test_that("betweenness works", {
+    expect_equal(round(mean(get_betweenness(institution)), digits=3), 351.841)
+})
+
+test_that("closeness works", {
+    expect_equal(round(mean(get_closeness(institution)), digits=3), 0.013)
+})
+
+test_that("diameter works", {
+    expect_equal(round(get_diameter(institution), digits=3), 5)
+})
