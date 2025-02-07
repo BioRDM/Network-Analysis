@@ -25,8 +25,18 @@ jobs:
         r-version: ['4.2.2']
 
     steps:
+      - uses: r-lib/actions/setup-tinytex
+      - uses: r-lib/actions/setup-pandoc
       - name: Install Ubuntu deps
-        run: sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev
+        run: sudo apt-get install -y --no-install-recommends \
+          libcurl4-openssl-dev \
+          libharfbuzz-dev \
+          libfribidi-dev \
+          libfreetype6-dev \
+          libpng-dev \
+          libtiff5-dev \
+          libjpeg-dev \
+          texlive-xetex
       - uses: actions/checkout@v4
       - name: Set up R ${{ matrix.r-version }}
         uses: r-lib/actions/setup-r@f57f1301a053485946083d7a45022b278929a78a
