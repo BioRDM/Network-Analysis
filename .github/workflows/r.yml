@@ -19,10 +19,10 @@ permissions:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
-        r-version: ['4.1.1']
+        r-version: ['4.2.2']
 
     steps:
       - uses: actions/checkout@v4
