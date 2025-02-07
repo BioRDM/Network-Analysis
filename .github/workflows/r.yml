@@ -35,6 +35,15 @@ jobs:
           install.packages(c("remotes", "rcmdcheck"))
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
+      - name: Install Rtools
+        run: |
+          choco install rtools --version=4.0
+          refreshenv
       - name: Check
         run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
         shell: Rscript {0}
+      - name: Run tests
+        run: Rscript -e 'devtools::test()'
+
+      - name: Code coverage
+        run: Rscript -e 'covr::codecov()'
