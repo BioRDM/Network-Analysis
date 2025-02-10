@@ -49,12 +49,12 @@ make_graph_from_csv <- function(file_path, delimiter = ";", column_name = "Autho
   # Create edges: pairwise combinations of co-authors
   edges <- data %>%
     dplyr::mutate(Authors = stringr::str_split(!!col_sym, delimiter)) %>%
-    filter(purrr::map_int(Authors, length) > 1) %>%  # Remove papers with less than 2 authors (no interaction can be inferred from them)
+    dplyr::filter(purrr::map_int(Authors, length) > 1) %>%  # Remove papers with less than 2 authors (no interaction can be inferred from them)
     dplyr::mutate(pairs = purrr::map(strsplit(!!col_sym, delimiter), ~combn(.x, 2, simplify = FALSE))) %>%  # Generate all pairs of authors
     tidyr::unnest(pairs) %>%
     tidyr::unnest_wider(pairs, names_sep = "_") %>%
     dplyr::mutate(pairs_1 = trimws(pairs_1), pairs_2 = trimws(pairs_2)) %>%  # Remove leading/trailing whitespaces
-    rowwise() %>%
+    dplyr::rowwise() %>%
     dplyr::mutate(Author1 = min(pairs_1, pairs_2), Author2 = max(pairs_1, pairs_2)) %>%  # Order author pairs alphabetically
     dplyr::ungroup() %>%
     dplyr::count(Author1, Author2, name = "weight")  # Count the frequency of each pair
@@ -138,4 +138,33 @@ get_diameter.Interactions <- function(interactions) {
 
 get_diameter <- function(interactions) {
   UseMethod("get_diameter", interactions)
+}
+
+#' @export
+plot_graph.Interactions <- function(interactions) {
+  grDevices::png(filename = "graph.png")
+  comm <- cluster_louvain(interactions$graph)
+  colors <- rainbow(length(unique(comm$membership)), alpha = 0.4)
+
+  centrality <- get_centrality(interactions)
+  vertex_size <- 1 + (centrality / max(centrality)) * 15
+
+  par(mfrow = c(1, 1), mar = c(1, 1, 1, 1))
+  plot(
+    interactions$graph,
+    vertex.label = NA,
+    vertex.size = vertex_size,
+    vertex.color = colors[comm$membership],
+    mark.groups = split(1:vcount(interactions$graph), comm$membership),
+    mark.col = colors,
+    mark.border = NA,
+    edge.width = 0.8,
+    edge.color = "gray",
+    layout = layout.fruchterman.reingold
+  )
+  dev.off()
+}
+
+plot_graph <- function(interactions) {
+  UseMethod("plot_graph", interactions)
 }
