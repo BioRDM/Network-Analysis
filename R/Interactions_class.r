@@ -1,3 +1,4 @@
+library(rlang)
 library(dplyr)
 library(tidyverse)
 library(igraph)
@@ -43,7 +44,7 @@ make_graph_from_csv <- function(file_path, delimiter = ";", column_name = "Autho
     data <- read.csv(file_path, stringsAsFactor = FALSE)
   }
 
-  col_sym <- sym(column_name)
+  col_sym <- rlang::sym(column_name)
 
   # Create edges: pairwise combinations of co-authors
   edges <- data %>%
