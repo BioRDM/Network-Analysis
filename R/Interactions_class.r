@@ -48,16 +48,16 @@ make_graph_from_csv <- function(file_path, delimiter = ";", column_name = "Autho
 
   # Create edges: pairwise combinations of co-authors
   edges <- data %>%
-    mutate(Authors = str_split(!!col_sym, delimiter)) %>%
-    filter(map_int(Authors, length) > 1) %>%  # Remove papers with less than 2 authors (no interaction can be inferred from them)
-    mutate(pairs = map(strsplit(!!col_sym, delimiter), ~combn(.x, 2, simplify = FALSE))) %>%  # Generate all pairs of authors
-    unnest(pairs) %>%
-    unnest_wider(pairs, names_sep = "_") %>%
+    mutate(Authors = stringr::str_split(!!col_sym, delimiter)) %>%
+    filter(purrr::map_int(Authors, length) > 1) %>%  # Remove papers with less than 2 authors (no interaction can be inferred from them)
+    mutate(pairs = purrr::map(strsplit(!!col_sym, delimiter), ~combn(.x, 2, simplify = FALSE))) %>%  # Generate all pairs of authors
+    tidyr::unnest(pairs) %>%
+    tidyr::unnest_wider(pairs, names_sep = "_") %>%
     mutate(pairs_1 = trimws(pairs_1), pairs_2 = trimws(pairs_2)) %>%  # Remove leading/trailing whitespaces
     rowwise() %>%
     mutate(Author1 = min(pairs_1, pairs_2), Author2 = max(pairs_1, pairs_2)) %>%  # Order author pairs alphabetically
     ungroup() %>%
-    count(Author1, Author2, name = "weight")  # Count the frequency of each pair
+    dplyr::count(Author1, Author2, name = "weight")  # Count the frequency of each pair
 
   graph <- graph_from_data_frame(edges, directed = FALSE)
   return(graph)
