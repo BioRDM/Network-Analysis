@@ -30,7 +30,7 @@ jobs:
       - name: Update apt
         run: sudo apt-get update
       - name: Install Ubuntu deps
-        run: sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev libtiff5-dev texlive-xetex ttf-mscorefonts-installer
+        run: sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev libtiff5-dev texlive-xetex
       - uses: actions/checkout@v4
       - name: Set up R ${{ matrix.r-version }}
         uses: r-lib/actions/setup-r@f57f1301a053485946083d7a45022b278929a78a

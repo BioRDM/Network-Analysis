@@ -45,7 +45,7 @@ output:
     latex_engine: xelatex
     extra_dependencies: ['fontspec']
 fontsize: 12pt
-mainfont: 'Times New Roman'
+mainfont: 'DejaVu Sans'
 toc: TRUE
 ---
 "
