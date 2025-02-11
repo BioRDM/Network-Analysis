@@ -1,3 +1,4 @@
+folder <- tempdir()
 file_path <- test_path("../data/SynthSysFinal_Direct_v2.csv")
 institution <- Interactions(file_path = file_path)
 
@@ -26,25 +27,38 @@ test_that("network cohesion works", {
 })
 
 test_that("interaction density works", {
-  expect_equal(round(get_density(institution), digits=3), 0.043)
+  expect_equal(round(get_density(institution), digits = 3), 0.043)
 })
 
 test_that("transitivity works", {
-  expect_equal(round(get_transitivity(institution), digits=3), 0.64)
+  expect_equal(round(get_transitivity(institution), digits = 3), 0.64)
 })
 
 test_that("centrality works", {
-  expect_equal(round(mean(get_centrality(institution)), digits=3), 16.879)
+  expect_equal(round(mean(get_centrality(institution)), digits = 3), 16.879)
 })
 
 test_that("betweenness works", {
-  expect_equal(round(mean(get_betweenness(institution)), digits=3), 351.841)
+  expect_equal(round(mean(get_betweenness(institution)), digits = 3), 351.841)
 })
 
 test_that("closeness works", {
-  expect_equal(round(mean(get_closeness(institution)), digits=3), 0.013)
+  expect_equal(round(mean(get_closeness(institution)), digits = 3), 0.013)
 })
 
 test_that("diameter works", {
-  expect_equal(round(get_diameter(institution), digits=3), 5)
+  expect_equal(round(get_diameter(institution), digits = 3), 5)
+})
+
+test_that("png device starts", {
+  test_file <- paste0(folder, "test.png")
+  grDevices::png(filename = test_file)
+  dev.off()
+  expect_true(file.exists(test_file))
+})
+
+test_that("plot is created", {
+  test_file <- paste0(folder, "graph.png")
+  plot_graph(institution, output_file = test_file)
+  expect_true(file.exists(test_file))
 })

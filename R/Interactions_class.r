@@ -141,8 +141,8 @@ get_diameter <- function(interactions) {
 }
 
 #' @export
-plot_graph.Interactions <- function(interactions) {
-  grDevices::png(filename = "output/graph.png", width = 2500, height = 2500, res = 400)
+plot_graph.Interactions <- function(interactions, output_file = "graph.png") {
+  grDevices::png(filename = output_file, width = 2500, height = 2500, res = 400)
   comm <- igraph::cluster_louvain(interactions$graph)
   colors <- grDevices::rainbow(length(unique(comm$membership)), alpha = 0.4)
 
@@ -165,6 +165,6 @@ plot_graph.Interactions <- function(interactions) {
   dev.off()
 }
 
-plot_graph <- function(interactions) {
+plot_graph <- function(interactions, output_file) {
   UseMethod("plot_graph", interactions)
 }
