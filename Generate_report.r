@@ -32,4 +32,4 @@ report <- add(report, centrality_metrics(institution))
 save(report, "output/Report.md")
 
 # Convert the report to pdf
-export_pdf(report, "Report.md")
+export_pdf(report, "Report.md", output_file = "output/Report.pdf")
