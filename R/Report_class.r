@@ -27,6 +27,19 @@ add <- function(report, section) {
 }
 
 #' @export
+add_figure.Report <- function(report, interactions, fig_caption = "") {
+  plot_graph(interactions)
+  report$text <- paste0(report$text, "\n",
+                        "![](graph.png)", "\n",
+                        "**Figure:** ", fig_caption, "\n")
+  return(report)
+}
+
+add_figure <- function(report, interactions, fig_caption) {
+  UseMethod("add_figure", report)
+}
+
+#' @export
 save.Report <- function(report, filename) {
   write(report$text, filename)
 }
@@ -36,7 +49,7 @@ save <- function(report, filename) {
 }
 
 #' @export
-export_pdf.Report <- function(report, report_path = "Report.md", output_file = "Report.pdf") {
+export_pdf.Report <- function(report, report_path = "output/Report.md", output_file = "Report.pdf") {
   header <- "---
 title: 'Network Analysis Report'
 date: \\today
@@ -45,7 +58,7 @@ output:
     latex_engine: xelatex
     extra_dependencies: ['fontspec']
 fontsize: 12pt
-mainfont: 'Times New Roman'
+mainfont: 'DejaVu Sans'
 toc: TRUE
 ---
 "

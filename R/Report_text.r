@@ -2,7 +2,7 @@
 introduction <- function() {
   text <- "
 # Introduction
-This report presents an analysis of a network dataset, focusing on key structural characteristics, group collaboration dynamics, and interdisciplinary."
+This report presents an analysis of a network dataset, focusing on key structural characteristics, group collaboration dynamics, and interdisciplinarity."
   return(text)
 }
 
