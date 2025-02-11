@@ -1,8 +1,9 @@
 
 # Introduction
 This report presents an analysis of a network dataset, focusing on key structural characteristics, group collaboration dynamics, and interdisciplinarity.
+
 ![](graph.png)
-**Figure:** Visualisation of the Author network
+**Figure 1:** Visualisation of the Author network
 
 
 # Network Description
