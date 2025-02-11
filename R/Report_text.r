@@ -8,7 +8,7 @@ This report presents an analysis of a network dataset, focusing on key structura
 
 #' @export
 network_type <- function(interactions) {
-  interactions <- get_network_description(interactions)
+  interactions$weighted <- igraph::is_weighted(interactions$graph)
   text <- "\n# Network Description
 ## Network Type"
   if (interactions$directed == TRUE) {
