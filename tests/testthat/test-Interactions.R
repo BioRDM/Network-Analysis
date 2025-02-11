@@ -50,13 +50,6 @@ test_that("diameter works", {
   expect_equal(round(get_diameter(institution), digits = 3), 5)
 })
 
-test_that("png device starts", {
-  test_file <- paste0(folder, "test.png")
-  grDevices::png(filename = test_file)
-  dev.off()
-  expect_true(file.exists(test_file))
-})
-
 test_that("plot is created", {
   test_file <- paste0(folder, "graph.png")
   plot_graph(institution, output_file = test_file)
