@@ -5,18 +5,18 @@ institution <- Interactions(file_path = file_path)
 test_that("Interactions is created", {
   institution <- Interactions(file_path = file_path)
   expect_type(institution, "list")
+  expect_false(igraph::is_directed(institution$graph))
+})
+
+test_that("Interactions can be directed", {
+  institution <- Interactions(file_path = file_path, directed = TRUE)
+  expect_true(igraph::is_directed(institution$graph))
 })
 
 test_that("graph is correct", {
   graph <- make_graph_from_csv(file_path)
   expect_equal(igraph::vcount(graph), 398)
   expect_equal(igraph::ecount(graph), 3359)
-})
-
-test_that("network description works", {
-  institution <- get_network_description(institution)
-  expect_false(institution$directed)
-  expect_true(institution$weighted)
 })
 
 test_that("network cohesion works", {

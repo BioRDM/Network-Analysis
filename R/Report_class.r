@@ -2,7 +2,7 @@ library(rmarkdown)
 
 #' @export
 Report <- function() {
-  report <- list(text = introduction())
+  report <- list(text = introduction(), fig_counter = 1)
 
   # Assign the class name
   class(report) <- "Report"
@@ -29,9 +29,10 @@ add <- function(report, section) {
 #' @export
 add_figure.Report <- function(report, interactions, fig_caption = "") {
   plot_graph(interactions)
-  report$text <- paste0(report$text, "\n",
+  report$text <- paste0(report$text, "\n\n",
                         "![](graph.png)", "\n",
-                        "**Figure:** ", fig_caption, "\n")
+                        "**Figure ", report$fig_counter, ":** ", fig_caption, "\n")
+  report$fig_counter <- report$fig_counter + 1
   return(report)
 }
 

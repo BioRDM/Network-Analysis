@@ -37,7 +37,7 @@ test_that("plot is added to the report", {
   intro <- report$text
   report <- add_figure(report, institution)
   file.remove("graph.png")
-  expect_equal(report$text, paste(paste0(intro, "\n",
+  expect_equal(report$text, paste(paste0(intro, "\n\n",
                                          "![](graph.png)", "\n",
-                                         "**Figure:** \n"), sep = "\n"))
+                                         "**Figure 1:** \n"), sep = "\n"))
 })

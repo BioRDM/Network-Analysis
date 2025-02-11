@@ -6,10 +6,10 @@ library(intergraph)
 library(statnet)
 
 #' @export
-Interactions <- function(file_path, csv_delimiter = ";", csv_column_name = "Author") {
+Interactions <- function(file_path, csv_delimiter = ";", csv_column_name = "Author", directed = FALSE) {
   if (grepl(".csv", file_path)) {
     data <- utils::read.csv(file_path, stringsAsFactor = FALSE)
-    graph <- make_graph_from_csv(file_path, delimiter = csv_delimiter, column_name = csv_column_name)
+    graph <- make_graph_from_csv(file_path, delimiter = csv_delimiter, column_name = csv_column_name, directed = directed)
   } else if (grepl(".net", file_path)) {
     data <- NA
     graph <- load_graph(file_path)
@@ -18,7 +18,7 @@ Interactions <- function(file_path, csv_delimiter = ";", csv_column_name = "Auth
   }
   network <- intergraph::asNetwork(graph)
 
-  interactions <- list(file_path = file_path, graph = graph, network = network, data = data)
+  interactions <- list(file_path = file_path, graph = graph, network = network, data = data, directed = directed)
 
   # Assign the class name
   class(interactions) <- "Interactions"
@@ -37,7 +37,7 @@ load_graph <- function(file_path) {
 }
 
 #' @export
-make_graph_from_csv <- function(file_path, delimiter = ";", column_name = "Author") {
+make_graph_from_csv <- function(file_path, delimiter = ";", column_name = "Author", directed = FALSE) {
   if (!file.exists(file_path)) {
     stop("File not found.")
   } else {
@@ -59,19 +59,8 @@ make_graph_from_csv <- function(file_path, delimiter = ";", column_name = "Autho
     dplyr::ungroup() %>%
     dplyr::count(Author1, Author2, name = "weight")  # Count the frequency of each pair
 
-  graph <- igraph::graph_from_data_frame(edges, directed = FALSE)
+  graph <- igraph::graph_from_data_frame(edges, directed = directed)
   return(graph)
-}
-
-#' @export
-get_network_description.Interactions <- function(interactions) {
-  interactions$directed <- igraph::is_directed(interactions$graph)
-  interactions$weighted <- igraph::is_weighted(interactions$graph)
-  return(interactions)
-}
-
-get_network_description <- function(interactions) {
-  UseMethod("get_network_description", interactions)
 }
 
 #' @export
@@ -160,7 +149,7 @@ plot_graph.Interactions <- function(interactions, output_file = "graph.png") {
     mark.border = NA,
     edge.width = 0.8,
     edge.color = "gray",
-    layout = layout.fruchterman.reingold
+    layout = igraph::layout.fruchterman.reingold
   )
   dev.off()
 }
