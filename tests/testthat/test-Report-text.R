@@ -1,6 +1,5 @@
 file_path <- test_path("../data/SynthSysFinal_Direct_v2.csv")
-data <- utils::read.csv(file_path, stringsAsFactor = FALSE)
-graph <- make_graph_from_csv(file_path, delimiter = ";", column_name = "Author")
+institution <- Interactions(file_path = file_path)
 
 test_that("introduction is created", {
   output_string <- introduction()
