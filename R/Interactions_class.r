@@ -130,13 +130,21 @@ get_diameter <- function(interactions) {
 }
 
 #' @export
-plot_graph.Interactions <- function(interactions, output_file = "graph.png") {
+plot_graph.Interactions <- function(interactions, output_file = "output/graph.png") {
   grDevices::png(filename = output_file, width = 2500, height = 2500, res = 400)
   comm <- igraph::cluster_louvain(interactions$graph)
   colors <- grDevices::rainbow(length(unique(comm$membership)), alpha = 0.4)
 
   centrality <- get_centrality(interactions)
   vertex_size <- 1 + (centrality / max(centrality)) * 15
+
+  # Identify the top 5 authors based on centrality
+  top_authors <- order(centrality, decreasing = TRUE)[1:5]
+  vertex_labels <- rep(NA, igraph::vcount(interactions$graph))
+  vertex_labels[top_authors] <- igraph::V(interactions$graph)$name[top_authors]
+
+  # Calculate layout coordinates
+  layout_coords <- igraph::layout.fruchterman.reingold(interactions$graph)
 
   graphics::par(mfrow = c(1, 1), mar = c(1, 1, 1, 1))
   graphics::plot(
@@ -149,8 +157,20 @@ plot_graph.Interactions <- function(interactions, output_file = "graph.png") {
     mark.border = NA,
     edge.width = 0.8,
     edge.color = "gray",
-    layout = igraph::layout.fruchterman.reingold
+    layout = layout_coords
   )
+
+  # Offset for labels
+  label_offset <- 0
+
+  # Add labels and lines
+  for (i in top_authors) {
+    x <- layout_coords[i, 1]
+    y <- layout_coords[i, 2]
+    text(x + label_offset, y + label_offset, labels = igraph::V(interactions$graph)$name[i], col = "black")
+    segments(x, y, x + label_offset, y + label_offset, col = "black")
+  }
+
   dev.off()
 }
 

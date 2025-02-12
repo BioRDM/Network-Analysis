@@ -27,16 +27,16 @@ add <- function(report, section) {
 }
 
 #' @export
-add_figure.Report <- function(report, interactions, fig_caption = "") {
-  plot_graph(interactions)
+add_figure.Report <- function(report, interactions, fig_caption = "", fig_file = "output/graph.png") {
+  plot_graph(interactions, output_file = fig_file)
   report$text <- paste0(report$text, "\n\n",
-                        "![](graph.png)", "\n",
+                        "![](", fig_file, ")", "\n",
                         "**Figure ", report$fig_counter, ":** ", fig_caption, "\n")
   report$fig_counter <- report$fig_counter + 1
   return(report)
 }
 
-add_figure <- function(report, interactions, fig_caption) {
+add_figure <- function(report, interactions, fig_caption, fig_file) {
   UseMethod("add_figure", report)
 }
 

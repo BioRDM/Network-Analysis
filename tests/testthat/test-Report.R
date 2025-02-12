@@ -35,7 +35,7 @@ test_that("report is exported as pdf", {
 test_that("plot is added to the report", {
   report <- Report()
   intro <- report$text
-  report <- add_figure(report, institution)
+  report <- add_figure(report, institution, fig_file = "graph.png")
   file.remove("graph.png")
   expect_equal(report$text, paste(paste0(intro, "\n\n",
                                          "![](graph.png)", "\n",
