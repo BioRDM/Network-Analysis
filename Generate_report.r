@@ -12,7 +12,7 @@ report <- Report()
 # Add graph Figure
 report <- add_figure(
   report,
-  institution,
+  plot = plot_graph(institution),
   fig_caption = "Visualisation of the Author network"
 )
 
@@ -27,6 +27,13 @@ report <- add(report, density_transitivity(institution))
 
 # Add centrality metrics
 report <- add(report, centrality_metrics(institution))
+
+# Add top authors Figure
+report <- add_figure(
+  report,
+  plot = plot_top_authors(institution, n = 15),
+  fig_caption = "Direct connections between the 15 most central authors"
+)
 
 # Save report as markdown
 save(report, "output/Report.md")

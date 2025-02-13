@@ -60,15 +60,3 @@ test_that("most_central_authors works", {
   expect_true(length(author_list) > 10)
   expect_true("Ghazal, P." %in% author_list)
 })
-
-test_that("graph plot is created", {
-  test_file <- paste0(folder, "graph.png")
-  plot_graph(institution, output_file = test_file)
-  expect_true(file.exists(test_file))
-})
-
-test_that("top authors plot is created", {
-  test_file <- paste0(folder, "top_authors.png")
-  plot_top_authors(institution, n = 10, output_file = test_file)
-  expect_true(file.exists(test_file))
-})

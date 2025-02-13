@@ -26,6 +26,7 @@ plot_graph.Interactions <- function(interactions, output_file = "output/graph.pn
   add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = most_central_authors, leg_colors = colors, leg_title = "Most central author")
 
   dev.off()
+  return(output_file)
 }
 
 plot_graph <- function(interactions, output_file) {
@@ -74,6 +75,7 @@ plot_top_authors.Interactions <- function(interactions, n = 10, output_file = "o
   )
 
   dev.off()
+  return(output_file)
 }
 
 plot_top_authors <- function(interactions, n, output_file) {

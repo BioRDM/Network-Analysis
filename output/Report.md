@@ -2,7 +2,7 @@
 # Introduction
 This report presents an analysis of a network dataset, focusing on key structural characteristics, group collaboration dynamics, and interdisciplinarity.
 
-![](graph.png)
+![](output/graph.png)
 **Figure 1:** Visualisation of the Author network
 
 
@@ -70,5 +70,9 @@ Closeness centrality measures how quickly a node can access other nodes in the n
 ## Network diameter
 The network diameter is the maximum distance (in terms of edges or steps) required to connect any two nodes in the network through the shortest possible path. 
 
-- In our network: **the diameter is 5**, it indicates that the farthest two nodes in your co-authorship network can be linked by the shortest path of 5 steps. 
-- In practical terms, if two authors in the network are the most distantly connected, they are separated by 5 intermediaries (co-authors).
+- In our network: **the diameter is 8**, it indicates that the farthest two nodes in your co-authorship network can be linked by the shortest path of 8 steps. 
+- In practical terms, if two authors in the network are the most distantly connected, they are separated by 8 intermediaries (co-authors).
+
+![](output/top_authors.png)
+**Figure 2:** Direct connections between the 15 most central authors
+
