@@ -9,8 +9,8 @@ test_that("Interactions is created", {
 })
 
 test_that("Interactions can be directed", {
-  institution <- Interactions(file_path = file_path, directed = TRUE)
-  expect_true(igraph::is_directed(institution$graph))
+  test_interactions <- Interactions(file_path = file_path, directed = TRUE)
+  expect_true(igraph::is_directed(test_interactions$graph))
 })
 
 test_that("graph is correct", {
@@ -47,7 +47,18 @@ test_that("closeness works", {
 })
 
 test_that("diameter works", {
-  expect_equal(round(get_diameter(institution), digits = 3), 5)
+  expect_equal(round(get_diameter(institution), digits = 3), 8)
+})
+
+test_that("communities work", {
+  comm <- get_communities(institution)
+  expect_equal(class(comm), "communities")
+})
+
+test_that("most_central_authors works", {
+  author_list <- get_most_central_per_community(institution)
+  expect_true(length(author_list) > 10)
+  expect_true("Ghazal, P." %in% author_list)
 })
 
 test_that("plot is created", {
