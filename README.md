@@ -1,6 +1,6 @@
 # NetworkAnalysis
 
-This code computes metrics about a network of publications.
+Welcome to the Social Network Analysis (SNA) repository! This project provides tools and code to perform social network analysis, generate insightful reports, and visualize interactions within a network. 
 
 ## Data format
 Data should be input in .csv format, with one column containing author names.
