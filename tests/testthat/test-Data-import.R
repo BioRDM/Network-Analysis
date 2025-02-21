@@ -19,13 +19,13 @@ test_that("make_graph_from_df creates a graph with correct edges", {
   graph <- make_graph_from_df(sample_data, delimiter = ";", column_name = "Author", max_authors = 50, directed = FALSE)
 
   # Check that the graph is an igraph object
-  expect_true(is_igraph(graph))
+  expect_true(igraph::is_igraph(graph))
 
   # Check the number of vertices
-  expect_equal(vcount(graph), 4)
+  expect_equal(igraph::vcount(graph), 4)
 
   # Check the number of edges
-  expect_equal(ecount(graph), 6)
+  expect_equal(igraph::ecount(graph), 6)
 
   # Check that specific edges exist
   expect_true(igraph::are_adjacent(graph, "Author1", "Author2"))
@@ -47,7 +47,7 @@ test_that("filter_small_authors removes authors with fewer than min_occurrences"
   filtered_graph <- filter_small_authors(graph, min_occurrences = 2)[[1]]
 
   # Check that the graph is an igraph object
-  expect_true(is_igraph(filtered_graph))
+  expect_true(igraph::is_igraph(filtered_graph))
 
   # Check that specific vertices exist
   expect_true("Author1" %in% igraph::V(filtered_graph)$name)
