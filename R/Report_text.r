@@ -9,21 +9,28 @@ This report presents an analysis of a network dataset, focusing on key structura
 #' @export
 network_type <- function(interactions) {
   interactions$weighted <- igraph::is_weighted(interactions$graph)
-  text <- "\n# Network Description
-## Network Type"
+  text <- "\n# Network Description"
+  if (interactions$papers_removed > 0) {
+    text <- paste0(text,
+                   "\n", interactions$papers_removed, " papers were removed from the dataset due to having more than ", interactions$max_authors, " authors. The network was constructed from the remaining ", interactions$n_papers, " papers.\n")
+  } else {
+    text <- paste0(text,
+                   "\nAll papers in the dataset had less than ", interactions$max_authors, " authors and were included in the network analysis.\n")
+  }
+  text <- paste0(text, "\n## Network Type")
   if (interactions$directed == TRUE) {
-    text <- paste0(text, "\n- **Directed**: The network is directed, meaning edges have a direction (e.g., A → B but not necessarily B → A). Examples include citation networks or hierarchical structures.")
+    text <- paste0(text, "\n - **Directed**: The network is directed, meaning edges have a direction (e.g., A → B but not necessarily B → A). Examples include citation networks or hierarchical structures.")
   } else if (interactions$directed == FALSE) {
-    text <- paste0(text, "\n- **Undirected**: The network is undirected, meaning all connections are mutual. This is common in co-authorship or collaboration networks. In an undirected network, connections do not have a direction (e.g., if A is connected to B, then B might also be connected to A by definition).")
+    text <- paste0(text, "\n - **Undirected**: The network is undirected, meaning all connections are mutual. This is common in co-authorship or collaboration networks. In an undirected network, connections do not have a direction (e.g., if A is connected to B, then B might also be connected to A by definition).")
   } else  {
-    text <- paste0(text, "\n- **Unknown directionnality**: This could be due to an error in the data or the data is not available.")
+    text <- paste0(text, "\n - **Unknown directionnality**: This could be due to an error in the data or the data is not available.")
   }
   if (interactions$weighted == TRUE) {
-    text <- paste0(text, "\n- **Weighted**: The network is weighted, meaning that connections between the nodes (authors) vary in strength or intensity. This result indicates that the network has weighted edges, meaning that the relationships between nodes are assigned numerical values. These weights could represent the strength or frequency of interactions, such as the number of co-authored papers.")
+    text <- paste0(text, "\n - **Weighted**: The network is weighted, meaning that connections between the nodes (authors) vary in strength or intensity. This result indicates that the network has weighted edges, meaning that the relationships between nodes are assigned numerical values. These weights could represent the strength or frequency of interactions, such as the number of co-authored papers.")
   } else if (interactions$weighted == FALSE) {
-    text <- paste0(text, "\n- **Unweighted**: Edges are unweighted and represent only the presence or absence of connections.")
+    text <- paste0(text, "\n - **Unweighted**: Edges are unweighted and represent only the presence or absence of connections.")
   } else {
-    text <- paste0(text, "\n- **Unknown weighting**: This could be due to an error in the data or the data is not available.")
+    text <- paste0(text, "\n - **Unknown weighting**: This could be due to an error in the data or the data is not available.")
   }
   return(text)
 }

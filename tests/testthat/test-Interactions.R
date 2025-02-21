@@ -14,7 +14,8 @@ test_that("Interactions can be directed", {
 })
 
 test_that("graph is correct", {
-  graph <- make_graph_from_csv(file_path)
+  data <- institution$data
+  graph <- make_graph_from_df(data)
   expect_equal(igraph::vcount(graph), 398)
   expect_equal(igraph::ecount(graph), 3359)
 })

@@ -1,66 +1,42 @@
-library(rlang)
-library(dplyr)
-library(tidyverse)
 library(igraph)
 library(intergraph)
 library(statnet)
 
 #' @export
-Interactions <- function(file_path, csv_delimiter = ";", csv_column_name = "Author", directed = FALSE) {
+Interactions <- function(file_path, author_delimiter = ";", csv_column_name = "Author", max_authors = 50, directed = FALSE) {
   if (grepl(".csv", file_path)) {
     data <- utils::read.csv(file_path, stringsAsFactor = FALSE)
-    graph <- make_graph_from_csv(file_path, delimiter = csv_delimiter, column_name = csv_column_name, directed = directed)
+    if (!csv_column_name %in% colnames(data)) {
+      stop(paste0("Column name ", csv_column_name, " not found in the dataset."))
+    }
+    result <- filter_papers_by_authors(data, column_name = csv_column_name, delimiter = author_delimiter, max_authors)
+    data <- result[[1]]
+    papers_removed <- result[[2]]
+    n_papers <- nrow(data)
+    graph <- make_graph_from_df(data, delimiter = author_delimiter, column_name = csv_column_name, max_authors, directed = directed)
   } else if (grepl(".net", file_path)) {
     data <- NA
+    n_papers <- NA
+    papers_removed <- NA
     graph <- load_graph(file_path)
   } else {
     stop("File type not supported.")
   }
   network <- intergraph::asNetwork(graph)
 
-  interactions <- list(file_path = file_path, graph = graph, network = network, data = data, directed = directed)
+  interactions <- list(file_path = file_path,
+                       graph = graph,
+                       network = network,
+                       data = data,
+                       n_papers = n_papers,
+                       max_authors = max_authors,
+                       papers_removed = papers_removed,
+                       directed = directed)
 
   # Assign the class name
   class(interactions) <- "Interactions"
 
   return(interactions)
-}
-
-#' @export
-load_graph <- function(file_path) {
-  if (!file.exists(file_path)) {
-    stop("File not found.")
-  } else {
-    graph <- igraph::read_graph(file_path, format = "pajek")
-  }
-  return(graph)
-}
-
-#' @export
-make_graph_from_csv <- function(file_path, delimiter = ";", column_name = "Author", directed = FALSE) {
-  if (!file.exists(file_path)) {
-    stop("File not found.")
-  } else {
-    data <- utils::read.csv(file_path, stringsAsFactor = FALSE)
-  }
-
-  col_sym <- rlang::sym(column_name)
-
-  # Create edges: pairwise combinations of co-authors
-  edges <- data %>%
-    dplyr::mutate(Authors = stringr::str_split(!!col_sym, delimiter)) %>%
-    dplyr::filter(purrr::map_int(Authors, length) > 1) %>%  # Remove papers with less than 2 authors (no interaction can be inferred from them)
-    dplyr::mutate(pairs = purrr::map(strsplit(!!col_sym, delimiter), ~utils::combn(.x, 2, simplify = FALSE))) %>%  # Generate all pairs of authors
-    tidyr::unnest(pairs) %>%
-    tidyr::unnest_wider(pairs, names_sep = "_") %>%
-    dplyr::mutate(pairs_1 = trimws(pairs_1), pairs_2 = trimws(pairs_2)) %>%  # Remove leading/trailing whitespaces
-    dplyr::rowwise() %>%
-    dplyr::mutate(Author1 = min(pairs_1, pairs_2), Author2 = max(pairs_1, pairs_2)) %>%  # Order author pairs alphabetically
-    dplyr::ungroup() %>%
-    dplyr::count(Author1, Author2, name = "weight")  # Count the frequency of each pair
-
-  graph <- igraph::graph_from_data_frame(edges, directed = directed)
-  return(graph)
 }
 
 #' @export

@@ -64,8 +64,10 @@ toc: TRUE
 "
   write(header, "tmp_report.md")
   write(report$text, "tmp_report.md", append = TRUE)
-  rmarkdown::render("tmp_report.md", output_file = output_file, output_format = "pdf_document")
+  print("Exporting PDF...")
+  rmarkdown::render("tmp_report.md", output_file = output_file, output_format = "pdf_document", quiet = TRUE)
   file.remove("tmp_report.md")
+  print("PDF exported successfully!")
 }
 
 export_pdf <- function(report, report_path, output_file) {

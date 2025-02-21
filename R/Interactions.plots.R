@@ -23,7 +23,11 @@ plot_graph.Interactions <- function(interactions, output_file = "output/graph.pn
   )
 
   most_central_authors <- get_most_central_per_community(interactions)
-  add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = most_central_authors, leg_colors = colors, leg_title = "Most central author")
+  if (length(most_central_authors) <= 20) {
+    add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = most_central_authors, leg_colors = colors, leg_title = "Most central author")
+  } else {
+    print(paste0("Graph plot: removing legend because there are too many communities (", length(most_central_authors), ")."))
+  }
 
   dev.off()
   return(output_file)

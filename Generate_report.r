@@ -3,8 +3,8 @@ library(devtools)
 load_all()
 
 # Load data
-graph_path <- "E:\\Daniel\\NetworkAnalysis\\data\\SynthsysFinal_Direct_v2.csv"
-institution <- Interactions(file_path = graph_path)
+graph_path <- "E:\\Daniel\\NetworkAnalysis\\Pure Data\\Scopus 2023.csv"
+institution <- Interactions(file_path = graph_path, author_delimiter = ";", csv_column_name = "Authors", max_authors = 50, directed = FALSE)
 
 # Initiate report
 report <- Report()
