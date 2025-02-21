@@ -3,17 +3,33 @@ library(intergraph)
 library(statnet)
 
 #' @export
-Interactions <- function(file_path, author_delimiter = ";", csv_column_name = "Author", max_authors = 50, directed = FALSE) {
+Interactions <- function(file_path,
+                         author_delimiter = ";",
+                         csv_column_name = "Author",
+                         max_authors_per_paper = 50,
+                         min_papers_per_author = 1,
+                         directed = FALSE) {
+
   if (grepl(".csv", file_path)) {
     data <- utils::read.csv(file_path, stringsAsFactor = FALSE)
     if (!csv_column_name %in% colnames(data)) {
       stop(paste0("Column name ", csv_column_name, " not found in the dataset."))
     }
-    result <- filter_papers_by_authors(data, column_name = csv_column_name, delimiter = author_delimiter, max_authors)
+    result <- filter_papers_by_authors(data,
+                                       column_name = csv_column_name,
+                                       delimiter = author_delimiter,
+                                       max_authors = max_authors_per_paper)
     data <- result[[1]]
     papers_removed <- result[[2]]
     n_papers <- nrow(data)
-    graph <- make_graph_from_df(data, delimiter = author_delimiter, column_name = csv_column_name, max_authors, directed = directed)
+    graph <- make_graph_from_df(data,
+                                delimiter = author_delimiter,
+                                column_name = csv_column_name,
+                                max_authors = max_authors_per_paper,
+                                directed = directed)
+    result <- filter_small_authors(graph, min_occurrences = min_papers_per_author)
+    graph <- result[[1]]
+    authors_removed <- result[[2]]
   } else if (grepl(".net", file_path)) {
     data <- NA
     n_papers <- NA
@@ -29,8 +45,10 @@ Interactions <- function(file_path, author_delimiter = ";", csv_column_name = "A
                        network = network,
                        data = data,
                        n_papers = n_papers,
-                       max_authors = max_authors,
+                       max_authors = max_authors_per_paper,
+                       min_papers = min_papers_per_author,
                        papers_removed = papers_removed,
+                       authors_removed = authors_removed,
                        directed = directed)
 
   # Assign the class name

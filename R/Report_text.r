@@ -9,7 +9,9 @@ This report presents an analysis of a network dataset, focusing on key structura
 #' @export
 network_type <- function(interactions) {
   interactions$weighted <- igraph::is_weighted(interactions$graph)
+  interactions <- get_cohesion(interactions)
   text <- "\n# Network Description"
+  text <- "\n## Data filtering"
   if (interactions$papers_removed > 0) {
     text <- paste0(text,
                    "\n", interactions$papers_removed, " papers were removed from the dataset due to having more than ", interactions$max_authors, " authors. The network was constructed from the remaining ", interactions$n_papers, " papers.\n")
@@ -17,6 +19,14 @@ network_type <- function(interactions) {
     text <- paste0(text,
                    "\nAll papers in the dataset had less than ", interactions$max_authors, " authors and were included in the network analysis.\n")
   }
+  if (interactions$authors_removed > 0) {
+    text <- paste0(text,
+                   "\n", interactions$authors_removed, " authors were removed from the network because they appeared in less than ", interactions$min_papers, " papers.")
+  } else {
+    text <- paste0(text,
+                   "\nAll authors in the dataset appeared in at least ", interactions$min_papers, " papers and were included in the network analysis.")
+  }
+  text <- paste0(text, "\n ", interactions$size, " authors were included in the network analysis.\n")
   text <- paste0(text, "\n## Network Type")
   if (interactions$directed == TRUE) {
     text <- paste0(text, "\n - **Directed**: The network is directed, meaning edges have a direction (e.g., A → B but not necessarily B → A). Examples include citation networks or hierarchical structures.")
