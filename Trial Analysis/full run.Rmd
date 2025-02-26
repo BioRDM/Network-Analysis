@@ -1,12 +1,14 @@
 ---
 title: "Full Run"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 date: "2025-01-30"
 ---
 ```{r}
 library(dplyr)
 
-data <- read.csv("E:\\Daniel\\NetworkAnalysis\\Pure Data\\Scopus 2023_24_v1.csv", stringsAsFactors = FALSE)
+data <- read.csv("Pure_23_24_Code.csv", stringsAsFactors = FALSE)
 
 class(data$Key)
 # Count unique papers
@@ -17,9 +19,74 @@ cat("Number of papers:", num_papers, "\n")
 ```
 ```{r}
 
+# Function to count authors based on the Source
+count_authors <- function(author_column, source_column) {
+  mapply(function(authors, source) {
+    if (source == "PUBMed") {
+      length(strsplit(authors, ",")[[1]])
+    } else {
+      length(strsplit(authors, ";")[[1]])
+    }
+  }, author_column, source_column)
+}
+
+# Apply the function to count authors
+data$num_authors <- count_authors(data$Author, data$Source)
+
+# Function to split authors conditionally
+split_authors <- function(authors, source) {
+  if (source == "PUBMed") {
+    unlist(strsplit(authors, ","))
+  } else {
+    unlist(strsplit(authors, ";"))
+  }
+}
+
+# Get all authors with conditional splitting
+all_authors <- unlist(mapply(split_authors, data$Author, data$Source))
+
+# Remove leading and trailing whitespace
+all_authors <- trimws(all_authors)
+
+# Count unique authors
+num_unique_authors <- length(unique(all_authors))
+
+# Print the result
+cat("Total number of unique authors:", num_unique_authors, "\n")
+
+# Calculate mean, median, min, max
+avg_authors <- mean(data$num_authors)
+median_authors <- median(data$num_authors)
+min_authors <- min(data$num_authors)
+max_authors <- max(data$num_authors)
+
+# Print results
+cat("Number of authors per paper:\n")
+print(data[, c("Key", "num_authors")])
+cat("\nAverage number of authors per paper:", avg_authors, "\n")
+cat("Median number of authors per paper:", median_authors, "\n")
+cat("Minimum number of authors per paper:", min_authors, "\n")
+cat("Maximum number of authors per paper:", max_authors, "\n")
+
+```
+
+
+```{r}
+
 
 # Split the authors column by ";" and count the number of authors per paper
 data$num_authors <- sapply(strsplit(data$Author, ";"), length)
+
+all_authors <- unlist(strsplit(data$Author, ";"))
+
+# Remove any leading or trailing whitespace
+all_authors <- trimws(all_authors)
+
+# Count unique authors
+num_unique_authors <- length(unique(all_authors))
+
+# Print the result
+cat("Total number of unique authors:", num_unique_authors, "\n")
 
 # Calculate the mean (average), median, min, and max number of authors per paper
 avg_authors <- mean(data$num_authors)  # Average (mean)
@@ -48,8 +115,7 @@ library(intergraph)
 ```
 
 
-##Trying to build .net
-
+#Filter Datasets by papers which exclude papers with noe author or >= x number of publication here is 2
 
 ```{r}
 # Load necessary libraries
@@ -57,32 +123,57 @@ library(dplyr)
 library(tidyverse)
 library(igraph)
 
-df_authors <- data %>%
-  mutate(Authors = str_split(Author, "; ")) %>%
-  select(Authors)
+#filter the papers
+df_filtered <- data %>%
+  filter(!is.na(Author) & Author != "") %>%
+  mutate(Authors = str_split(Author, "; ")) %>% #how the authors names are splitted by;
+  filter(map_int(Authors, length) > 0 & map_int(Authors, length) <= 50) #remove the papers with no authors or authors above 50 
 
-df_authors <- df_authors %>%
-  filter(map_int(Authors, length) > 1)
+cat("Number of papers remaining after filtering publications ]0,50]:", nrow(df_filtered), "\n")
 
-# Create edges: pairwise combinations of co-authors
-edges <- df_authors %>%
-  mutate(pairs = map(Authors, ~combn(.x, 2, simplify = FALSE))) %>%
+authors_filtered_papers <- unlist(df_filtered$Authors)
+authors_filtered_papers <- trimws(authors_filtered_papers)
+num_authors_filtered_papers <- length(unique(authors_filtered_papers))
+cat("Number of authors in papers with > 0 and <= 50 authors:", num_authors_filtered_papers, "\n")
+
+df_authors <- df_filtered %>%
+select(Authors)
+
+```
+
+#build the graph and net files (filtering the authors per publications= include more than x nummber of publication)
+
+```{r}
+#here i have filtered the authors to exclude any aithors with less than 2 publications in the datasets
+author_pairs <- df_authors %>%
+  mutate(pairs = map(Authors, ~ if (length(.x) > 1) combn(.x, 2, simplify = FALSE) else list())) %>%
   unnest(pairs) %>%
   unnest_wider(pairs, names_sep = "_") %>%
-  rename(Author1 = pairs_1, Author2 = pairs_2)
+  rename(Author1 = pairs_1, Author2 = pairs_2) %>%
+  count(Author1, Author2) %>%
+  filter(n >= 2) #you can change the filter here
+
+authors_with_2_plus_pubs <- unique(c(author_pairs$Author1, author_pairs$Author2))
+cat("Number of authors with >= 2 publications:", length(authors_with_2_plus_pubs), "\n")
+
+
+
+edges <- author_pairs %>%
+  select(Author1, Author2)
 
 # Remove duplicate edges (undirected network)
 edges <- edges %>%
   distinct(Author1, Author2) %>%
   filter(Author1 != Author2)
 
-
 # Create the graph
 institution.graph <- graph_from_data_frame(edges, directed = FALSE)
 
 # Save as Pajek (.net format)
-write.graph(institution.graph, file = "author_network.net", format = "pajek")
+write_graph(institution.graph, file = "author_network.net", format = "pajek")
 
+
+library(intergraph)
 institution.net <- asNetwork(institution.graph)  # Convert igraph to network object
 
 #you should modify here to .net or .graph and use .net for the function that require network files and .grah for the function that require igraph files
@@ -113,8 +204,8 @@ library(statnet)
 ```{r}
 class(institution.graph)
 library(igraph)
-is.directed(institution.graph)  # Check if the graph is directed
-is.weighted(institution.graph) 
+is_directed(institution.graph)  # Check if the graph is directed
+is_weighted(institution.graph) 
 
 ##What the information reflects:
 ###Is the Network Directed (is.directed(institution.graph)):
@@ -133,8 +224,6 @@ is.weighted(institution.graph)
 ```
 #3.2 Exploring network cohesion
 ```{r}
-
-#You need to convert the igraph object (institution.net) to a network object, which can be done using the intergraph package. Here's how you can modify the code:
 
 library(intergraph)
 
@@ -159,6 +248,11 @@ gden(institution.net)  # Density
 ##Values range from 0 to 1. #High Density: Close to 1, meaning most nodes are connected. This indicates a highly cohesive network. # Low Density: Close to 0, meaning most nodes are not connected. Sparse networks are common in real-world systems. 
 
 #A density of ~4.25% indicates that only a small fraction of all possible connections (edges) are present in the network. This is typical for real-world networks, which are often sparse.
+
+institution.graph <- simplify(institution.graph, remove.multiple = TRUE, remove.loops = TRUE)
+
+# Convert to network object
+institution.net <- asNetwork(institution.graph)
 
 gtrans(institution.net)  # Transitivity
 #ransitivity, or the clustering coefficient, measures the tendency of nodes to form triangles (e.g., if A → B and B → C, then A → C). It is calculated as:
@@ -279,7 +373,7 @@ is_connected(institution.graph) # graph
 ###Possibility: If you had a strongly connected network, the result would be TRUE, indicating that all nodes in the network are reachable from each other, forming a single cohesive structure.
 
 # Check if the network is weakly connected
-is.connected(institution.graph, mode = "weak") # graph
+is_connected(institution.graph, mode = "weak") # graph
 #This function checks if the network is weakly connected. A network is weakly connected if, by ignoring the direction of edges (in the case of a directed graph), there is a path between every pair of nodes. This means if we reverse all edges, is the network still connected?
 
 ###Interpretation:
@@ -300,7 +394,7 @@ geodist(institution.net) # graph
 shortest_paths <- distances(institution.graph)
 
 # Print the shortest paths matrix
-shortest_paths
+#shortest_paths
 
 ##The shortest path matrix will have values like 0 (a node to itself), values between nodes that indicate how far apart they are, and Inf for nodes that are not connected.
 
@@ -309,7 +403,7 @@ shortest_paths
 longest_shortest_path <- max(shortest_paths[shortest_paths != Inf])
 
 # Print the longest shortest path
-longest_shortest_path
+#longest_shortest_path
 
 ##The longest shortest path helps you understand the "diameter" of the network.
 
@@ -317,7 +411,7 @@ longest_shortest_path
 average_shortest_path <- mean(shortest_paths[shortest_paths != Inf])
 
 # Print the average shortest path length
-average_shortest_path
+cat("Network diameter (average shortest path):", average_shortest_path, "\n")
 #The average shortest path length tells you how efficiently information can be spread in the network.
 
 
@@ -508,25 +602,27 @@ cutpoints_result <- cutpoints(institution.net)
 
 # Print cutpoints result
 cutpoints_result
-institution.net <- read.graph("SBS_Direct_Andrew_Data.net", format="pajek")
+
+
+institution <- read.graph("author_network.net", format="pajek")
 # Visualize the network with cutpoints highlighted
 # Highlight the cutpoints in a different color
-V(institution.net)$color <- ifelse(V(institution.net) %in% cutpoints_result, "red", "lightblue") ##the nodes identified as cutpoints are colored red
+V(institution)$color <- ifelse(V(institution) %in% cutpoints_result, "red", "lightblue") ##the nodes identified as cutpoints are colored red
 
 # Adjust margins
 par(mar = c(5, 5, 5, 5))  # Increase margins (bottom, left, top, right)
 
 # Plot the graph
-plot(institution.net, vertex.label = NA, vertex.size = 10, vertex.color = V(institution.net)$color)
+plot(institution, vertex.label = NA, vertex.size = 10, vertex.color = V(institution)$color)
 
 # Save as PNG with a larger size
 png("institution_network_plot.png", width = 1200, height = 1200)  # Adjust width and height
-plot(institution.net, vertex.label = NA, vertex.size = 10, vertex.color = V(institution.net)$color)
+plot(institution, vertex.label = NA, vertex.size = 10, vertex.color = V(institution)$color)
 dev.off()  # Close the PNG device
 
 ```
 ```{r}
-institution.net <- asNetwork(institution.net)
+#institution.net <- asNetwork(institution.net)
 # Find the nodes with red color (assuming red corresponds to a particular group or centrality)
 # Example: Nodes are red if they are cutpoints
 institution_cp <- cutpoints(institution.net, mode = "graph", return.indicator = TRUE)
