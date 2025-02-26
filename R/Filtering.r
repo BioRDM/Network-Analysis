@@ -3,6 +3,22 @@ library(dplyr)
 library(tidyverse)
 
 #' @export
+filter_by_year <- function(data, year_column_name, from_year, to_year) {
+  check_year_filter(from_year, to_year)
+  col <- rlang::sym(year_column_name)
+  if (!is.null(from_year) && !is.null(to_year)) {
+    filtered_data <- data %>% dplyr::filter(!!col >= from_year & !!col <= to_year)
+  } else if (!is.null(from_year)) {
+    filtered_data <- data %>% dplyr::filter(!!col >= from_year)
+  } else if (!is.null(to_year)) {
+    filtered_data <- data %>% dplyr::filter(!!col <= to_year)
+  } else {
+    filtered_data <- data
+  }
+  return(filtered_data)
+}
+
+#' @export
 filter_papers_by_authors <- function(data, column_name = "Author", delimiter = ";", max_authors) {
   col_sym <- rlang::sym(column_name)
 

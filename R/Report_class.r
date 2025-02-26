@@ -40,12 +40,12 @@ add_figure <- function(report, plot, fig_caption) {
 }
 
 #' @export
-save.Report <- function(report, filename) {
+save_md.Report <- function(report, filename) {
   write(report$text, filename)
 }
 
-save <- function(report, filename) {
-  UseMethod("save", report)
+save_md <- function(report, filename) {
+  UseMethod("save_md", report)
 }
 
 #' @export

@@ -3,13 +3,10 @@ library(dplyr)
 library(tidyverse)
 
 #' @export
-load_graph <- function(file_path) {
-  if (!file.exists(file_path)) {
-    stop("File not found.")
-  } else {
-    graph <- igraph::read_graph(file_path, format = "pajek")
-  }
-  return(graph)
+import_csv_data <- function(file_path) {
+  check_file_format(file_path)
+  data <- utils::read.csv(file_path, stringsAsFactor = FALSE)
+  return(data)
 }
 
 #' @export

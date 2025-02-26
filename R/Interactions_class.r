@@ -3,47 +3,49 @@ library(intergraph)
 library(statnet)
 
 #' @export
-Interactions <- function(file_path,
+Interactions <- function(data,
                          author_delimiter = ";",
-                         csv_column_name = "Author",
+                         author_column_name = "Author",
+                         year_column_name = "Year",
                          max_authors_per_paper = 50,
                          min_papers_per_author = 1,
-                         directed = FALSE) {
+                         directed = FALSE,
+                         from_year = NULL,
+                         to_year = NULL) {
 
-  if (grepl(".csv", file_path)) {
-    data <- utils::read.csv(file_path, stringsAsFactor = FALSE)
-    if (!csv_column_name %in% colnames(data)) {
-      stop(paste0("Column name ", csv_column_name, " not found in the dataset."))
-    }
-    result <- filter_papers_by_authors(data,
-                                       column_name = csv_column_name,
-                                       delimiter = author_delimiter,
-                                       max_authors = max_authors_per_paper)
-    data <- result[[1]]
-    papers_removed <- result[[2]]
-    n_papers <- nrow(data)
-    graph <- make_graph_from_df(data,
-                                delimiter = author_delimiter,
-                                column_name = csv_column_name,
-                                max_authors = max_authors_per_paper,
-                                directed = directed)
-    result <- filter_small_authors(graph, min_occurrences = min_papers_per_author)
-    graph <- result[[1]]
-    authors_removed <- result[[2]]
-  } else if (grepl(".net", file_path)) {
-    data <- NA
-    n_papers <- NA
-    papers_removed <- NA
-    graph <- load_graph(file_path)
-  } else {
-    stop("File type not supported.")
+  # Filter data by year if specified
+  if (!is.null(from_year) || !is.null(to_year)) {
+    check_year_column(data, year_column_name)
+    data <- filter_by_year(data, year_column_name, from_year, to_year)
   }
+
+  # Filter papers by number of authors
+  result <- filter_papers_by_authors(data,
+                                     column_name = author_column_name,
+                                     delimiter = author_delimiter,
+                                     max_authors = max_authors_per_paper)
+  data <- result[[1]]
+  papers_removed <- result[[2]]
+  n_papers <- nrow(data)
+
+  # Create graph
+  graph <- make_graph_from_df(data,
+                              delimiter = author_delimiter,
+                              column_name = author_column_name,
+                              max_authors = max_authors_per_paper,
+                              directed = directed)
+
+  # Filter authors with few papers from graph
+  result <- filter_small_authors(graph, min_occurrences = min_papers_per_author)
+  graph <- result[[1]]
+  authors_removed <- result[[2]]
+
+  # Create network object from the graph
   network <- intergraph::asNetwork(graph)
 
-  interactions <- list(file_path = file_path,
+  interactions <- list(data = data,
                        graph = graph,
                        network = network,
-                       data = data,
                        n_papers = n_papers,
                        max_authors = max_authors_per_paper,
                        min_papers = min_papers_per_author,
@@ -59,9 +61,9 @@ Interactions <- function(file_path,
 
 #' @export
 get_cohesion.Interactions <- function(interactions) {
-  interactions$dyadcount <- network::network.dyadcount(interactions$network) # How many dyads? (n*n-1)
-  interactions$edgecount <- network::network.edgecount(interactions$network) # How many edges?
-  interactions$size <- network::network.size(interactions$network) # How large is the network?
+  interactions$dyadcount <- network::network.dyadcount(interactions$network)
+  interactions$edgecount <- network::network.edgecount(interactions$network)
+  interactions$size <- network::network.size(interactions$network)
   return(interactions)
 }
 
