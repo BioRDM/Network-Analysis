@@ -34,3 +34,31 @@ test_that("make_graph_from_df creates a graph with correct edges", {
   expect_true(igraph::are_adjacent(graph, "Author2", "Author4"))
   expect_true(igraph::are_adjacent(graph, "Author3", "Author4"))
 })
+
+test_that("tidy_authors processes authors correctly", {
+  sample_data <- data.frame(
+    Author = c("AuthorA, AuthorB", "Author C. D.; Author K.", "Author E.; Author F.", "Author G.; AuthorH"),
+    Source = c("PubMed", "PURE", "Scopus", "Other"),
+    stringsAsFactors = FALSE
+  )
+
+  # Apply the tidy_authors function
+  tidy_data <- tidy_authors(sample_data)
+
+  # Check the transformations
+  expect_equal(tidy_data$Author[1], "AuthorA;AuthorB")  # PubMed: replace "," with ";"
+  expect_equal(tidy_data$Author[2], "AuthorCD;AuthorK")  # PURE: remove non-letter characters except semicolons and white spaces
+  expect_equal(tidy_data$Author[3], "AuthorE;AuthorF")  # Scopus: remove non-letter characters except semicolons and white spaces
+  expect_equal(tidy_data$Author[4], "AuthorG;AuthorH")  # Other: remove non-letter characters except semicolons and white spaces
+
+  # Check special character conversion
+  sample_data_special <- data.frame(
+    Author = c("Élise, André", "Jürgen; Müller"),
+    Source = c("PubMed", "PURE"),
+    stringsAsFactors = FALSE
+  )
+
+  tidy_data_special <- tidy_authors(sample_data_special)
+  expect_equal(tidy_data_special$Author[1], "Elise;Andre")  # Special characters converted and white spaces removed
+  expect_equal(tidy_data_special$Author[2], "Jurgen;Muller")  # Special characters converted, non-letter characters removed except semicolons, and white spaces removed
+})

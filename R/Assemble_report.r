@@ -7,6 +7,9 @@ assemble_report <- function(config) {
   config$year_column_name <- gsub(" ", ".", config$year_column_name)
   check_author_column(data, config$author_column_name)
 
+  # Tidy the author column
+  data <- tidy_authors(data, author_column = config$author_column_name)  # Tidy the author column
+
   # Create output folders
   paths <- create_output_paths(config)
 

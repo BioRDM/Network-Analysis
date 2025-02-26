@@ -35,3 +35,23 @@ make_graph_from_df <- function(data, delimiter = ";", column_name = "Author", di
   graph <- igraph::graph_from_data_frame(edges, directed = directed)
   return(graph)
 }
+
+#' @export
+tidy_authors <- function(data, author_column = "Author", source_column = "Source") {
+  if ("Source" %in% colnames(data)) {
+    author_col <- rlang::sym(author_column)
+    source_col <- rlang::sym(source_column)
+
+    data <- data %>%
+      dplyr::mutate(!!author_col := dplyr::case_when(
+        toupper(!!source_col) == "PUBMED" ~ stringr::str_replace_all(!!author_col, ",", ";"),
+        TRUE ~ !!author_col
+      )) %>%
+      dplyr::mutate(!!author_col := stringi::stri_trans_general(!!author_col, "Latin-ASCII")) %>%  # Convert special characters
+      dplyr::mutate(!!author_col := stringr::str_replace_all(!!author_col, "[^A-Za-z;]", "")) %>%  # Remove non-letter characters except semicolons
+      dplyr::mutate(!!author_col := stringr::str_replace_all(!!author_col, "\\s+", ""))  # Remove all white spaces
+  } else {
+    print("No source column found. Skipping author tidying.")
+  }
+  return(data)
+}
