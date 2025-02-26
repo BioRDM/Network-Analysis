@@ -28,17 +28,19 @@ Interactions <- function(data,
   papers_removed <- result[[2]]
   n_papers <- nrow(data)
 
+  # Remove authors with few papers from data
+  result <- filter_infrequent_authors(data,
+                                      column_name = author_column_name,
+                                      delimiter = author_delimiter,
+                                      min_occurrences = min_papers_per_author)
+  data <- result[[1]]
+  authors_removed <- result[[2]]
+
   # Create graph
   graph <- make_graph_from_df(data,
                               delimiter = author_delimiter,
                               column_name = author_column_name,
-                              max_authors = max_authors_per_paper,
                               directed = directed)
-
-  # Filter authors with few papers from graph
-  result <- filter_small_authors(graph, min_occurrences = min_papers_per_author)
-  graph <- result[[1]]
-  authors_removed <- result[[2]]
 
   # Create network object from the graph
   network <- intergraph::asNetwork(graph)

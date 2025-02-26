@@ -8,6 +8,7 @@ plot_graph.Interactions <- function(interactions, output_file = "output/graph.pn
 
   grDevices::png(filename = output_file, width = 2500, height = 1800, res = 360)
 
+  coords <- igraph::layout_(interactions$graph, igraph::with_drl(options = list(simmer.attraction = 0)))
   graphics::par(mfrow = c(1, 1), mar = c(1, 1, 1, 10))
   graphics::plot(
     interactions$graph,
@@ -15,11 +16,11 @@ plot_graph.Interactions <- function(interactions, output_file = "output/graph.pn
     vertex.size = vertex_size,
     vertex.color = colors[comm$membership],
     mark.groups = split(1:igraph::vcount(interactions$graph), comm$membership),
-    mark.col = colors,
+    mark.col = NA,
     mark.border = NA,
     edge.width = 0.8,
     edge.color = "gray",
-    layout = igraph::layout_with_fr(interactions$graph)
+    layout = coords
   )
 
   most_central_authors <- get_most_central_per_community(interactions)

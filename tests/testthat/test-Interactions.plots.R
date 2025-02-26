@@ -12,12 +12,12 @@ interactions <- Interactions(data = sample_data)
 
 test_that("graph plot is created", {
   test_file <- paste0(folder, "graph.png")
-  plot_graph(institution, output_file = test_file)
+  plot_graph(interactions, output_file = test_file)
   expect_true(file.exists(test_file))
 })
 
 test_that("top authors plot is created", {
   test_file <- paste0(folder, "top_authors.png")
-  plot_top_authors(institution, n = 3, output_file = test_file)
+  plot_top_authors(interactions, n = 3, output_file = test_file)
   expect_true(file.exists(test_file))
 })

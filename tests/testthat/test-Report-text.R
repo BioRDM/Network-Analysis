@@ -16,31 +16,31 @@ test_that("introduction is created", {
 })
 
 test_that("network type is created", {
-  output_string <- network_type(institution)
+  output_string <- network_type(interactions)
   expect_type(output_string, "character")
   expect_true(length(output_string) > 0)
 })
 
 test_that("cohesion metrics is created", {
-  output_string <- cohesion_metrics(institution)
+  output_string <- cohesion_metrics(interactions)
   expect_type(output_string, "character")
   expect_true(length(output_string) > 0)
 })
 
 test_that("density transitivity is created", {
-  output_string <- density_transitivity(institution)
+  output_string <- density_transitivity(interactions)
   expect_type(output_string, "character")
   expect_true(length(output_string) > 0)
 })
 
 test_that("centrality metrics is created", {
-  output_string <- centrality_metrics(institution)
+  output_string <- centrality_metrics(interactions)
   expect_type(output_string, "character")
   expect_true(length(output_string) > 0)
 })
 
 test_that("community detection is created", {
-  output_string <- community_detection(institution)
+  output_string <- community_detection(interactions)
   expect_type(output_string, "character")
   expect_true(length(output_string) > 0)
 })
