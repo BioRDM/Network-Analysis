@@ -1,6 +1,14 @@
 folder <- tempdir()
-file_path <- test_path("../data/SynthSysFinal_Direct_v2.csv")
-institution <- Interactions(file_path = file_path)
+sample_data <- data.frame(
+  Author = c(
+    "Author1;Author2;Author3",
+    "Author2;Author3;Author4",
+    "Author1;Author4",
+    "Author5"
+  ),
+  stringsAsFactors = FALSE
+)
+interactions <- Interactions(data = sample_data)
 
 test_that("graph plot is created", {
   test_file <- paste0(folder, "graph.png")
@@ -10,6 +18,6 @@ test_that("graph plot is created", {
 
 test_that("top authors plot is created", {
   test_file <- paste0(folder, "top_authors.png")
-  plot_top_authors(institution, n = 10, output_file = test_file)
+  plot_top_authors(institution, n = 3, output_file = test_file)
   expect_true(file.exists(test_file))
 })

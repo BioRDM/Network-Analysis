@@ -1,6 +1,14 @@
 folder <- tempdir()
-file_path <- test_path("../data/SynthSysFinal_Direct_v2.csv")
-institution <- Interactions(file_path = file_path)
+sample_data <- data.frame(
+  Author = c(
+    "Author1;Author2;Author3",
+    "Author2;Author3;Author4",
+    "Author1;Author4",
+    "Author5"
+  ),
+  stringsAsFactors = FALSE
+)
+interactions <- Interactions(data = sample_data)
 
 test_that("report is created", {
   report <- Report()
@@ -18,7 +26,7 @@ test_that("text is added to report", {
 test_that("report is saved as md", {
   report <- Report()
   target_file <- paste0(folder, "/Report.md")
-  save(report, target_file)
+  save_md(report, target_file)
   expect_true(file.exists(target_file))
 })
 
@@ -26,7 +34,7 @@ test_that("report is exported as pdf", {
   report <- Report()
   source_report <- paste0(folder, "/Report.md")
   target_file <- paste0(folder, "/Report.pdf")
-  save(report, source_report)
+  save_md(report, source_report)
   export_pdf(report, source_report, output_file = target_file)
   expect_true(file.exists(target_file))
   expect_false(file.exists("tmp_report.md"))

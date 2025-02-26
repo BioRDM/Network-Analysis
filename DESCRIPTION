@@ -14,6 +14,7 @@ Suggests:
     dplyr,
     igraph,
     intergraph,
+    mockery,
     rlang,
     rmarkdown,
     statnet,

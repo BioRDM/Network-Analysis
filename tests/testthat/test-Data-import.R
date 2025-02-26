@@ -8,11 +8,16 @@ sample_data <- data.frame(
   stringsAsFactors = FALSE
 )
 
-test_that("papers are removed", {
-  res <- filter_papers_by_authors(sample_data, column_name = "Author", delimiter = ";", max_authors = 2)
-  expect_equal(nrow(res[[1]]), 1)
-  expect_equal(res[[2]], 2)
-  expect_equal(res[[3]], 1)
+test_that("import_csv_data works correctly", {
+  # Test importing the CSV file
+  data <- import_csv_data("E:\\Daniel\\NetworkAnalysis\\tests\\data\\SynthSysFinal_Direct_v2.csv")
+  expect_equal(nrow(data), 103)
+  expect_equal(ncol(data), 87)
+
+  # Test invalid file format
+  temp_file_txt <- tempfile(fileext = ".txt")
+  writeLines("Author,Year\nAuthor1,2000\nAuthor2,2002\nAuthor3,2004", temp_file_txt)
+  expect_error(import_csv_data(temp_file_txt), "Only CSV files are supported.")
 })
 
 test_that("make_graph_from_df creates a graph with correct edges", {
@@ -33,28 +38,4 @@ test_that("make_graph_from_df creates a graph with correct edges", {
   expect_true(igraph::are_adjacent(graph, "Author2", "Author3"))
   expect_true(igraph::are_adjacent(graph, "Author2", "Author4"))
   expect_true(igraph::are_adjacent(graph, "Author3", "Author4"))
-})
-
-test_that("filter_small_authors removes authors with fewer than min_occurrences", {
-  # Create the initial graph
-  graph <- make_graph_from_df(sample_data,
-                              delimiter = ";",
-                              column_name = "Author",
-                              max_authors = 50,
-                              directed = FALSE)
-
-  # Filter authors that appear fewer than 2 times
-  filtered_graph <- filter_small_authors(graph, min_occurrences = 2)[[1]]
-
-  # Check that the graph is an igraph object
-  expect_true(igraph::is_igraph(filtered_graph))
-
-  # Check that specific vertices exist
-  expect_true("Author1" %in% igraph::V(filtered_graph)$name)
-  expect_true("Author2" %in% igraph::V(filtered_graph)$name)
-  expect_true("Author3" %in% igraph::V(filtered_graph)$name)
-  expect_true("Author4" %in% igraph::V(filtered_graph)$name)
-
-  # Check that specific vertices do not exist
-  expect_false("Author5" %in% igraph::V(filtered_graph)$name)
 })

@@ -1,5 +1,13 @@
-file_path <- test_path("../data/SynthSysFinal_Direct_v2.csv")
-institution <- Interactions(file_path = file_path)
+sample_data <- data.frame(
+  Author = c(
+    "Author1;Author2;Author3",
+    "Author2;Author3;Author4",
+    "Author1;Author4",
+    "Author5"
+  ),
+  stringsAsFactors = FALSE
+)
+interactions <- Interactions(data = sample_data)
 
 test_that("introduction is created", {
   output_string <- introduction()
