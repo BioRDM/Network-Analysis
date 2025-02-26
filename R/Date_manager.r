@@ -1,5 +1,6 @@
 get_years_from_to <- function(data, config) {
   check_split_per_year(config$split_per_year)
+  check_year_column(data, config$year_column_name)
   year_from <- max(min(data[[config$year_column_name]]), config$from_year)
   year_to <- min(max(data[[config$year_column_name]]), config$to_year)
   if (!is.null(config$split_per_year)) {
