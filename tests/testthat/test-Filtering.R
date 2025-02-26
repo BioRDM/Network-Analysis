@@ -42,26 +42,32 @@ test_that("papers are removed", {
   expect_equal(res[[3]], 1)
 })
 
-test_that("filter_small_authors removes authors with fewer than min_occurrences", {
-  # Create the initial graph
-  graph <- make_graph_from_df(sample_data,
-                              delimiter = ";",
-                              column_name = "Author",
-                              max_authors = 50,
-                              directed = FALSE)
-
+test_that("filter_infrequent_authors removes authors with fewer than min_occurrences", {
   # Filter authors that appear fewer than 2 times
-  filtered_graph <- filter_small_authors(graph, min_occurrences = 2)[[1]]
+  filtered_data <- filter_infrequent_authors(sample_data, min_occurrences = 2)[[1]]
+  expect_equal(nrow(filtered_data), 3)
+  expect_true(all(grepl("Author1|Author2|Author3|Author4", filtered_data$Author)))
+  expect_false(any(grepl("Author5", filtered_data$Author)))
 
-  # Check that the graph is an igraph object
-  expect_true(igraph::is_igraph(filtered_graph))
+  # Filter authors that appear fewer than 3 times
+  filtered_data <- filter_infrequent_authors(sample_data, min_occurrences = 3)[[1]]
+  expect_equal(nrow(filtered_data), 0)
+  expect_false(any(grepl("Author1|Author2|Author3|Author4|Author5", filtered_data$Author)))
 
-  # Check that specific vertices exist
-  expect_true("Author1" %in% igraph::V(filtered_graph)$name)
-  expect_true("Author2" %in% igraph::V(filtered_graph)$name)
-  expect_true("Author3" %in% igraph::V(filtered_graph)$name)
-  expect_true("Author4" %in% igraph::V(filtered_graph)$name)
+  # Filter authors that appear fewer than 1 time (should return all data)
+  filtered_data <- filter_infrequent_authors(sample_data, min_occurrences = 1)[[1]]
+  expect_equal(nrow(filtered_data), 4)
+  expect_true(all(grepl("Author1|Author2|Author3|Author4|Author5", filtered_data$Author)))
+})
 
-  # Check that specific vertices do not exist
-  expect_false("Author5" %in% igraph::V(filtered_graph)$name)
+test_that("filter_infrequent_authors handles empty data", {
+  empty_data <- data.frame(Author = character(0), stringsAsFactors = FALSE)
+  filtered_data <- filter_infrequent_authors(empty_data, min_occurrences = 2)[[1]]
+  expect_equal(nrow(filtered_data), 0)
+})
+
+test_that("filter_infrequent_authors handles no authors meeting the criteria", {
+  # Filter authors that appear fewer than 10 times (none should meet this criteria)
+  filtered_data <- filter_infrequent_authors(sample_data, min_occurrences = 10)[[1]]
+  expect_equal(nrow(filtered_data), 0)
 })

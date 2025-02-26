@@ -10,7 +10,7 @@ import_csv_data <- function(file_path) {
 }
 
 #' @export
-make_graph_from_df <- function(data, delimiter = ";", column_name = "Author", max_authors = 50, directed = FALSE) {
+make_graph_from_df <- function(data, delimiter = ";", column_name = "Author", directed = FALSE) {
   col_sym <- rlang::sym(column_name)
 
   data <- (data %>%

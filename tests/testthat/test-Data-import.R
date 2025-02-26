@@ -16,7 +16,7 @@ test_that("import_csv_data works correctly", {
 })
 
 test_that("make_graph_from_df creates a graph with correct edges", {
-  graph <- make_graph_from_df(sample_data, delimiter = ";", column_name = "Author", max_authors = 50, directed = FALSE)
+  graph <- make_graph_from_df(sample_data, delimiter = ";", column_name = "Author", directed = FALSE)
 
   # Check that the graph is an igraph object
   expect_true(igraph::is_igraph(graph))

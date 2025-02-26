@@ -41,29 +41,40 @@ filter_papers_by_authors <- function(data, column_name = "Author", delimiter = "
 }
 
 #' @export
-filter_small_authors <- function(graph, min_occurrences) {
-  # Get the edge list from the graph
-  edge_list <- igraph::as_data_frame(graph, what = "edges")
+filter_infrequent_authors <- function(data, column_name = "Author", delimiter = ";", min_occurrences = 5) {
+  col_sym <- rlang::sym(column_name)
+
+  # Split the authors into a list
+  author_list <- data %>%
+    dplyr::mutate(item_list = stringr::str_split(!!col_sym, delimiter)) %>%
+    tidyr::unnest(item_list) %>%
+    dplyr::rename(author = item_list)
 
   # Count the occurrences of each author
-  author_counts <- edge_list %>%
-    tidyr::pivot_longer(cols = starts_with("from") | starts_with("to"),
-                        names_to = "type", values_to = "author") %>%
+  author_counts <- author_list %>%
     dplyr::count(author, name = "count")
 
-  # Filter authors that appear more than min_occurrences times
+  # Filter authors that appear at least min_occurrences times
   frequent_authors <- author_counts %>%
     dplyr::filter(count >= min_occurrences) %>%
     dplyr::pull(author)
 
-  # Remove vertices from the graph that are not in the frequent_authors list
-  vertices_to_remove <- setdiff(igraph::V(graph)$name, frequent_authors)
-  filtered_graph <- igraph::delete_vertices(graph, vertices_to_remove)
+  # Calculate the number of authors removed
+  all_authors <- unique(author_list$author)
+  removed_authors <- length(lubridate::setdiff(all_authors, frequent_authors))
+  kept_authors <- length(all_authors) - removed_authors
 
-  if (length(vertices_to_remove) > 0) {
-    print(paste0("Removed ", length(vertices_to_remove), " authors that appeared less than ", min_occurrences, " times."))
+  # Filter the original data to keep only frequent authors
+  filtered_data <- data %>%
+    dplyr::mutate(item_list = stringr::str_split(!!col_sym, delimiter)) %>%
+    dplyr::mutate(item_list = purrr::map(item_list, ~ .x[.x %in% frequent_authors])) %>%
+    dplyr::mutate(!!col_sym := purrr::map_chr(item_list, ~ paste(.x, collapse = delimiter))) %>%
+    dplyr::filter(!!col_sym != "")
+
+  if (removed_authors > 0) {
+    print(paste0("Removed ", removed_authors, " authors that appeared less than ", min_occurrences, " times."))
   }
-  print(paste0("Constructed network with ", igraph::vcount(filtered_graph), " authors."))
+  print(paste0("Constructed network with ", kept_authors, " authors."))
 
-  return(list(filtered_graph, length(vertices_to_remove)))
+  return(list(filtered_data, removed_authors))
 }
