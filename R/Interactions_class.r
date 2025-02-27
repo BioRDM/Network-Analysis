@@ -93,29 +93,14 @@ get_transitivity <- function(interactions) {
 
 #' @export
 get_centrality.Interactions <- function(interactions) {
-  return(igraph::degree(interactions$graph))
+  degree <- igraph::degree(interactions$graph)
+  closeness <- igraph::closeness(interactions$graph)
+  betweenness <- igraph::betweenness(interactions$graph)
+  return(list(degree = degree, closeness = closeness, betweenness = betweenness))
 }
 
 get_centrality <- function(interactions) {
   UseMethod("get_centrality", interactions)
-}
-
-#' @export
-get_betweenness.Interactions <- function(interactions) {
-  return(igraph::betweenness(interactions$graph))
-}
-
-get_betweenness <- function(interactions) {
-  UseMethod("get_betweenness", interactions)
-}
-
-#' @export
-get_closeness.Interactions <- function(interactions) {
-  return(igraph::closeness(interactions$graph))
-}
-
-get_closeness <- function(interactions) {
-  UseMethod("get_closeness", interactions)
 }
 
 #' @export
@@ -139,7 +124,7 @@ get_communities <- function(interactions) {
 #' @export
 get_most_central_per_community.Interactions <- function(interactions) {
   comm <- get_communities(interactions)
-  centrality <- get_centrality(interactions)
+  centrality <- get_centrality(interactions)$degree
   most_central_authors <- sapply(unique(comm$membership), function(group) {
     group_vertices <- which(comm$membership == group)
     group_centrality <- centrality[group_vertices]
@@ -151,4 +136,20 @@ get_most_central_per_community.Interactions <- function(interactions) {
 
 get_most_central_per_community <- function(interactions) {
   UseMethod("get_most_central_per_community", interactions)
+}
+
+#' @export
+save_centrality_data.Interactions <- function(interactions, output_file = "output/centrality_data.csv") {
+  centrality <- get_centrality(interactions)
+  output_data <- data.frame(
+    degree = centrality$degree,
+    closeness = centrality$closeness,
+    betweenness = centrality$betweenness
+  )
+  output_data <- output_data[statnet.common::order(-output_data$degree), ]
+  utils::write.csv(output_data, output_file, row.names = TRUE)
+}
+
+save_centrality_data <- function(interactions, output_file) {
+  UseMethod("save_centrality_data", interactions)
 }

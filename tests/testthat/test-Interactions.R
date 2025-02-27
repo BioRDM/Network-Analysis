@@ -36,15 +36,10 @@ test_that("transitivity works", {
 })
 
 test_that("centrality works", {
-  expect_equal(mean(get_centrality(interactions)), 3)
-})
-
-test_that("betweenness works", {
-  expect_equal(round(mean(get_betweenness(interactions)), digits = 3), 0.167)
-})
-
-test_that("closeness works", {
-  expect_equal(round(mean(get_closeness(interactions)), digits = 3), 0.292)
+  centrality <- get_centrality(interactions)
+  expect_equal(mean(centrality$degree), 3)
+  expect_equal(round(mean(centrality$betweenness), digits = 3), 0.167)
+  expect_equal(round(mean(centrality$closeness), digits = 3), 0.292)
 })
 
 test_that("diameter works", {
@@ -59,4 +54,33 @@ test_that("communities work", {
 test_that("most_central_authors works", {
   author_list <- get_most_central_per_community(interactions)
   expect_equal(author_list, "Author1")
+})
+
+test_that("save_centrality_data saves the correct centrality data to a CSV file", {
+  # Create a sample data frame
+  data <- data.frame(
+    Author = c("Author1;Author2", "Author2;Author3", "Author1;Author3"),
+    Year = c(2020, 2021, 2022)
+  )
+
+  # Create an Interactions object
+  interactions <- Interactions(data)
+
+  # Define the output file path
+  output_file <- tempfile(fileext = ".csv")
+
+  # Call the save_centrality_data function
+  save_centrality_data(interactions, output_file)
+
+  # Read the output file
+  output_data <- read.csv(output_file)
+
+  # Check that the output data has the correct columns
+  expect_true(all(c("degree", "closeness", "betweenness") %in% colnames(output_data)))
+
+  # Check that the output data is sorted by degree in descending order
+  expect_true(all(diff(output_data$degree) <= 0))
+
+  # Clean up the temporary file
+  unlink(output_file)
 })

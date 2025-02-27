@@ -3,7 +3,7 @@ plot_graph.Interactions <- function(interactions, output_file = "output/graph.pn
   comm <- get_communities(interactions)
   colors <- grDevices::rainbow(length(unique(comm$membership)), alpha = 0.4)
 
-  centrality <- get_centrality(interactions)
+  centrality <- get_centrality(interactions)$degree
   vertex_size <- 1 + (centrality / max(centrality)) * 15
 
   grDevices::png(filename = output_file, width = 2500, height = 1800, res = 360)
@@ -41,7 +41,7 @@ plot_graph <- function(interactions, output_file) {
 #' @export
 plot_top_authors.Interactions <- function(interactions, n = 10, output_file = "output/top_authors.png") {
   # Identify the top n authors based on centrality
-  centrality <- get_centrality(interactions)
+  centrality <- get_centrality(interactions)$degree
   top_authors <- order(centrality, decreasing = TRUE)[1:n]
 
   # Create a subgraph with the top n authors

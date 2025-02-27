@@ -74,6 +74,9 @@ assemble_report <- function(config) {
       fig_caption = "Direct connections between the 15 most central authors"
     )
 
+    # Save centrality data as csv
+    save_centrality_data(interactions, paste0(paths$output, "/centrality_data_", date_range, ".csv"))
+
     # Save report as markdown
     save_md(report, paste0(paths$output, "/Report_", date_range, ".md"))
 

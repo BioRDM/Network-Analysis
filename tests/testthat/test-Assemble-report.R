@@ -83,12 +83,27 @@ test_that("assemble_report works correctly", {
 
   mock_save_md <- function(report, file_path) {
     md_path <- paste0(folder, "/Report_2000-2001.md")
-    writeLines("Mock PDF Content", con = md_path)
+    writeLines("Mock MD Content", con = md_path)
   }
 
   mock_export_pdf <- function(report, input_file, output_file) {
     pdf_path <- paste0(folder, "/Report_2000-2001.pdf")
     writeLines("Mock PDF Content", con = pdf_path)
+  }
+
+  mock_save_centrality_data <- function(interactions, output_path) {
+    csv_path <- paste0(folder, "/centrality_data_2000-2001.csv")
+    writeLines("Mock CSV Content", con = csv_path)
+  }
+
+  mock_get_author_stats <- function(data, author_column_name = "Author", delimiter = ";") {
+    list(
+      sum = 3,
+      average = 2,
+      median = 2,
+      min = 1,
+      max = 3
+    )
   }
 
   # Use with_mock to override the functions
@@ -109,6 +124,8 @@ test_that("assemble_report works correctly", {
     plot_top_authors = mock_plot_top_authors,
     save_md = mock_save_md,
     export_pdf = mock_export_pdf,
+    save_centrality_data = mock_save_centrality_data,
+    get_author_stats = mock_get_author_stats,
     {
       # Run the assemble_report function with the mock config
       assemble_report(config)

@@ -101,33 +101,31 @@ density_transitivity <- function(interactions) {
 #' @export
 centrality_metrics <- function(interactions) {
   centrality <- get_centrality(interactions)
-  betweenness <- get_betweenness(interactions)
-  closeness <- get_closeness(interactions)
   diameter <- get_diameter(interactions)
   text <- paste0("\n# Node Centrality and Centralization",
                  "\n## Degree Centrality",
                  "\nDegree centrality measures the number of direct connections each node has in the network.
                  Nodes with higher degree centrality are likely to be influential or well-connected individuals/entities.",
-                 "\n\n- **The least connected node has (Min)**: ", round(min(centrality)),
-                 "\n- **The most connected node has (Max)**: ", round(max(centrality)),
-                 "\n- **On average, nodes have about (Mean)**: ", round(mean(centrality)),
-                 "\n- **Half of the nodes have more connection than (Median)**: ", round(median(centrality)),
+                 "\n\n- **The least connected node has (Min)**: ", round(min(centrality$degree)),
+                 "\n- **The most connected node has (Max)**: ", round(max(centrality$degree)),
+                 "\n- **On average, nodes have about (Mean)**: ", round(mean(centrality$degree)),
+                 "\n- **Half of the nodes have more connection than (Median)**: ", round(median(centrality$degree)),
 
                  "\n\n## Betweenness Centrality",
                  "\nBetweenness centrality quantifies how often a node acts as a bridge in the shortest paths between other nodes.
                  Nodes with high betweenness are critical connectors in the network. Removing them could significantly disrupt the flow of information.",
-                 "\n\n- **Min**: ", round(min(betweenness)),
-                 "\n- **The node with the highest value is a critical bridge in the network, controlling the flow of information. with Max**: ", round(max(betweenness)),
-                 "\n- **Mean**: ", round(mean(betweenness)),
-                 "\n- **Median**: ", round(median(betweenness)),
+                 "\n\n- **Min**: ", round(min(centrality$betweenness)),
+                 "\n- **The node with the highest value is a critical bridge in the network, controlling the flow of information. with Max**: ", round(max(centrality$betweenness)),
+                 "\n- **Mean**: ", round(mean(centrality$betweenness)),
+                 "\n- **Median**: ", round(median(centrality$betweenness)),
 
                  "\n\n## Closeness Centrality",
                  "\nCloseness centrality measures how quickly a node can access other nodes in the network.
                  Nodes with high closeness centrality are in advantageous positions to disseminate information quickly.",
-                 "\n\n- **The least central node has a (Min) avarage path to reach other nodes**: ", round(min(closeness), digits = 5),
-                 "\n- **Max**: ", round(max(closeness), digits = 5),
-                 "\n- **Mean**: ", round(mean(closeness), digits = 5),
-                 "\n- **Median**: ", round(median(closeness), digits = 5),
+                 "\n\n- **The least central node has a (Min) avarage path to reach other nodes**: ", round(min(centrality$closeness), digits = 5),
+                 "\n- **Max**: ", round(max(centrality$closeness), digits = 5),
+                 "\n- **Mean**: ", round(mean(centrality$closeness), digits = 5),
+                 "\n- **Median**: ", round(median(centrality$closeness), digits = 5),
                  "\n\n## Network diameter",
                  "\nThe network diameter is the maximum distance (in terms of edges or steps) required to connect any two nodes in the network through the shortest possible path. ",
                  "\n\n- In our network: **the diameter is ", diameter, "**, it indicates that the farthest two nodes in your co-authorship network can be linked by the shortest path of ", diameter, " steps. ",
