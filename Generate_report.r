@@ -3,10 +3,10 @@ library(devtools)
 load_all()
 
 config <- list(
-  file_path = "PURE Data/Scopus 2023_24.csv",
+  file_path = "Trial Analysis\\Pure_23_24_Code.csv",
   output_path = "output",
   author_delimiter = ";",
-  author_column_name = "Authors",
+  author_column_name = "Author",
   year_column_name = "Year",
   max_authors_per_paper = 50,
   min_papers_per_author = 5,

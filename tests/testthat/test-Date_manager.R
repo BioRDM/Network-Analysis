@@ -55,3 +55,13 @@ test_that("get_years_from_to handles all-NULL input", {
   expect_equal(result$years_from, 2000)
   expect_equal(result$years_to, 2010)
 })
+
+test_that("year parser gets years", {
+  data <- data.frame(
+    dates = c("2000-01-01", "02/03/2004", "March 5, 2006", "2008.07.09", "2010"),
+    num_dates = c(2000, 2004, 2006, 2008, 2010)
+  )
+
+  expect_equal(year_parser(data, year_column_name = "dates")$dates, data$num_dates)
+  expect_equal(year_parser(data, year_column_name = "num_dates")$num_dates, data$num_dates)
+})
