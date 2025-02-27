@@ -105,7 +105,10 @@ get_centrality <- function(interactions) {
 
 #' @export
 get_diameter.Interactions <- function(interactions) {
-  return(igraph::diameter(interactions$graph, directed = interactions$directed, weights = NULL))
+  diameter <- igraph::diameter(interactions$graph, directed = interactions$directed, weights = NULL)
+  shortest_paths <- distances(interactions$graph)
+  average_shortest_path <- mean(shortest_paths[shortest_paths != Inf])
+  return(list(diameter = diameter, average_shortest_path = average_shortest_path))
 }
 
 get_diameter <- function(interactions) {

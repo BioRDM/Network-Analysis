@@ -128,8 +128,9 @@ centrality_metrics <- function(interactions) {
                  "\n- **Median**: ", round(median(centrality$closeness), digits = 5),
                  "\n\n## Network diameter",
                  "\nThe network diameter is the maximum distance (in terms of edges or steps) required to connect any two nodes in the network through the shortest possible path. ",
-                 "\n\n- In our network: **the diameter is ", diameter, "**, it indicates that the farthest two nodes in your co-authorship network can be linked by the shortest path of ", diameter, " steps. ",
-                 "\n- In practical terms, if two authors in the network are the most distantly connected, they are separated by ", diameter, " intermediaries (co-authors).")
+                 "\n\n- In our network: **the diameter is ", diameter$diameter, "**, it indicates that the farthest two nodes in the co-authorship network can be linked in ", diameter$diameter, " steps at shortest.",
+                 "\n- In practical terms, the two most distantly connected authors in the network are separated by ", diameter$diameter, " intermediates (co-authors).",
+                 "\n- The average shortest path between two authors in the network is ", round(diameter$average_shortest_path, digits = 1), " steps.")
   return(text)
 }
 

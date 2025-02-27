@@ -43,7 +43,9 @@ test_that("centrality works", {
 })
 
 test_that("diameter works", {
-  expect_equal(get_diameter(interactions), 2)
+  diameter <- get_diameter(interactions)
+  expect_equal(diameter$diameter, 2)
+  expect_equal(diameter$average_shortest_path, 0.875)
 })
 
 test_that("communities work", {
