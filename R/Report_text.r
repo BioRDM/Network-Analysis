@@ -115,14 +115,14 @@ centrality_metrics <- function(interactions) {
                  "\nBetweenness centrality quantifies how often a node acts as a bridge in the shortest paths between other nodes.
                  Nodes with high betweenness are critical connectors in the network. Removing them could significantly disrupt the flow of information.",
                  "\n\n- **Min**: ", round(min(centrality$betweenness)),
-                 "\n- **The node with the highest value is a critical bridge in the network, controlling the flow of information. with Max**: ", round(max(centrality$betweenness)),
+                 "\n- **Max**: ", round(max(centrality$betweenness)), "(the node with the highest betweenness value is a critical bridge in the network, controlling the flow of information).",
                  "\n- **Mean**: ", round(mean(centrality$betweenness)),
                  "\n- **Median**: ", round(median(centrality$betweenness)),
 
                  "\n\n## Closeness Centrality",
                  "\nCloseness centrality measures how quickly a node can access other nodes in the network.
                  Nodes with high closeness centrality are in advantageous positions to disseminate information quickly.",
-                 "\n\n- **The least central node has a (Min) avarage path to reach other nodes**: ", round(min(centrality$closeness), digits = 5),
+                 "\n\n- **Min**: ", round(min(centrality$closeness), digits = 5), "(average path for the least central node to reach other nodes).",
                  "\n- **Max**: ", round(max(centrality$closeness), digits = 5),
                  "\n- **Mean**: ", round(mean(centrality$closeness), digits = 5),
                  "\n- **Median**: ", round(median(centrality$closeness), digits = 5),
@@ -131,6 +131,16 @@ centrality_metrics <- function(interactions) {
                  "\n\n- In our network: **the diameter is ", diameter$diameter, "**, it indicates that the farthest two nodes in the co-authorship network can be linked in ", diameter$diameter, " steps at shortest.",
                  "\n- In practical terms, the two most distantly connected authors in the network are separated by ", diameter$diameter, " intermediates (co-authors).",
                  "\n- The average shortest path between two authors in the network is ", round(diameter$average_shortest_path, digits = 1), " steps.")
+  return(text)
+}
+
+#' @export
+reachability_metrics <- function(interactions) {
+  unreachable_percentage <- get_reachability(interactions) * 100
+  text <- paste0("\n# Reachability",
+                 "\nReachability measures the proportion of pairs of nodes that are reachable in the network.",
+                 "\n\n- **Unreachable Pairs**: ", round(unreachable_percentage), "% of all possible pairs of nodes are unreachable in the network.",
+                 "\n- **Interpretation**: A high percentage of unreachable pairs may indicate a fragmented network or isolated nodes that are not connected to the main network.")
   return(text)
 }
 

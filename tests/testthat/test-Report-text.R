@@ -39,6 +39,12 @@ test_that("centrality metrics is created", {
   expect_true(length(output_string) > 0)
 })
 
+test_that("reachability metrics is created", {
+  output_string <- reachability_metrics(interactions)
+  expect_type(output_string, "character")
+  expect_true(length(output_string) > 0)
+})
+
 test_that("community detection is created", {
   output_string <- community_detection(interactions)
   expect_type(output_string, "character")

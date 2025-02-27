@@ -106,13 +106,27 @@ get_centrality <- function(interactions) {
 #' @export
 get_diameter.Interactions <- function(interactions) {
   diameter <- igraph::diameter(interactions$graph, directed = interactions$directed, weights = NULL)
-  shortest_paths <- distances(interactions$graph)
+  shortest_paths <- igraph::distances(interactions$graph)
   average_shortest_path <- mean(shortest_paths[shortest_paths != Inf])
   return(list(diameter = diameter, average_shortest_path = average_shortest_path))
 }
 
 get_diameter <- function(interactions) {
   UseMethod("get_diameter", interactions)
+}
+
+#' @export
+get_reachability.Interactions <- function(interactions) {
+  reachability_matrix <- sna::reachability(interactions$network)
+  num_nodes <- nrow(reachability_matrix)
+  total_pairs <- num_nodes * (num_nodes - 1)
+  num_unreachable_pairs <- sum(reachability_matrix == 0) - num_nodes
+  unreachable_fraction <- num_unreachable_pairs / total_pairs
+  return(unreachable_fraction)
+}
+
+get_reachability <- function(interactions) {
+  UseMethod("get_reachability", interactions)
 }
 
 #' @export

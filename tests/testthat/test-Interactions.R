@@ -48,6 +48,11 @@ test_that("diameter works", {
   expect_equal(diameter$average_shortest_path, 0.875)
 })
 
+test_that("reachability works", {
+  unreachable_fraction <- get_reachability(interactions)
+  expect_equal(round(unreachable_fraction, digits = 2), -0.33)
+})
+
 test_that("communities work", {
   comm <- get_communities(interactions)
   expect_equal(class(comm), "communities")

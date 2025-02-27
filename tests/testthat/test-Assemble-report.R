@@ -77,6 +77,10 @@ test_that("assemble_report works correctly", {
     "Centrality Metrics"
   }
 
+  mock_reachability_metrics <- function(interactions) {
+    "Reachability Metrics"
+  }
+
   mock_plot_top_authors <- function(interactions, n, output_file) {
     NULL
   }
@@ -121,6 +125,7 @@ test_that("assemble_report works correctly", {
     cohesion_metrics = mock_cohesion_metrics,
     density_transitivity = mock_density_transitivity,
     centrality_metrics = mock_centrality_metrics,
+    reachability_metrics = mock_reachability_metrics,
     plot_top_authors = mock_plot_top_authors,
     save_md = mock_save_md,
     export_pdf = mock_export_pdf,

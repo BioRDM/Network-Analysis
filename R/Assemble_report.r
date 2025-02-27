@@ -67,6 +67,9 @@ assemble_report <- function(config) {
     # Add centrality metrics
     report <- add(report, centrality_metrics(interactions))
 
+    # Add reachability metrics
+    report <- add(report, reachability_metrics(interactions))
+
     # Add top authors Figure
     report <- add_figure(
       report,
