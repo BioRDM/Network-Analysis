@@ -5,6 +5,7 @@ assemble_report <- function(config) {
   # Replace spaces with dots in column names to match R column names
   config$author_column_name <- gsub(" ", ".", config$author_column_name)
   config$year_column_name <- gsub(" ", ".", config$year_column_name)
+  # Check that the author column exists
   check_author_column(data, config$author_column_name)
 
   # Tidy the author column
@@ -25,6 +26,9 @@ assemble_report <- function(config) {
     date_range <- paste0(from_year, "-", to_year)
     print(paste0("Creating report for the period ", from_year, " to ", to_year))
 
+    # Retrieve authors statistics before filtering
+    prefilter_author_stats <- get_author_stats(data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)
+
     interactions <- Interactions(data = data,
                                  author_delimiter = config$author_delimiter,
                                  author_column_name = config$author_column_name,
@@ -35,6 +39,9 @@ assemble_report <- function(config) {
                                  from_year = from_year,
                                  to_year = to_year)
 
+    # Retrieve authors statistics after filtering
+    postfilter_author_stats <- get_author_stats(interactions$data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)
+
     # Initiate report
     report <- Report()
 
@@ -44,6 +51,9 @@ assemble_report <- function(config) {
       plot = plot_graph(interactions, output_file = paste0(paths$figures, "/graph_", date_range, ".png")),
       fig_caption = "Visualisation of the Author network"
     )
+
+    # Add filtering information
+    report <- add(report, data_filtering(interactions, prefilter_author_stats, postfilter_author_stats))
 
     # Add network type paragraph
     report <- add(report, network_type(interactions))
