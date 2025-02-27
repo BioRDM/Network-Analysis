@@ -29,12 +29,12 @@ get_years_from_to <- function(data, config) {
 #' @export
 year_parser <- function(data, year_column_name) {
   date_formats <- c("Y", "y", "ymd", "mdy", "dmy", "Ymd", "mdY", "dmY")
-  year_col <- sym(year_column_name)
+  year_col <- rlang::sym(year_column_name)
   data <- data %>%
     dplyr::mutate(!!year_col := lubridate::parse_date_time(!!year_col,
                                                            orders = date_formats,
                                                            quiet = TRUE)) %>%
-    dplyr::mutate(!!year_col := year(!!year_col)) %>%
+    dplyr::mutate(!!year_col := lubridate::year(!!year_col)) %>%
     dplyr::mutate(!!year_col := as.numeric(!!year_col))
   return(data)
 }
