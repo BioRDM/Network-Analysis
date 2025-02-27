@@ -45,6 +45,13 @@ test_that("reachability metrics is created", {
   expect_true(length(output_string) > 0)
 })
 
+test_that("cutpoint authors is created", {
+  output_string <- cutpoint_authors(interactions)
+  expect_type(output_string, "character")
+  expect_true(length(output_string) > 0)
+  expect_false(grepl("NA", output_string))
+})
+
 test_that("community detection is created", {
   output_string <- community_detection(interactions)
   expect_type(output_string, "character")

@@ -8,23 +8,20 @@ plot_graph.Interactions <- function(interactions, output_file = "output/graph.pn
 
   grDevices::png(filename = output_file, width = 2500, height = 1800, res = 360)
 
-  coords <- igraph::layout_(interactions$graph, igraph::with_drl(options = list(simmer.attraction = 0)))
   graphics::par(mfrow = c(1, 1), mar = c(1, 1, 1, 10))
   graphics::plot(
     interactions$graph,
     vertex.label = NA,
     vertex.size = vertex_size,
     vertex.color = colors[comm$membership],
-    mark.groups = split(1:igraph::vcount(interactions$graph), comm$membership),
-    mark.col = NA,
-    mark.border = NA,
     edge.width = 0.8,
     edge.color = "gray",
-    layout = coords
+    layout = interactions$layout_coords
   )
 
   most_central_authors <- get_most_central_per_community(interactions)
-  if (length(most_central_authors) <= 20) {
+  most_central_authors <- add_space_after_last_name(most_central_authors)
+  if (length(most_central_authors) <= 18) {
     add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = most_central_authors, leg_colors = colors, leg_title = "Most central author")
   } else {
     print(paste0("Graph plot: removing legend because there are too many communities (", length(most_central_authors), ")."))
@@ -36,6 +33,38 @@ plot_graph.Interactions <- function(interactions, output_file = "output/graph.pn
 
 plot_graph <- function(interactions, output_file) {
   UseMethod("plot_graph", interactions)
+}
+
+#' @export
+plot_cutpoints.Interactions <- function(interactions, output_file = "output/cutpoint_graph.png") {
+  cutpoints <- get_cutpoints(interactions)
+  vertex_colors <- ifelse(cutpoints, "red", "lightblue")
+  vertex_colors <- grDevices::adjustcolor(vertex_colors, alpha.f = 0.4)
+
+  centrality <- get_centrality(interactions)$degree
+  vertex_size <- 1 + (centrality / max(centrality)) * 15
+
+  grDevices::png(filename = output_file, width = 2500, height = 1800, res = 360)
+
+  graphics::par(mfrow = c(1, 1), mar = c(1, 1, 1, 10))
+  graphics::plot(
+    interactions$graph,
+    vertex.label = NA,
+    vertex.size = vertex_size,
+    vertex.color = vertex_colors,
+    edge.width = 0.8,
+    edge.color = "gray",
+    layout = interactions$layout_coords
+  )
+
+  add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = c("Other node", "Cutpoint"), leg_colors = c("lightblue", "red"), leg_title = "")
+
+  dev.off()
+  return(output_file)
+}
+
+plot_cutpoints <- function(interactions, output_file) {
+  UseMethod("plot_cutpoints", interactions)
 }
 
 #' @export
@@ -67,7 +96,7 @@ plot_top_authors.Interactions <- function(interactions, n = 10, output_file = "o
   graphics::plot(
     subgraph,
     layout = igraph::layout_in_circle(subgraph),
-    vertex.label = igraph::V(subgraph)$name,
+    vertex.label = add_space_after_last_name(igraph::V(subgraph)$name),
     vertex.label.dist = vertex_label_dist,
     vertex.label.degree = label_degrees,
     vertex.label.color = "black",
@@ -88,7 +117,7 @@ plot_top_authors <- function(interactions, n, output_file) {
 }
 
 #' @export
-add_graph_legend <- function(leg_x, leg_y, leg_items, leg_colors, leg_title) {
+add_graph_legend <- function(leg_x, leg_y, leg_items, leg_colors, leg_title = "") {
   par(xpd = NA)
   leg_spread <- 0.12 * length(leg_items) / 2
   leg_y <- seq(leg_y - leg_spread, leg_y + leg_spread, length.out = length(leg_items))
@@ -110,4 +139,9 @@ add_graph_legend <- function(leg_x, leg_y, leg_items, leg_colors, leg_title) {
        labels = leg_items,
        adj = c(0, 0.5),
        cex = 0.8)
+}
+
+#' @export
+get_graph_coords <- function(graph) {
+  return(igraph::layout_(graph, igraph::with_drl(options = list(simmer.attraction = 0))))
 }

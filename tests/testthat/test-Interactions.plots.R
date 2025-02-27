@@ -21,3 +21,16 @@ test_that("top authors plot is created", {
   plot_top_authors(interactions, n = 3, output_file = test_file)
   expect_true(file.exists(test_file))
 })
+
+test_that("cutpoints plot is created", {
+  test_file <- paste0(folder, "cutpoints.png")
+  plot_cutpoints(interactions, output_file = test_file)
+  expect_true(file.exists(test_file))
+})
+
+test_that("graph coordinates are returned correctly", {
+  coords <- get_graph_coords(interactions$graph)
+  expect_true(is.matrix(coords))
+  expect_equal(nrow(coords), vcount(interactions$graph))
+  expect_equal(ncol(coords), 2)
+})

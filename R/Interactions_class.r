@@ -45,6 +45,9 @@ Interactions <- function(data,
   # Create network object from the graph
   network <- intergraph::asNetwork(graph)
 
+  # Get the layout coordinates for graphs
+  layout_coords <- get_graph_coords(graph)
+
   interactions <- list(data = data,
                        graph = graph,
                        network = network,
@@ -53,7 +56,8 @@ Interactions <- function(data,
                        min_papers = min_papers_per_author,
                        papers_removed = papers_removed,
                        authors_removed = authors_removed,
-                       directed = directed)
+                       directed = directed,
+                       layout_coords = layout_coords)
 
   # Assign the class name
   class(interactions) <- "Interactions"
@@ -127,6 +131,15 @@ get_reachability.Interactions <- function(interactions) {
 
 get_reachability <- function(interactions) {
   UseMethod("get_reachability", interactions)
+}
+
+#' @export
+get_cutpoints.Interactions <- function(interactions) {
+  return(sna::cutpoints(interactions$network, mode = "graph", return.indicator = TRUE))
+}
+
+get_cutpoints <- function(interactions) {
+  UseMethod("get_cutpoints", interactions)
 }
 
 #' @export

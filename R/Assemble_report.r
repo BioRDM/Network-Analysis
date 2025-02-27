@@ -80,6 +80,16 @@ assemble_report <- function(config) {
     # Save centrality data as csv
     save_centrality_data(interactions, paste0(paths$output, "/centrality_data_", date_range, ".csv"))
 
+    # Add list of cutpoint authors
+    report <- add(report, cutpoint_authors(interactions))
+
+    # Add cutpoints Figure
+    report <- add_figure(
+      report,
+      plot = plot_cutpoints(interactions, output_file = paste0(paths$figures, "/cutpoints_", date_range, ".png")),
+      fig_caption = "Visualisation of the Author network with cutpoints highlighted"
+    )
+
     # Save report as markdown
     save_md(report, paste0(paths$output, "/Report_", date_range, ".md"))
 

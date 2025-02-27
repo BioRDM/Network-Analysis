@@ -145,6 +145,29 @@ reachability_metrics <- function(interactions) {
 }
 
 #' @export
+cutpoint_authors <- function(interactions) {
+  cutpoints <- get_cutpoints(interactions)
+  cutpoint_names <- network::network.vertex.names(interactions$network)[which(cutpoints == TRUE)]
+  if (length(cutpoint_names) == 0) {
+    text <- "\n# Cutpoint Authors"
+    text <- paste0(text,
+                   "\n## Definition",
+                   "\nCutpoint authors are nodes in the network whose removal would increase the number of connected components in the network.",
+                   "\n\n## List of Cutpoint Authors",
+                   "\nThere are no cutpoint authors in the network.")
+  } else {
+    cutpoint_names <- add_space_after_last_name(cutpoint_names)
+    cutpoint_names <- sort(cutpoint_names)
+    text <- paste0("\n# Cutpoint Authors",
+                   "\n## Definition",
+                   "\nCutpoint authors are nodes in the network whose removal would increase the number of connected components in the network.",
+                   "\n\n## List of Cutpoint Authors",
+                   "\n", paste(cutpoint_names, collapse = ", "))
+  }
+  return(text)
+}
+
+#' @export
 community_detection <- function(interactions) {
   text <- paste0("\n# Community (cohesive subgroups) Detection",
                  "\n## Strong and Weak Connectivity",
