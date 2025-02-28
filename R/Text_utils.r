@@ -1,5 +1,5 @@
 #' @export
-add_space_after_last_name <- function(name_list) {
+format_names <- function(name_list) {
   name_list <- sapply(name_list, function(name) {
     # First check if there are any uppercase letters after lowercase letters
     if (grepl("[a-z][A-Z]", name)) {

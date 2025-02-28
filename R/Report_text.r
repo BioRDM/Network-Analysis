@@ -156,7 +156,7 @@ cutpoint_authors <- function(interactions) {
                    "\n\n## List of Cutpoint Authors",
                    "\nThere are no cutpoint authors in the network.")
   } else {
-    cutpoint_names <- add_space_after_last_name(cutpoint_names)
+    cutpoint_names <- format_names(cutpoint_names)
     cutpoint_names <- sort(cutpoint_names)
     text <- paste0("\n# Cutpoint Authors",
                    "\n## Definition",

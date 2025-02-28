@@ -20,7 +20,7 @@ plot_graph.Interactions <- function(interactions, output_file = "output/graph.pn
   )
 
   most_central_authors <- get_most_central_per_community(interactions)
-  most_central_authors <- add_space_after_last_name(most_central_authors)
+  most_central_authors <- format_names(most_central_authors)
   if (length(most_central_authors) <= 18) {
     add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = most_central_authors, leg_colors = colors, leg_title = "Most central author")
   } else {
@@ -96,7 +96,7 @@ plot_top_authors.Interactions <- function(interactions, n = 10, output_file = "o
   graphics::plot(
     subgraph,
     layout = igraph::layout_in_circle(subgraph),
-    vertex.label = add_space_after_last_name(igraph::V(subgraph)$name),
+    vertex.label = format_names(igraph::V(subgraph)$name),
     vertex.label.dist = vertex_label_dist,
     vertex.label.degree = label_degrees,
     vertex.label.color = "black",
