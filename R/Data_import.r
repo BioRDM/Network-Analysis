@@ -33,6 +33,7 @@ make_graph_from_df <- function(data, delimiter = ";", column_name = "Author", di
     dplyr::count(item1, item2, name = "weight")  # Count the frequency of each pair
 
   graph <- igraph::graph_from_data_frame(edges, directed = directed)
+  print(paste0("Constructed network with ", graph %>% igraph::vcount(), " authors"))
   return(graph)
 }
 

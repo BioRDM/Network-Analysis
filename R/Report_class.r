@@ -62,6 +62,7 @@ toc: TRUE
 ---
 "
   write(header, "tmp_report.md")
+  write("\\pagebreak", "tmp_report.md", append = TRUE)
   write(report$text, "tmp_report.md", append = TRUE)
   print("Exporting PDF...")
   rmarkdown::render("tmp_report.md", output_file = output_file, output_format = "pdf_document", quiet = TRUE)

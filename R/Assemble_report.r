@@ -9,7 +9,7 @@ assemble_report <- function(config) {
   check_author_column(data, config$author_column_name)
 
   # Tidy the author column
-  data <- tidy_authors(data, author_column = config$author_column_name)  # Tidy the author column
+  data <- tidy_authors(data, author_column = config$author_column_name)  # Tidy the author names
 
   # Create output folders
   paths <- create_output_paths(config)
@@ -45,6 +45,9 @@ assemble_report <- function(config) {
     # Initiate report
     report <- Report()
 
+    # Add filtering information
+    report <- add(report, data_filtering(interactions, prefilter_author_stats, postfilter_author_stats))
+
     # Add graph Figure
     report <- add_figure(
       report,
@@ -52,9 +55,6 @@ assemble_report <- function(config) {
       fig_caption = "**Visualisation of the Co-Authorship Network Analysis**
       \nEach color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. The legend identifies the most central authors from each cluster, providing insight into key contributors within their respective groups."
     )
-
-    # Add filtering information
-    report <- add(report, data_filtering(interactions, prefilter_author_stats, postfilter_author_stats))
 
     # Add network type paragraph
     report <- add(report, network_type(interactions))
