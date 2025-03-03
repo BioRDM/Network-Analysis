@@ -9,7 +9,7 @@ assemble_report <- function(config) {
   check_author_column(data, config$author_column_name)
 
   # Tidy the author column
-  data <- tidy_authors(data, author_column = config$author_column_name)  # Tidy the author column
+  data <- tidy_authors(data, author_column = config$author_column_name)  # Tidy the author names
 
   # Create output folders
   paths <- create_output_paths(config)
@@ -45,15 +45,15 @@ assemble_report <- function(config) {
     # Initiate report
     report <- Report()
 
+    # Add filtering information
+    report <- add(report, data_filtering(interactions, prefilter_author_stats, postfilter_author_stats))
+
     # Add graph Figure
     report <- add_figure(
       report,
       plot = plot_graph(interactions, output_file = paste0(paths$figures, "/graph_", date_range, ".png")),
       fig_caption = "Visualisation of the Author network"
     )
-
-    # Add filtering information
-    report <- add(report, data_filtering(interactions, prefilter_author_stats, postfilter_author_stats))
 
     # Add network type paragraph
     report <- add(report, network_type(interactions))
