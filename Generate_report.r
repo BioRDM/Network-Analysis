@@ -32,7 +32,7 @@ config <- list(
   
   # Filter 2: Minimum number of papers an author must have to be included in the analysis.
   # - Authors with fewer than this number of papers will be excluded.
-      min_papers_per_author = 6,
+      min_papers_per_author = 5,
   
   # Specify whether the network analysis should be directed or undirected.
   # For this author network analysis, this should typically be set to FALSE (undirected).- So keep it as it is
