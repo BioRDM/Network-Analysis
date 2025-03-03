@@ -49,7 +49,8 @@ assemble_report <- function(config) {
     report <- add_figure(
       report,
       plot = plot_graph(interactions, output_file = paste0(paths$figures, "/graph_", date_range, ".png")),
-      fig_caption = "Visualisation of the Author network"
+      fig_caption = "**Visualisation of the Co-Authorship Network Analysis**
+      \nEach color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. The legend identifies the most central authors from each cluster, providing insight into key contributors within their respective groups."
     )
 
     # Add filtering information
@@ -74,7 +75,10 @@ assemble_report <- function(config) {
     report <- add_figure(
       report,
       plot = plot_top_authors(interactions, n = 15, output_file = paste0(paths$figures, "/top_authors_", date_range, ".png")),
-      fig_caption = "Direct connections between the 15 most central authors"
+      fig_caption = "**Direct connections between the 15 most central authors**
+      \nThis figure highlights the direct connections between the 15 most central authors in the network. Nodes positioned around the circle represent these top authors, and the thickness of the connecting lines indicates the strength of their collaboration (thicker lines represent stronger connections). 
+      \nA known limitation in social network analysis is reflected in cases where authors share the same last name and first initial, leading to duplicate entries being treated as a single node. This issue arises when the dataset lacks full names, resulting in potential misrepresentation of distinct authors as one."
+      
     )
 
     # Save centrality data as csv
@@ -87,7 +91,8 @@ assemble_report <- function(config) {
     report <- add_figure(
       report,
       plot = plot_cutpoints(interactions, output_file = paste0(paths$figures, "/cutpoints_", date_range, ".png")),
-      fig_caption = "Visualisation of the Author network with cutpoints highlighted"
+      fig_caption = "**Visualisation of the Author network with cutpoints highlighted**
+      \nThis figure builds on Figure 1, with the addition of highlighting cutpoint authors in red. Cutpoints are authors whose removal would fragment the network, indicating their critical role in maintaining connectivity. The names of these cutpoint authors are listed above."
     )
 
     # Save report as markdown

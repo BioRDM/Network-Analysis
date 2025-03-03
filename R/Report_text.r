@@ -84,16 +84,16 @@ density_transitivity <- function(interactions) {
                  "\nDensity measures the proportion of realised connections compared to all possible connections. It is calculated as:",
                  "\n\n`Density = Number of Edges/(Number of Possible Edges) = Actual Edges/[nx(n-1)/2]`",
                  "\n\n- **Value**: ", round(density * 100, digits = 2), "%",
-                 "\n- **Interpretation**: Values of Density range from 0 to 1.
-                 High Density: Close to 1, meaning most nodes are connected. This indicates a highly cohesive network.
-                 Low Density: Close to 0, meaning most nodes are not connected. Sparse networks are common in real-world systems.",
+                 "\n- **Interpretation**: The value of Density is in percantage.
+                 High Density: Close to 100%, meaning most nodes are connected. This indicates a highly cohesive network.
+                 Low Density: low percantage, meaning most nodes are not connected. Sparse networks are common in real-world systems.",
                  "\n\n## Transitivity",
                  "\nTransitivity, or the clustering coefficient, measures the tendency of nodes to form triangles (e.g., if A → B and B → C, then A → C). (In other words, if two nodes are connected to a common third node, they are also likely to be connected to each other). It is calculated as:",
                  "\n\n`Transitivity = Number of Triangles/Number of Connected Triplets`",
                  "\n\n- **Value**: ", round(transitivity * 100, digits = 0), "%",
-                 "\n- **Interpretation**: Values range from 0 to 1.
-                 High Transitivity: Close to 1, indicating a high level of clustering. Nodes tend to form tight-knit groups.
-                 Low Transitivity: Close to 0, indicating a lack of clustering.
+                 "\n- **Interpretation**: The value of Transitivity is in percantage.
+                 High Transitivity: Close to 100%, indicating a high level of clustering. Nodes tend to form tight-knit groups.
+                 Low Transitivity: low percantage, indicating a lack of clustering.
                  A higher Transitivity value suggests that network tend to collaborate in groups, forming cohesive communities.")
   return(text)
 }
@@ -102,7 +102,7 @@ density_transitivity <- function(interactions) {
 centrality_metrics <- function(interactions) {
   centrality <- get_centrality(interactions)
   diameter <- get_diameter(interactions)
-  text <- paste0("\n# Node Centrality and Centralization",
+  text <- paste0("\n# Node Centrality and Centralisation",
                  "\n## Degree Centrality",
                  "\nDegree centrality measures the number of direct connections each node has in the network.
                  Nodes with higher degree centrality are likely to be influential or well-connected individuals/entities.",
@@ -160,8 +160,11 @@ cutpoint_authors <- function(interactions) {
     cutpoint_names <- sort(cutpoint_names)
     text <- paste0("\n# Cutpoint Authors",
                    "\n## Definition",
-                   "\nCutpoint authors are nodes in the network whose removal would increase the number of connected components in the network.",
+                   "\nCutpoint authors, also known as 'articulation points,' are critical nodes in the co-authorship network. If a cutpoint author is removed, the network would break into disconnected components, meaning the collaboration structure would become fragmented. These authors act as bridges, connecting different clusters or groups of researchers, and their presence is essential for maintaining the overall connectivity of the network.",
+                   "\n\n## Importance",
+                   "\nIdentifying cutpoint authors helps us understand who plays a pivotal role in sustaining collaboration across the network. Their removal could disrupt communication and collaboration between research groups, highlighting their strategic importance in the network's structure.",
                    "\n\n## List of Cutpoint Authors",
+                   "\nThe following authors have been identified as cutpoints in this network:",
                    "\n", paste(cutpoint_names, collapse = ", "))
   }
   return(text)
