@@ -176,6 +176,7 @@ save_centrality_data.Interactions <- function(interactions, output_file = "outpu
     closeness = centrality$closeness,
     betweenness = centrality$betweenness
   )
+  rownames(output_data) <- format_names(igraph::V(interactions$graph)$name)
   output_data <- output_data[statnet.common::order(-output_data$degree), ]
   utils::write.csv(output_data, output_file, row.names = TRUE)
 }
