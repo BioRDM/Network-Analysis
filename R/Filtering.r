@@ -62,7 +62,6 @@ filter_infrequent_authors <- function(data, column_name = "Author", delimiter = 
   # Calculate the number of authors removed
   all_authors <- unique(author_list$author)
   removed_authors <- length(lubridate::setdiff(all_authors, frequent_authors))
-  kept_authors <- length(all_authors) - removed_authors
 
   # Filter the original data to keep only frequent authors
   filtered_data <- data %>%
@@ -71,10 +70,14 @@ filter_infrequent_authors <- function(data, column_name = "Author", delimiter = 
     dplyr::mutate(!!col_sym := purrr::map_chr(item_list, ~ paste(.x, collapse = delimiter))) %>%
     dplyr::filter(!!col_sym != "")
 
+  # Remove papers that were left with with less than 2 authors
+  filtered_data <- filtered_data %>%
+    dplyr::mutate(item_list = stringr::str_split(!!col_sym, delimiter)) %>%
+    dplyr::filter(purrr::map_int(item_list, length) >= 2)
+
   if (removed_authors > 0) {
     print(paste0("Removed ", removed_authors, " authors that appeared less than ", min_occurrences, " times."))
   }
-  print(paste0("Constructed network with ", kept_authors, " authors."))
 
   return(list(filtered_data, removed_authors))
 }
