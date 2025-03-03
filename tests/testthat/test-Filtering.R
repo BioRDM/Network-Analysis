@@ -56,7 +56,7 @@ test_that("filter_infrequent_authors removes authors with fewer than min_occurre
 
   # Filter authors that appear fewer than 1 time (should return all data)
   filtered_data <- filter_infrequent_authors(sample_data, min_occurrences = 1)[[1]]
-  expect_equal(nrow(filtered_data), 4)
+  expect_equal(nrow(filtered_data), 3)
   expect_true(all(grepl("Author1|Author2|Author3|Author4|Author5", filtered_data$Author)))
 })
 

@@ -61,7 +61,7 @@ filter_infrequent_authors <- function(data, column_name = "Author", delimiter = 
 
   # Calculate the number of authors removed
   all_authors <- unique(author_list$author)
-  removed_authors <- length(lubridate::setdiff(all_authors, frequent_authors))
+  removed_authors <- length(setdiff(all_authors, frequent_authors))
 
   # Filter the original data to keep only frequent authors
   filtered_data <- data %>%
