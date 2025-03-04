@@ -1,7 +1,3 @@
-library(rlang)
-library(dplyr)
-library(lubridate)
-
 #' @export
 get_years_from_to <- function(data, config) {
   year_col <- config$year_column_name

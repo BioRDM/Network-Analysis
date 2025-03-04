@@ -1,7 +1,3 @@
-library(rlang)
-library(dplyr)
-library(tidyverse)
-
 #' @export
 import_csv_data <- function(file_path) {
   check_file_format(file_path)

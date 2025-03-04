@@ -1,7 +1,3 @@
-library(igraph)
-library(intergraph)
-library(statnet)
-
 #' @export
 Interactions <- function(data,
                          author_delimiter = ";",
