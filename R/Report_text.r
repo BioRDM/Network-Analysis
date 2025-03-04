@@ -8,7 +8,8 @@ This report presents an analysis of a network dataset, focusing on key structura
 
 #' @export
 data_filtering <- function(interactions, prefilter_author_stats, postfilter_author_stats) {
-  text <- "\n# Data filtering"
+  text <- paste0("\n# Data filtering
+  \nThe initial dataset contained ", interactions$n_papers+interactions$papers_removed, " papers and ", prefilter_author_stats$sum, " authors from ", interactions$from_year, " to ", interactions$to_year, ".\n")
   text <- paste0(text,
                  "\n## Before filtering",
                  "\n - Average authors per paper: ", round(prefilter_author_stats$average),

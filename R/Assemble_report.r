@@ -78,7 +78,6 @@ assemble_report <- function(config) {
       fig_caption = "**Direct connections between the 15 most central authors**
       \nThis figure highlights the direct connections between the 15 most central authors in the network. Nodes positioned around the circle represent these top authors, and the thickness of the connecting lines indicates the strength of their collaboration (thicker lines represent stronger connections). 
       \nA known limitation in social network analysis is reflected in cases where authors share the same last name and first initial, leading to duplicate entries being treated as a single node (in this figures, it looks like the authors connected to themselves). This issue arises when the dataset lacks full names, resulting in potential misrepresentation of distinct authors as one."
-      
     )
 
     # Save centrality data as csv

@@ -57,6 +57,8 @@ Interactions <- function(data,
                        papers_removed = papers_removed,
                        authors_removed = authors_removed,
                        directed = directed,
+                       from_year = from_year,
+                       to_year = to_year,
                        layout_coords = layout_coords)
 
   # Assign the class name
