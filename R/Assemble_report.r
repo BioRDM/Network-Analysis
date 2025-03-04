@@ -1,4 +1,5 @@
 assemble_report <- function(config) {
+  config <- read_config(config)
 
   # Import the data
   data <- import_csv_data(config$file_path)
@@ -97,12 +98,23 @@ assemble_report <- function(config) {
     # Appendix
     report <- add(report, "\n\n# Appendix\n")
 
-    #
+    # Network plot with vertex size based on betweenness centrality
     report <- add_figure(
       report,
-      plot = plot_graph(interactions, output_file = paste0(paths$figures, "/graph_", date_range, ".png")),
-      fig_caption = "**Visualisation of the Co-Authorship Network Analysis**
-      \nEach color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. The legend identifies the most central authors from each cluster, providing insight into key contributors within their respective groups."
+      plot = plot_graph(interactions,
+                        centrality = "betweenness",
+                        output_file = paste0(paths$figures, "/graph_betweenness_", date_range, ".png")),
+      fig_caption = "**Visualisation of betweenness centrality in the Co-Authorship Network Analysis**
+      \nEach color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the betweenness centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. The legend identifies the most central authors from each cluster, providing insight into key contributors within their respective groups."
+    )
+
+    report <- add_figure(
+      report,
+      plot = plot_graph(interactions,
+                        centrality = "none",
+                        output_file = paste0(paths$figures, "/graph_no_centrality_", date_range, ".png")),
+      fig_caption = "**Visualisation of the Co-Authorship Network Analysis without centrality indicator**
+      \nEach color represents a cluster of authors who are strongly connected within the network. The legend identifies the most central authors from each cluster, providing insight into key contributors within their respective groups."
     )
 
     # Save report as markdown

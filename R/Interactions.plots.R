@@ -1,10 +1,19 @@
 #' @export
-plot_graph.Interactions <- function(interactions, output_file = "output/graph.png") {
+plot_graph.Interactions <- function(interactions, centrality = "degree", output_file = "output/graph.png") {
   comm <- interactions$communities
   colors <- grDevices::rainbow(length(unique(comm$membership)), alpha = 0.4)
 
-  centrality <- get_centrality(interactions)$degree
-  vertex_size <- 1 + (centrality / max(centrality)) * 15
+  size_metric <- switch(centrality,
+                        "degree" = get_centrality(interactions)$degree,
+                        "betweenness" = get_centrality(interactions)$betweenness,
+                        "closeness" = get_centrality(interactions)$closeness,
+                        "none" = rep(1, igraph::vcount(interactions$graph)))
+
+  if (centrality == "none") {
+    vertex_size <- 4 * size_metric
+  } else {
+    vertex_size <- 1 + (size_metric / max(size_metric)) * 15
+  }
 
   grDevices::png(filename = output_file, width = 2500, height = 1800, res = 360)
 
@@ -19,9 +28,9 @@ plot_graph.Interactions <- function(interactions, output_file = "output/graph.pn
     layout = interactions$layout_coords
   )
 
-  most_central_authors <- get_most_central_per_community(interactions)
+  most_central_authors <- get_most_central_per_community(interactions, centrality = centrality)
   most_central_authors <- format_names(most_central_authors)
-  if (length(most_central_authors) <= 18) {
+  if (length(most_central_authors) <= 20 && length(most_central_authors) > 0) {
     add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = most_central_authors, leg_colors = colors, leg_title = "Most central author")
   } else {
     print(paste0("Graph plot: removing legend because there are too many communities (", length(most_central_authors), ")."))
@@ -31,18 +40,26 @@ plot_graph.Interactions <- function(interactions, output_file = "output/graph.pn
   return(output_file)
 }
 
-plot_graph <- function(interactions, output_file) {
+plot_graph <- function(interactions, centrality, output_file) {
   UseMethod("plot_graph", interactions)
 }
 
 #' @export
-plot_cutpoints.Interactions <- function(interactions, output_file = "output/cutpoint_graph.png") {
+plot_cutpoints.Interactions <- function(interactions, centrality = "degree", output_file = "output/cutpoint_graph.png") {
   cutpoints <- get_cutpoints(interactions)
   vertex_colors <- ifelse(cutpoints, "red", "lightblue")
   vertex_colors <- grDevices::adjustcolor(vertex_colors, alpha.f = 0.4)
 
-  centrality <- get_centrality(interactions)$degree
-  vertex_size <- 1 + (centrality / max(centrality)) * 15
+  size_metric <- switch(centrality,
+                        "degree" = get_centrality(interactions)$degree,
+                        "betweenness" = get_centrality(interactions)$betweenness,
+                        "closeness" = get_centrality(interactions)$closeness,
+                        "none" = rep(1, igraph::vcount(interactions$graph)))
+  if (centrality == "none") {
+    vertex_size <- 0.1 * size_metric
+  } else {
+    vertex_size <- 1 + (size_metric / max(size_metric)) * 15
+  }
 
   grDevices::png(filename = output_file, width = 2500, height = 1800, res = 360)
 
@@ -63,7 +80,7 @@ plot_cutpoints.Interactions <- function(interactions, output_file = "output/cutp
   return(output_file)
 }
 
-plot_cutpoints <- function(interactions, output_file) {
+plot_cutpoints <- function(interactions, centrality, output_file) {
   UseMethod("plot_cutpoints", interactions)
 }
 

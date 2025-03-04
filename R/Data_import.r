@@ -56,3 +56,25 @@ tidy_authors <- function(data, author_column = "Author", source_column = "Source
   }
   return(data)
 }
+
+#' @export
+read_config <- function(config) {
+  # Define default values for the configuration options
+  default_config <- list(
+    author_column_name = "Author",
+    author_delimiter = ";",
+    year_column_name = "Year",
+    max_authors_per_paper = 50,
+    min_papers_per_author = 2,
+    directed = FALSE,
+    from_year = NULL,
+    to_year = NULL,
+    output_path = "output",
+    figures_path = "figures"
+  )
+
+  # Merge the provided config with the default config
+  config <- modifyList(default_config, config)
+
+  return(config)
+}

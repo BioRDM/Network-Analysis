@@ -153,19 +153,25 @@ get_cutpoints <- function(interactions) {
 }
 
 #' @export
-get_most_central_per_community.Interactions <- function(interactions) {
+get_most_central_per_community.Interactions <- function(interactions, centrality = "degree") {
+  if (centrality == "none") {
+    return(NULL)
+  }
   comm <- interactions$communities
-  centrality <- get_centrality(interactions)$degree
+  centrality_metric <- switch(centrality,
+                              "degree" = get_centrality(interactions)$degree,
+                              "betweenness" = get_centrality(interactions)$betweenness,
+                              "closeness" = get_centrality(interactions)$closeness)
   most_central_authors <- sapply(unique(comm$membership), function(group) {
     group_vertices <- which(comm$membership == group)
-    group_centrality <- centrality[group_vertices]
+    group_centrality <- centrality_metric[group_vertices]
     most_central_vertex <- group_vertices[which.max(group_centrality)]
     igraph::V(interactions$graph)$name[most_central_vertex]
   })
   return(most_central_authors)
 }
 
-get_most_central_per_community <- function(interactions) {
+get_most_central_per_community <- function(interactions, centrality) {
   UseMethod("get_most_central_per_community", interactions)
 }
 
