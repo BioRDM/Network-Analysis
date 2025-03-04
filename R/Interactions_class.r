@@ -48,6 +48,13 @@ Interactions <- function(data,
   # Get the layout coordinates for graphs
   layout_coords <- get_graph_coords(graph)
 
+  # Get the community clustering
+  if (!directed) {
+    communities <- get_communities(graph)
+  } else {
+    communities <- NULL
+  }
+
   interactions <- list(data = data,
                        graph = graph,
                        network = network,
@@ -59,7 +66,8 @@ Interactions <- function(data,
                        directed = directed,
                        from_year = from_year,
                        to_year = to_year,
-                       layout_coords = layout_coords)
+                       layout_coords = layout_coords,
+                       communities = communities)
 
   # Assign the class name
   class(interactions) <- "Interactions"
@@ -145,17 +153,8 @@ get_cutpoints <- function(interactions) {
 }
 
 #' @export
-get_communities.Interactions <- function(interactions) {
-  return(igraph::cluster_louvain(interactions$graph))
-}
-
-get_communities <- function(interactions) {
-  UseMethod("get_communities", interactions)
-}
-
-#' @export
 get_most_central_per_community.Interactions <- function(interactions) {
-  comm <- get_communities(interactions)
+  comm <- interactions$communities
   centrality <- get_centrality(interactions)$degree
   most_central_authors <- sapply(unique(comm$membership), function(group) {
     group_vertices <- which(comm$membership == group)
@@ -185,4 +184,9 @@ save_centrality_data.Interactions <- function(interactions, output_file = "outpu
 
 save_centrality_data <- function(interactions, output_file) {
   UseMethod("save_centrality_data", interactions)
+}
+
+#' @export
+get_communities <- function(graph) {
+  return(igraph::cluster_louvain(graph))
 }

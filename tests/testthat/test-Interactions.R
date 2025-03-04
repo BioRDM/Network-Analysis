@@ -54,7 +54,7 @@ test_that("reachability works", {
 })
 
 test_that("communities work", {
-  comm <- get_communities(interactions)
+  comm <- get_communities(interactions$graph)
   expect_equal(class(comm), "communities")
 })
 

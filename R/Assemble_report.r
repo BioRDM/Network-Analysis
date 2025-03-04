@@ -94,6 +94,17 @@ assemble_report <- function(config) {
       \nThis figure builds on Figure 1, with the addition of highlighting cutpoint authors in red. Cutpoints are authors whose removal would fragment the network, indicating their critical role in maintaining connectivity. The names of these cutpoint authors are listed above."
     )
 
+    # Appendix
+    report <- add(report, "\n\n# Appendix\n")
+
+    #
+    report <- add_figure(
+      report,
+      plot = plot_graph(interactions, output_file = paste0(paths$figures, "/graph_", date_range, ".png")),
+      fig_caption = "**Visualisation of the Co-Authorship Network Analysis**
+      \nEach color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. The legend identifies the most central authors from each cluster, providing insight into key contributors within their respective groups."
+    )
+
     # Save report as markdown
     save_md(report, paste0(paths$output, "/Report_", date_range, ".md"))
 

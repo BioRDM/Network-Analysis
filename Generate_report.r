@@ -34,10 +34,6 @@ config <- list(
   # - Authors with fewer than this number of papers will be excluded.
       min_papers_per_author = 5,
   
-  # Specify whether the network analysis should be directed or undirected.
-  # For this author network analysis, this should typically be set to FALSE (undirected).- So keep it as it is
-      directed = FALSE,
-  
   # Timeframe for the analysis: specify the start and end years.
   # - Use `NULL` to include all the years in your csv.
   # - Example: `from_year = 2019, to_year = 2022` for papers published between 2019 and 2022.

@@ -1,6 +1,6 @@
 #' @export
 plot_graph.Interactions <- function(interactions, output_file = "output/graph.png") {
-  comm <- get_communities(interactions)
+  comm <- interactions$communities
   colors <- grDevices::rainbow(length(unique(comm$membership)), alpha = 0.4)
 
   centrality <- get_centrality(interactions)$degree
@@ -77,7 +77,7 @@ plot_top_authors.Interactions <- function(interactions, n = 10, output_file = "o
   subgraph <- igraph::induced_subgraph(interactions$graph, vids = top_authors)
 
   # Get community membership for the top authors
-  comm <- get_communities(interactions)
+  comm <- interactions$communities
   top_authors_communities <- comm$membership[top_authors]
   colors <- grDevices::rainbow(length(unique(comm$membership)), alpha = 0.4)
   vertex_colors <- colors[top_authors_communities]
