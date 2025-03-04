@@ -1,6 +1,6 @@
 # CoAuthorship - Social Network Analysis
 
-Welcome to the **Social Network Analysis (SNA) repository!**   
+Welcome to the **Co-Authorship Network Analysis repository!**   
 This project focuses on *co-authorship network analysis*, a powerful method for visualising and analysing collaboration patterns among researchers. By representing authors as nodes and their co-authorships as edges, we construct a network that reveals clusters of closely connected researchers, highlights central figures, and identifies critical "cutpoint" authors whose removal would fragment the network.   
 
 This repository provides tools and code to perform social network analysis, generate insightful reports, and visualise interactions within a network.
@@ -21,6 +21,8 @@ Run the following commands in R to install the package:
 install.packages("pak")
 pak::pkg_install("BioRDM/Network-Analysis")
 ```
+
+The package uses pandoc to produce the report in pdf format. If you have not already, [install pandoc](https://pandoc.org/installing.html) on your system.
 
 #### For Linux users
 Additional dependencies might be needed. On Debian-based systems, they can be installed with this command:
