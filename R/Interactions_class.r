@@ -108,9 +108,9 @@ get_transitivity <- function(interactions) {
 #' @export
 get_centrality.Interactions <- function(interactions) {
   degree <- igraph::degree(interactions$graph)
-  closeness <- igraph::harmonic_centrality(interactions$graph)
+  harmonic <- igraph::harmonic_centrality(interactions$graph)
   betweenness <- igraph::betweenness(interactions$graph)
-  return(list(degree = degree, closeness = closeness, betweenness = betweenness))
+  return(list(degree = degree, harmonic = harmonic, betweenness = betweenness))
 }
 
 get_centrality <- function(interactions) {
@@ -161,7 +161,7 @@ get_most_central_per_community.Interactions <- function(interactions, centrality
   centrality_metric <- switch(centrality,
                               "degree" = get_centrality(interactions)$degree,
                               "betweenness" = get_centrality(interactions)$betweenness,
-                              "closeness" = get_centrality(interactions)$closeness)
+                              "harmonic" = get_centrality(interactions)$harmonic)
   most_central_authors <- sapply(unique(comm$membership), function(group) {
     group_vertices <- which(comm$membership == group)
     group_centrality <- centrality_metric[group_vertices]
@@ -180,7 +180,7 @@ save_centrality_data.Interactions <- function(interactions, output_file = "outpu
   centrality <- get_centrality(interactions)
   output_data <- data.frame(
     degree = centrality$degree,
-    closeness = centrality$closeness,
+    harmonic = centrality$harmonic,
     betweenness = centrality$betweenness
   )
   rownames(output_data) <- format_names(igraph::V(interactions$graph)$name)

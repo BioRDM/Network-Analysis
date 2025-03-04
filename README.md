@@ -44,10 +44,10 @@ If you analyse multiple CSV files, a separate subfolder (under the same name of 
       This CSV file contains centrality metrics for all authors in the co-authorship network. It includes four columns:
       - Author: Each row represents an author in the network, along with their centrality metrics.
       - Degree: The number of direct co-authorship connections an author has in the network.
-      - Closeness: Indicates how quickly an author can reach others in the network, reflecting their proximity to all other authors.
+      - Harmonic: Indicates how quickly an author can reach others in the network, reflecting their proximity to all other authors.
       - Betweenness: Measures the extent to which an author acts as a bridge between other researchers, highlighting their role in connecting different parts of the network.
       
-      Use this file to identify influential authors (high degree), those central to information flow (high closeness), and key connectors (high betweenness).
+      Use this file to identify influential authors (high degree), those central to information flow (high harmonicity), and key connectors (high betweenness).
       
       3. `figures` Folder 
       This folder contains three PNG images:

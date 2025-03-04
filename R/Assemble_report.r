@@ -108,6 +108,16 @@ assemble_report <- function(config) {
       \nEach color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the betweenness centrality of the author, a measure of how often an author appears on the shortest path between two other authors. Authors with high betweenness centrality act as bridges, controlling the flow of information between different clusters or groups. "
     )
 
+    # Network plot with vertex size based on harmonic centrality
+    report <- add_figure(
+      report,
+      plot = plot_graph(interactions,
+                        centrality = "harmonic",
+                        output_file = paste0(paths$figures, "/graph_harmonic_", date_range, ".png")),
+      fig_caption = "**Visualisation of harmonic centrality in the Co-Authorship Network Analysis**
+      \nEach color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the harmonic centrality of the author."
+    )
+
     report <- add_figure(
       report,
       plot = plot_graph(interactions,

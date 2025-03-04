@@ -120,13 +120,13 @@ centrality_metrics <- function(interactions) {
                  "\n- **Mean**: ", round(mean(centrality$betweenness)),
                  "\n- **Median**: ", round(median(centrality$betweenness)),
 
-                 "\n\n## Closeness Centrality",
-                 "\nCloseness centrality measures how close a node is to all other nodes in a network.
-                 Nodes with high closeness centrality are in advantageous positions to disseminate information quickly.",
-                 "\n\n- **Min**: ", round(min(centrality$closeness), digits = 5), "(average path for the least central node to reach other nodes).",
-                 "\n- **Max**: ", round(max(centrality$closeness), digits = 5),
-                 "\n- **Mean**: ", round(mean(centrality$closeness), digits = 5),
-                 "\n- **Median**: ", round(median(centrality$closeness), digits = 5),
+                 "\n\n## Harmonic Centrality",
+                 "\nHarmonic centrality measures how close a node is to all other nodes in a network.
+                 Nodes with high harmonic centrality are in advantageous positions to disseminate information quickly.",
+                 "\n\n- **Min**: ", round(min(centrality$harmonic), digits = 5), "(average path for the least central node to reach other nodes).",
+                 "\n- **Max**: ", round(max(centrality$harmonic), digits = 5),
+                 "\n- **Mean**: ", round(mean(centrality$harmonic), digits = 5),
+                 "\n- **Median**: ", round(median(centrality$harmonic), digits = 5),
                  "\n\n## Network diameter",
                  "\nThe network diameter is the maximum distance (in terms of edges or steps) required to connect any two nodes in the network through the shortest possible path. ",
                  "\n\n- In our network: **the diameter is ", diameter$diameter, "**, it indicates that the farthest two nodes in the co-authorship network can be linked in ", diameter$diameter, " steps at shortest.",

@@ -39,7 +39,7 @@ test_that("centrality works", {
   centrality <- get_centrality(interactions)
   expect_equal(mean(centrality$degree), 3)
   expect_equal(round(mean(centrality$betweenness), digits = 3), 0.167)
-  expect_equal(round(mean(centrality$closeness), digits = 3), 0.292)
+  expect_equal(round(mean(centrality$harmonic), digits = 3), 2.750)
 })
 
 test_that("diameter works", {
@@ -83,7 +83,7 @@ test_that("save_centrality_data saves the correct centrality data to a CSV file"
   output_data <- read.csv(output_file)
 
   # Check that the output data has the correct columns
-  expect_true(all(c("degree", "closeness", "betweenness") %in% colnames(output_data)))
+  expect_true(all(c("degree", "harmonic", "betweenness") %in% colnames(output_data)))
 
   # Check that the output data is sorted by degree in descending order
   expect_true(all(diff(output_data$degree) <= 0))
