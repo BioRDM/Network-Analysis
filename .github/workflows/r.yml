@@ -28,7 +28,7 @@ jobs:
       - uses: r-lib/actions/setup-tinytex@v2
       - uses: r-lib/actions/setup-pandoc@v2
       - name: Add PPA
-      - uses: sudo add-apt-repository ppa:cran/travis
+        run: sudo add-apt-repository ppa:cran/travis
       - name: Update apt
         run: sudo apt-get update
       - name: Install Ubuntu deps
