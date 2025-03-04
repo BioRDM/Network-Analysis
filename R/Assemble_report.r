@@ -54,7 +54,7 @@ assemble_report <- function(config) {
       report,
       plot = plot_graph(interactions, output_file = paste0(paths$figures, "/graph_", date_range, ".png")),
       fig_caption = "**Visualisation of the Co-Authorship Network Analysis**
-      \nEach color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. The legend identifies the most central authors from each cluster, providing insight into key contributors within their respective groups."
+      \nEach color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. Centrality, in this context, reflects an author's influence based on their position in the network — those with higher centrality are more interconnected and play a larger role in facilitating collaboration. The legend identifies the most central authors from each cluster, providing insight into key contributors within their respective groups."
     )
 
     # Add network type paragraph
@@ -92,7 +92,7 @@ assemble_report <- function(config) {
       report,
       plot = plot_cutpoints(interactions, output_file = paste0(paths$figures, "/cutpoints_", date_range, ".png")),
       fig_caption = "**Visualisation of the Author network with cutpoints highlighted**
-      \nThis figure builds on Figure 1, with the addition of highlighting cutpoint authors in red. Cutpoints are authors whose removal would fragment the network, indicating their critical role in maintaining connectivity. The names of these cutpoint authors are listed above."
+      \nThis figure builds on Figure 1, with the addition of highlighting cutpoint authors in red. Cutpoints are authors whose removal would fragment the network, indicating their critical role in maintaining connectivity. The node size, as in Figure 1, still reflects the centrality of each author — larger nodes indicate more central figures within the network. The names of these cutpoint authors are listed above."
     )
 
     # Appendix
@@ -105,7 +105,7 @@ assemble_report <- function(config) {
                         centrality = "betweenness",
                         output_file = paste0(paths$figures, "/graph_betweenness_", date_range, ".png")),
       fig_caption = "**Visualisation of betweenness centrality in the Co-Authorship Network Analysis**
-      \nEach color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the betweenness centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. The legend identifies the most central authors from each cluster, providing insight into key contributors within their respective groups."
+      \nEach color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the betweenness centrality of the author, a measure of how often an author appears on the shortest path between two other authors. Authors with high betweenness centrality act as bridges, controlling the flow of information between different clusters or groups. "
     )
 
     report <- add_figure(

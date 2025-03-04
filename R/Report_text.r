@@ -121,7 +121,7 @@ centrality_metrics <- function(interactions) {
                  "\n- **Median**: ", round(median(centrality$betweenness)),
 
                  "\n\n## Closeness Centrality",
-                 "\nCloseness centrality measures how quickly a node can access other nodes in the network.
+                 "\nCloseness centrality measures how close a node is to all other nodes in a network.
                  Nodes with high closeness centrality are in advantageous positions to disseminate information quickly.",
                  "\n\n- **Min**: ", round(min(centrality$closeness), digits = 5), "(average path for the least central node to reach other nodes).",
                  "\n- **Max**: ", round(max(centrality$closeness), digits = 5),

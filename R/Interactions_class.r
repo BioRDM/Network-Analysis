@@ -108,7 +108,7 @@ get_transitivity <- function(interactions) {
 #' @export
 get_centrality.Interactions <- function(interactions) {
   degree <- igraph::degree(interactions$graph)
-  closeness <- igraph::closeness(interactions$graph)
+  closeness <- igraph::harmonic_centrality(interactions$graph)
   betweenness <- igraph::betweenness(interactions$graph)
   return(list(degree = degree, closeness = closeness, betweenness = betweenness))
 }
