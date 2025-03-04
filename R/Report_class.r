@@ -1,5 +1,3 @@
-library(rmarkdown)
-
 #' @export
 Report <- function() {
   report <- list(text = introduction(), fig_counter = 1)

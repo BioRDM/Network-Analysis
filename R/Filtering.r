@@ -1,7 +1,3 @@
-library(rlang)
-library(dplyr)
-library(tidyverse)
-
 #' @export
 filter_by_year <- function(data, year_column_name, from_year, to_year) {
   check_year_filter(from_year, to_year)

@@ -6,7 +6,7 @@ plot_graph.Interactions <- function(interactions, centrality = "degree", output_
   size_metric <- switch(centrality,
                         "degree" = get_centrality(interactions)$degree,
                         "betweenness" = get_centrality(interactions)$betweenness,
-                        "closeness" = get_centrality(interactions)$closeness,
+                        "harmonic" = get_centrality(interactions)$harmonic,
                         "none" = rep(1, igraph::vcount(interactions$graph)))
 
   if (centrality == "none") {
@@ -53,7 +53,7 @@ plot_cutpoints.Interactions <- function(interactions, centrality = "degree", out
   size_metric <- switch(centrality,
                         "degree" = get_centrality(interactions)$degree,
                         "betweenness" = get_centrality(interactions)$betweenness,
-                        "closeness" = get_centrality(interactions)$closeness,
+                        "harmonic" = get_centrality(interactions)$harmonic,
                         "none" = rep(1, igraph::vcount(interactions$graph)))
   if (centrality == "none") {
     vertex_size <- 0.1 * size_metric

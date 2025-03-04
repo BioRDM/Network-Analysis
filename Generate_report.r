@@ -1,7 +1,4 @@
-library(devtools)
-
-# Load all functions from the repository
-load_all()
+library(NetworkAnalysis)
 
 # Configuration list for the analysis
 config <- list(
