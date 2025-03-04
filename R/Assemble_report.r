@@ -1,3 +1,4 @@
+#' @export
 assemble_report <- function(config) {
   config <- read_config(config)
 
