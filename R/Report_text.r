@@ -124,20 +124,21 @@ centrality_metrics <- function(interactions) {
                  "\nHarmonic centrality measures how close a node is to all other nodes in a network. Harmonic centrality is a variation of closeness centrality that works better when the graph has disconnected components.
                  A node with high harmonic centrality can reach many other nodes quickly, even if some nodes are disconnected. Low harmonic centrality means the node is either far from others or isolated.",
                  "\n\n- **Min**: ", round(min(centrality$harmonic), digits = 5), "(The most distant node, or those in isolated groups with few reachable neighbors.).",
-                 "\n- **Max**: ", round(max(centrality$harmonic), digits = 5), "(The most central node, can quickly reach others, even across disconnected parts of the graph.)"
-                 "\n- **Mean**: ", round(mean(centrality$harmonic), digits = 5), "(If the mean is high, the network is compact and well-connected. A low mean suggests the graph is fragmented, with many weakly connected groups.)"
+                 "\n- **Max**: ", round(max(centrality$harmonic), digits = 5), "(The most central node, can quickly reach others, even across disconnected parts of the graph.)",
+                 "\n- **Mean**: ", round(mean(centrality$harmonic), digits = 5), "(If the mean is high, the network is compact and well-connected. A low mean suggests the graph is fragmented, with many weakly connected groups.)",
                  "\n- **Median**: ", round(median(centrality$harmonic), digits = 5),
                  "\n\n## Network diameter",
                  "\nThe network diameter is the maximum distance (in terms of edges or steps) required to connect any two nodes in the network through the shortest possible path. ",
                  "\n\n- In our network: **the diameter is ", diameter$diameter, "**, it indicates that the farthest two nodes in the co-authorship network can be linked in ", diameter$diameter, " steps at shortest.",
                  "\n- In practical terms, the two most distantly connected authors in the network are separated by ", diameter$diameter, " intermediates (co-authors).",
                  "\n- The average shortest path between two authors in the network is ", round(diameter$average_shortest_path, digits = 1), " steps.",
-                 "\n ##Centrality Data CSV outcome:",
+                 
+                 "\n\n## Centrality Data CSV outcome:",
                  "\nAlongside this report, there is a CSV file titled centrality_data.csv. This file contains information about the centrality metrics for each author (node) in the network.",
-                 "\n **Author Name:** The name of the author (node).",
-                 "\n **Degree Centrality:** A number representing how many direct connections (edges) the author has with others. Higher values mean the author has many direct connections, suggesting popularity or influence in their immediate circle.", 
-                 "\n **Betweenness Centrality:** A measure of how often the author appears on the shortest paths between other pairs of nodes. A high betweenness score indicates the author plays a bridge role, connecting different parts of the network.",
-                 "\n **Harmonic Centrality:** A centrality measure that accounts for the distance to all other reachable nodes, giving partial credit to distant nodes. (Reflects how close an author is to all others in the network, even accounting for unreachable nodes.) Higher scores suggest the author can efficiently interact with many others, even in fragmented networks.",
+                 "\n\n- **Author Name:** The name of the author (node).",
+                 "\n- **Degree Centrality:** A number representing how many direct connections (edges) the author has with others. Higher values mean the author has many direct connections, suggesting popularity or influence in their immediate circle.", 
+                 "\n- **Betweenness Centrality:** A measure of how often the author appears on the shortest paths between other pairs of nodes. A high betweenness score indicates the author plays a bridge role, connecting different parts of the network.",
+                 "\n- **Harmonic Centrality:** A centrality measure that accounts for the distance to all other reachable nodes, giving partial credit to distant nodes. (Reflects how close an author is to all others in the network, even accounting for unreachable nodes.) Higher scores suggest the author can efficiently interact with many others, even in fragmented networks."
                  )
   return(text)
 }
