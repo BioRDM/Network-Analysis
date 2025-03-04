@@ -58,6 +58,40 @@ If you analyse multiple CSV files, a separate subfolder (under the same name of 
 ---
 ## Repository Contents
 
+|---------------- .github             
+            (Automatically generated folder used for GitHub workflows, such as building PDF files.)            
+|---------------- Pure Data             
+            (Contains datasets extracted from the University of Edinburgh's Research Explorer (Pure))             
+|---------------- R            
+            (Includes all R functions used to generate the analysis outcomes and build the PDF report.)                 
+|---------------- Trial Analysis          
+            (Contains datasets from the UOE Explorer (Pure) and RMarkdown files used to develop the code.)             
+|---------------- assets         
+            (Stores additional resources, such as the .tiff file for the font type used in the PDF report.)              
+|---------------- data           
+            (Contains datasets from the Centre for Engineering Biology at the University of Edinburgh.)            
+|---------------- tests  
+            (Includes trial datasets and code used during the development and testing of the repository.)  
+|------- .Rbuildignore  
+            (Specifies files and folders to ignore when building the R package.)       
+|-------.gitignore     
+            (Lists files and folders to exclude from Git version control.)        
+|-------.lintr     
+            (Configuration file for linting R code to ensure style and syntax consistency.)            
+|-------DESCRIPTION     
+            (Metadata file for the R package, including dependencies and project details.)             
+|-------Generate_report.r     
+            (The main R script for generating the PDF report and other analysis outputs.)           
+|-------LICENSE     
+            (The license file for the repository (plain text format).)      
+|-------LICENSE.md       
+            (The license file in markdown format.)       
+|-------NAMESPACE         
+            (Defines the namespace for the R package, including exported functions.)   
+|-------NetworkAnalysis.Rproj       
+            (RStudio project file for managing the repository.)   
+|-------README.md      
+            (This file, providing an overview of the repository and instructions for use.)      
 
 ---
 
