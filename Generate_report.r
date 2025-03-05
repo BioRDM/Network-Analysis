@@ -1,5 +1,4 @@
 library(devtools)
-
 load_all()
 
 # Configuration list for the analysis

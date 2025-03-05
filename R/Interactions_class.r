@@ -15,6 +15,9 @@ Interactions <- function(data,
     data <- filter_by_year(data, year_column_name, from_year, to_year)
   }
 
+  # Initial number of papers before author filtering
+  initial_papers <- nrow(data)
+
   # Filter papers by number of authors
   result <- filter_papers_by_authors(data,
                                      column_name = author_column_name,
@@ -57,6 +60,7 @@ Interactions <- function(data,
                        year_column_name = year_column_name,
                        graph = graph,
                        network = network,
+                       initial_papers = initial_papers,
                        n_papers = n_papers,
                        max_authors = max_authors_per_paper,
                        min_papers = min_papers_per_author,
@@ -75,11 +79,43 @@ Interactions <- function(data,
 }
 
 #' @export
-get_cohesion.Interactions <- function(interactions) {
-  interactions$dyadcount <- network::network.dyadcount(interactions$network)
-  interactions$edgecount <- network::network.edgecount(interactions$network)
-  interactions$size <- network::network.size(interactions$network)
+generate_network_metrics.Interactions <- function(interactions) {
+  interactions$weighted <- igraph::is_weighted(interactions$graph)
+  interactions$cohesion <- get_cohesion(interactions)
+  interactions$density <- get_density(interactions)
+  interactions$transitivity <- get_transitivity(interactions)
+  interactions$centrality <- get_centrality(interactions)
+  interactions$diameter <- get_diameter(interactions)
+  interactions$unreachable_percentage <- get_reachability(interactions) * 100
+  interactions$cutpoints <- get_cutpoints(interactions)
   return(interactions)
+}
+
+generate_network_metrics <- function(interactions) {
+  UseMethod("generate_network_metrics", interactions)
+}
+
+#' @export
+generate_figures.Interactions <- function(interactions, paths, date_range) {
+  fig1 <- plot_graph(interactions, output_file = paste0(paths$figures, "/graph_", date_range, ".png"))
+  fig2 <- plot_top_authors(interactions, n = 15, output_file = paste0(paths$figures, "/top_authors_", date_range, ".png"))
+  fig3 <- plot_cutpoints(interactions, output_file = paste0(paths$figures, "/cutpoints_", date_range, ".png"))
+  fig4 <- plot_graph(interactions, centrality = "betweenness", output_file = paste0(paths$figures, "/graph_betweenness_", date_range, ".png"))
+  fig5 <- plot_graph(interactions, centrality = "harmonic", output_file = paste0(paths$figures, "/graph_harmonic_", date_range, ".png"))
+  fig6 <- plot_graph(interactions, centrality = "none", output_file = paste0(paths$figures, "/graph_no_centrality_", date_range, ".png"))
+  return(list(fig1 = fig1, fig2 = fig2, fig3 = fig3, fig4 = fig4, fig5 = fig5, fig6 = fig6))
+}
+
+generate_figures <- function(interactions, paths, date_range) {
+  UseMethod("generate_figures", interactions)
+}
+
+#' @export
+get_cohesion.Interactions <- function(interactions) {
+  dyadcount <- network::network.dyadcount(interactions$network)
+  edgecount <- network::network.edgecount(interactions$network)
+  size <- network::network.size(interactions$network)
+  return(list(dyadcount = dyadcount, edgecount = edgecount, size = size))
 }
 
 get_cohesion <- function(interactions) {
@@ -144,7 +180,11 @@ get_reachability <- function(interactions) {
 
 #' @export
 get_cutpoints.Interactions <- function(interactions) {
-  return(sna::cutpoints(interactions$network, mode = "graph", return.indicator = TRUE))
+  cutpoints <- sna::cutpoints(interactions$network, mode = "graph", return.indicator = TRUE)
+  cutpoint_names <- network::network.vertex.names(interactions$network)[which(cutpoints == TRUE)]
+  cutpoint_names <- format_names(cutpoint_names)
+  cutpoint_names <- sort(cutpoint_names)
+  return(cutpoint_names)
 }
 
 get_cutpoints <- function(interactions) {

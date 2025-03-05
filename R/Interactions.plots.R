@@ -48,7 +48,7 @@ plot_graph <- function(interactions, centrality, output_file) {
 
 #' @export
 plot_cutpoints.Interactions <- function(interactions, centrality = "degree", output_file = "output/cutpoint_graph.png") {
-  cutpoints <- get_cutpoints(interactions)
+  cutpoints <- sna::cutpoints(interactions$network, mode = "graph", return.indicator = TRUE)
   vertex_colors <- ifelse(cutpoints, "red", "lightblue")
   vertex_colors <- grDevices::adjustcolor(vertex_colors, alpha.f = 0.4)
 

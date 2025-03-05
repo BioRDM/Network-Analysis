@@ -15,7 +15,6 @@ get_author_stats <- function(data, author_column_name = "Author", delimiter = ";
   all_authors <- unique(unlist(strsplit(paste(author_column, collapse = delimiter), delimiter)))
   unique_author_count <- length(all_authors)
 
-  # Return the statistics as a list
   return(list(
     sum = unique_author_count,
     average = avg_authors,
@@ -48,7 +47,7 @@ get_summary_stats <- function(interactions) {
     "Mean_betweenness_centrality" = round(mean(centrality$betweenness), digits = 3),
     "Mean_harmonic_centrality" = round(mean(centrality$harmonic), digits = 3),
     "Mean_shortest_path" = diameter$average_shortest_path,
-    "Number_of_cutpoints" = sum(get_cutpoints(interactions))
+    "Number_of_cutpoints" = length(get_cutpoints(interactions))
   )
   return(summary_table)
 }
