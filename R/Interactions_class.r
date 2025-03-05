@@ -52,6 +52,9 @@ Interactions <- function(data,
   }
 
   interactions <- list(data = data,
+                       author_column_name = author_column_name,
+                       author_delimiter = author_delimiter,
+                       year_column_name = year_column_name,
                        graph = graph,
                        network = network,
                        n_papers = n_papers,
