@@ -1,54 +1,39 @@
-test_that("create_output_paths works correctly", {
-  # Create a temporary directory for testing
-  temp_dir <- tempdir()
-  config <- list(
-    output_path = temp_dir,
-    file_path = "path/to/mock_data.csv"
-  )
+config <- list(
+  file_path = "data/input_file.csv",
+  output_path = tempdir()
+)
 
-  # Run the function
-  paths <- create_output_paths(config)
+test_that("Paths function works correctly", {
+  paths <- Paths(config)
 
-  # Check if the output paths are correct
-  expected_output_path <- file.path(temp_dir, tools::file_path_sans_ext(basename(config$file_path)))
-  expected_figures_path <- file.path(expected_output_path, "figures")
-
-  expect_equal(paths$output, expected_output_path)
-  expect_equal(paths$figures, expected_figures_path)
-
-  # Check if the directories were created
-  expect_true(dir.exists(expected_output_path))
-  expect_true(dir.exists(expected_figures_path))
-
-  # Clean up
-  unlink(expected_output_path, recursive = TRUE)
+  expect_equal(paths$input_file, config$file_path)
+  expect_equal(paths$output, paste0(config$output_path, "/input_file"))
+  expect_equal(paths$figures, paste0(config$output_path, "/input_file/figures"))
+  expect_equal(paths$summary_table, paste0(config$output_path, "/input_file/Summary_statistics.csv"))
+  expect_s3_class(paths, "Paths")
 })
 
-test_that("create_output_paths handles existing directories", {
-  # Create a temporary directory for testing
-  temp_dir <- tempdir()
-  config <- list(
-    output_path = temp_dir,
-    file_path = "path/to/mock_data.csv"
-  )
-
-  # Create the directories beforehand
-  expected_output_path <- file.path(temp_dir, tools::file_path_sans_ext(basename(config$file_path)))
-  expected_figures_path <- file.path(expected_output_path, "figures")
-  dir.create(expected_output_path)
-  dir.create(expected_figures_path)
-
-  # Run the function
+test_that("create_output_paths function works correctly", {
   paths <- create_output_paths(config)
 
-  # Check if the output paths are correct
-  expect_equal(paths$output, expected_output_path)
-  expect_equal(paths$figures, expected_figures_path)
+  expect_true(dir.exists(paths$output))
+  expect_true(dir.exists(paths$figures))
+})
 
-  # Check if the directories still exist
-  expect_true(dir.exists(expected_output_path))
-  expect_true(dir.exists(expected_figures_path))
+test_that("get_output_path function works correctly", {
+  output_path <- get_output_path(config)
 
-  # Clean up
-  unlink(expected_output_path, recursive = TRUE)
+  expect_equal(output_path, paste0(config$output_path, "/input_file"))
+})
+
+test_that("get_figures_path function works correctly", {
+  figures_path <- get_figures_path(config)
+
+  expect_equal(figures_path, paste0(config$output_path, "/input_file/figures"))
+})
+
+test_that("get_summary_table_path function works correctly", {
+  summary_table_path <- get_summary_table_path(config)
+
+  expect_equal(summary_table_path, paste0(config$output_path, "/input_file/Summary_statistics.csv"))
 })

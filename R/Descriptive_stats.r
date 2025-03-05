@@ -24,3 +24,31 @@ get_author_stats <- function(data, author_column_name = "Author", delimiter = ";
     max = max_authors
   ))
 }
+
+#' @export
+get_summary_stats <- function(interactions) {
+  # Calculate summary statistics
+  author_stats <- get_author_stats(interactions$data, author_column_name = interactions$author_column_name, delimiter = interactions$author_delimiter)
+  centrality <- get_centrality(interactions)
+  diameter <- get_diameter(interactions)
+
+  # Create a summary table
+  summary_table <- data.frame(
+    "Start_year" = interactions$from_year,
+    "End_year" = interactions$to_year,
+    "Total_Papers" = interactions$n_papers,
+    "Total_Authors" = author_stats$sum,
+    "Average_Authors_per_Paper" = author_stats$average,
+    "Median_Authors_per_Paper" = author_stats$median,
+    "Min_Authors_per_Paper" = author_stats$min,
+    "Max_Authors_per_Paper" = author_stats$max,
+    "Density" = get_density(interactions),
+    "Transitivity" = get_transitivity(interactions),
+    "Mean_degree_centrality" = round(mean(centrality$degree), digits = 3),
+    "Mean_betweenness_centrality" = round(mean(centrality$betweenness), digits = 3),
+    "Mean_harmonic_centrality" = round(mean(centrality$harmonic), digits = 3),
+    "Mean_shortest_path" = diameter$average_shortest_path,
+    "Number_of_cutpoints" = sum(get_cutpoints(interactions))
+  )
+  return(summary_table)
+}

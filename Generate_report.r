@@ -42,7 +42,7 @@ config <- list(
   # Split the analysis into smaller time intervals (e.g., every 2, 3, or 5 years).
   # - Use `NULL` to avoid splitting the analysis.
   # - Example: `split_per_year = 2` to generate a separate report every 2 years.
-      split_per_year = NULL
+      split_per_year = 1
 )
 
 # Run the analysis and generate the report using the provided configuration.

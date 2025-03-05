@@ -11,7 +11,7 @@ test_that("assemble_report works correctly", {
     max_authors_per_paper = 5,
     min_papers_per_author = 1,
     directed = FALSE,
-    output_path = "path/to/output",
+    output_path = folder,
     split_per_year = 2
   )
 
@@ -27,10 +27,12 @@ test_that("assemble_report works correctly", {
     TRUE
   }
 
-  mock_create_output_paths <- function(config) {
+  mock_Paths <- function(config) {
     list(
-      figures = "path/to/figures",
-      output = "path/to/output"
+      input_file = config$file_path,
+      output = config$output_path,
+      figures = paste0(config$output_path, "/figures"),
+      summary_table = paste0(config$output_path, "/Summary_statistics.csv")
     )
   }
 
@@ -110,11 +112,22 @@ test_that("assemble_report works correctly", {
     )
   }
 
+  mock_get_summary_stats <- function(interactions) {
+    data.frame(
+      Statistic = c("A", "B"),
+      Value = c(1, 1)
+    )
+  }
+
+  mockery::stub(write.table, "write.table", function(summary_stats, file, sep, row.names, col.names, append) {
+    writeLines("Mock Summary Stats Content", con = file)
+  })
+
   # Use with_mock to override the functions
   testthat::with_mocked_bindings(
     import_csv_data = mock_import_csv_data,
     check_author_column = mock_check_author_column,
-    create_output_paths = mock_create_output_paths,
+    Paths = mock_Paths,
     get_years_from_to = mock_get_years_from_to,
     Interactions = mock_Interactions,
     Report = mock_Report,
@@ -131,6 +144,7 @@ test_that("assemble_report works correctly", {
     export_pdf = mock_export_pdf,
     save_centrality_data = mock_save_centrality_data,
     get_author_stats = mock_get_author_stats,
+    get_summary_stats = mock_get_summary_stats,
     {
       # Run the assemble_report function with the mock config
       assemble_report(config)
@@ -138,6 +152,7 @@ test_that("assemble_report works correctly", {
       # Add assertions to check the expected outcomes
       expect_true(file.exists(paste0(folder, "/Report_2000-2001.md")))
       expect_true(file.exists(paste0(folder, "/Report_2000-2001.pdf")))
+      expect_true(file.exists(paste0(config$output_path, "/Summary_statistics.csv")))
     }
   )
 })

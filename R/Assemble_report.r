@@ -2,8 +2,11 @@
 assemble_report <- function(config) {
   config <- read_config(config)
 
+  # Create output folders
+  paths <- Paths(config)
+
   # Import the data
-  data <- import_csv_data(config$file_path)
+  data <- import_csv_data(paths$input_file)
   # Replace spaces with dots in column names to match R column names
   config$author_column_name <- gsub(" ", ".", config$author_column_name)
   config$year_column_name <- gsub(" ", ".", config$year_column_name)
@@ -12,9 +15,6 @@ assemble_report <- function(config) {
 
   # Tidy the author column
   data <- tidy_authors(data, author_column = config$author_column_name)  # Tidy the author names
-
-  # Create output folders
-  paths <- create_output_paths(config)
 
   # Calculate the year intervals for the reports
   years <- get_years_from_to(data, config)
@@ -133,6 +133,17 @@ assemble_report <- function(config) {
 
     # Convert the report to pdf
     export_pdf(report, "Report.md", output_file = paste0(paths$output, "/Report_", date_range, ".pdf"))
+
+    # Generate the summary statistics and save as csv
+    summary_stats <- get_summary_stats(interactions)
+    if (i == 1) {
+      col_names <- TRUE
+      append <- FALSE
+    } else {
+      col_names <- FALSE
+      append <- TRUE
+    }
+    write.table(summary_stats, paths$summary_table, sep = ",", row.names = FALSE, col.names = col_names, append = append)
   }
 
 }
