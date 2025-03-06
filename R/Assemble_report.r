@@ -1,8 +1,6 @@
-report_var <<- list() # Global variable to store report variables
-summary_var <<- list() # Global variable to store summary variables
-
 #' @export
 assemble_report <- function(config) {
+  summary_var <<- list() # Global variable to store summary variables
   config <- read_config(config)
 
   # Create output folders
