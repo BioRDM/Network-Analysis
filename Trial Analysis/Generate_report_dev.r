@@ -6,7 +6,7 @@ config <- list(
   #Copy and Paste the file path
   # File path to the CSV file containing the data.
   # - Use double backslashes (\\) or forward slashes (/) in the file path.
-      file_path = "Trial Analysis\\Pure_23_24_Code.csv", 
+      file_path = "Pure Data\\Scopus 2023_Code.csv", 
       
   # Output directory where the results (PDFs, figures, CSV files, etc.) will be saved.
   # - A folder named "output" will be created if it doesn't already exist.
@@ -30,7 +30,7 @@ config <- list(
   
   # Filter 2: Minimum number of papers an author must have to be included in the analysis.
   # - Authors with fewer than this number of papers will be excluded.
-      min_papers_per_author = 5,
+      min_papers_per_author = 0,
   
   # Timeframe for the analysis: specify the start and end years.
   # - Use `NULL` to include all the years in your csv.
