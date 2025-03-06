@@ -9,6 +9,8 @@ fontsize: 12pt
 toc: TRUE
 ---
 
+\pagebreak
+
 # Introduction
 This report presents the results of a Co-Authorship Social Network Analysis (SNA), focusing on the collaborative relationships among researchers. By constructing a co-authorship network — where nodes represent authors and edges signify co-authored publications — this analysis reveals the structure of academic collaboration within the dataset. 
 
@@ -164,9 +166,16 @@ Identifying cutpoint authors helps us understand who plays a pivotal role in sus
 ## List of cutpoint authors
 ```{r, echo=FALSE}
 if (length(report_var$interactions$cutpoints) == 0) {
-  cutpoint_list <- "There are no cutpoint authors in the network."
+  cutpoint_text <- "There are no cutpoint authors in the network."
 } else {
-  cutpoint_list <- paste0("The following authors have been identified as cutpoints in this network: ", paste(report_var$interactions$cutpoints, collapse = ", "), ".")
+  cutpoint_text <- paste0("The following authors have been identified as cutpoints in this network:")
+  cutpoint_table <- matrix(report_var$interactions$cutpoints, ncol = 4, byrow = TRUE)
+}
+```
+`r cutpoint_text`
+```{r, echo=FALSE}
+if (length(report_var$interactions$cutpoints) > 0) {
+  knitr::kable(cutpoint_table, col.names = c("", "", "", ""), format = "markdown")
 }
 ```
 
