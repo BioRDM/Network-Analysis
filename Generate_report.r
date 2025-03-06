@@ -1,4 +1,5 @@
 library(NetworkAnalysis)
+library(tidyverse)
 
 # Configuration list for the analysis
 config <- list(
