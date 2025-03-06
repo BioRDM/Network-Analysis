@@ -1,5 +1,6 @@
 config <- list(
   file_path = "data/input_file.csv",
+  input_file = "input_file",
   output_path = tempdir()
 )
 
@@ -9,7 +10,7 @@ test_that("Paths function works correctly", {
   expect_equal(paths$input_file, config$file_path)
   expect_equal(paths$output, paste0(config$output_path, "/input_file"))
   expect_equal(paths$figures, paste0(config$output_path, "/input_file/figures"))
-  expect_equal(paths$summary_table, paste0(config$output_path, "/input_file/Summary_statistics.csv"))
+  expect_equal(paths$summary_table, paste0(config$output_path, "/input_file/data/Summary_statistics.csv"))
   expect_s3_class(paths, "Paths")
 })
 
@@ -35,5 +36,17 @@ test_that("get_figures_path function works correctly", {
 test_that("get_summary_table_path function works correctly", {
   summary_table_path <- get_summary_table_path(config)
 
-  expect_equal(summary_table_path, paste0(config$output_path, "/input_file/Summary_statistics.csv"))
+  expect_equal(summary_table_path, paste0(config$output_path, "/input_file/data/Summary_statistics.csv"))
+})
+
+test_that("get_data_path function works correctly", {
+  data_path <- get_data_path(config)
+
+  expect_equal(data_path, paste0(config$output_path, "/input_file/data"))
+})
+
+test_that("get_centrality_data_path function works correctly", {
+  centrality_data_path <- get_centrality_data_path(config)
+
+  expect_equal(centrality_data_path, paste0(config$output_path, "/input_file/data/Centrality_data_"))
 })

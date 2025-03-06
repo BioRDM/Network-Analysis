@@ -47,54 +47,12 @@ test_that("assemble_report works correctly", {
     list()
   }
 
-  mock_Report <- function() {
-    list()
-  }
-
-  mock_add_figure <- function(report, plot, fig_caption) {
-    report
-  }
-
-  mock_add <- function(report, content) {
-    report
-  }
-
   mock_plot_graph <- function(interactions, output_file) {
     NULL
   }
 
-  mock_network_type <- function(interactions) {
-    "Network Type"
-  }
-
-  mock_cohesion_metrics <- function(interactions) {
-    "Cohesion Metrics"
-  }
-
-  mock_density_transitivity <- function(interactions) {
-    "Density and Transitivity"
-  }
-
-  mock_centrality_metrics <- function(interactions) {
-    "Centrality Metrics"
-  }
-
-  mock_reachability_metrics <- function(interactions) {
-    "Reachability Metrics"
-  }
-
   mock_plot_top_authors <- function(interactions, n, output_file) {
     NULL
-  }
-
-  mock_save_md <- function(report, file_path) {
-    md_path <- paste0(folder, "/Report_2000-2001.md")
-    writeLines("Mock MD Content", con = md_path)
-  }
-
-  mock_export_pdf <- function(report, input_file, output_file) {
-    pdf_path <- paste0(folder, "/Report_2000-2001.pdf")
-    writeLines("Mock PDF Content", con = pdf_path)
   }
 
   mock_save_centrality_data <- function(interactions, output_path) {
@@ -119,9 +77,51 @@ test_that("assemble_report works correctly", {
     )
   }
 
+  mock_generate_network_metrics <- function(interactions) {
+    interactions$metrics <- list(
+      density = 0.5,
+      transitivity = 0.3,
+      centrality = list(degree = c(1, 2, 3)),
+      diameter = 4,
+      unreachable_percentage = 10,
+      cutpoints = c("Author1", "Author2")
+    )
+    return(interactions)
+  }
+
+  mock_generate_figures <- function(interactions, paths, date_range) {
+    list(
+      fig1 = paste0(paths$figures, "/graph_", date_range, ".png"),
+      fig2 = paste0(paths$figures, "/top_authors_", date_range, ".png"),
+      fig3 = paste0(paths$figures, "/cutpoints_", date_range, ".png"),
+      fig4 = paste0(paths$figures, "/graph_betweenness_", date_range, ".png"),
+      fig5 = paste0(paths$figures, "/graph_harmonic_", date_range, ".png"),
+      fig6 = paste0(paths$figures, "/graph_no_centrality_", date_range, ".png")
+    )
+  }
+
+  mock_format_summary_stats <- function(summary_stats) {
+    data.frame(
+      `Dates` = c("2000-2001", "2002-2003"),
+      `Papers` = c(10, 15),
+      `Authors` = c(5, 7),
+      `Density (%)` = c(50, 60),
+      `Transitivity (%)` = c(30, 40),
+      `Mean Shortest Path` = c(2.5, 2.8),
+      `Cutpoints` = c(1, 2)
+    )
+  }
+
   mockery::stub(write.table, "write.table", function(summary_stats, file, sep, row.names, col.names, append) {
     writeLines("Mock Summary Stats Content", con = file)
   })
+
+  mock_rmarkdown_render <- function(input, output_file, output_format, quiet) {
+    test_output_file <- paste0(folder, "/test_output_file.pdf")
+    writeLines("Mock Render Content", con = test_output_file)
+  }
+
+  mockery::stub(assemble_report, "rmarkdown::render", mock_rmarkdown_render)
 
   # Use with_mock to override the functions
   testthat::with_mocked_bindings(
@@ -130,29 +130,21 @@ test_that("assemble_report works correctly", {
     Paths = mock_Paths,
     get_years_from_to = mock_get_years_from_to,
     Interactions = mock_Interactions,
-    Report = mock_Report,
-    add_figure = mock_add_figure,
-    add = mock_add,
     plot_graph = mock_plot_graph,
-    network_type = mock_network_type,
-    cohesion_metrics = mock_cohesion_metrics,
-    density_transitivity = mock_density_transitivity,
-    centrality_metrics = mock_centrality_metrics,
-    reachability_metrics = mock_reachability_metrics,
     plot_top_authors = mock_plot_top_authors,
-    save_md = mock_save_md,
-    export_pdf = mock_export_pdf,
     save_centrality_data = mock_save_centrality_data,
     get_author_stats = mock_get_author_stats,
     get_summary_stats = mock_get_summary_stats,
+    generate_network_metrics = mock_generate_network_metrics,
+    generate_figures = mock_generate_figures,
+    format_summary_stats = mock_format_summary_stats,
     {
       # Run the assemble_report function with the mock config
       assemble_report(config)
 
       # Add assertions to check the expected outcomes
-      expect_true(file.exists(paste0(folder, "/Report_2000-2001.md")))
-      expect_true(file.exists(paste0(folder, "/Report_2000-2001.pdf")))
-      expect_true(file.exists(paste0(config$output_path, "/Summary_statistics.csv")))
+      expect_true(file.exists(paste0(folder, "/test_output_file.pdf")))
+      expect_true(file.exists(paste0(folder, "/centrality_data_2000-2001.csv")))
     }
   )
 })

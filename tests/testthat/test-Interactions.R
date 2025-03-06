@@ -91,3 +91,39 @@ test_that("save_centrality_data saves the correct centrality data to a CSV file"
   # Clean up the temporary file
   unlink(output_file)
 })
+
+test_that("get_cutpoints works correctly", {
+  graph <- igraph::graph_from_edgelist(matrix(c(
+    1, 2,
+    2, 3,
+    3, 4,
+    4, 5,
+    3, 6,
+    6, 7,
+    7, 8
+  ), ncol = 2, byrow = TRUE))
+
+  network <- intergraph::asNetwork(graph)
+  network::network.vertex.names(network) <- as.character(1:network::network.size(network))
+
+  print(network)
+  print(network::network.vertex.names(network))
+
+  mock_interactions <- list(
+    network = network,
+    graph = graph
+  )
+  class(mock_interactions) <- "Interactions"
+
+  mock_format_names <- function(names) {
+    return(names)
+  }
+
+  with_mocked_bindings(
+    format_names = mock_format_names,
+    {
+      cutpoints <- get_cutpoints(mock_interactions)
+      expect_equal(sort(cutpoints), sort(c("2", "3", "4", "6", "7")))
+    }
+  )
+})
