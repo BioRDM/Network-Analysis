@@ -71,7 +71,7 @@ assemble_report <- function(config) {
 
     # Generate the pdf report
     print("Exporting PDF...")
-    rmarkdown::render("./Templates/Report_template.Rmd", output_file = paste0("../../", paths$output, "/Report_", date_range, ".pdf"), output_format = "pdf_document", quiet = TRUE)
+    rmarkdown::render(paste0(paths$templates, "/Report_template.Rmd"), output_file = paste0(paths$output, "/Report_", date_range, ".pdf"), output_format = "pdf_document", quiet = TRUE)
     print("PDF exported successfully!")
   }
 
@@ -80,7 +80,7 @@ assemble_report <- function(config) {
 
   summary_var$summary_stats <- format_summary_stats(summary_stats)
   print("Exporting Summary Table...")
-  rmarkdown::render("./Templates/Summary_template.Rmd", output_file = paste0("../../", paths$output, "/Summary.pdf"), output_format = "pdf_document", quiet = TRUE)
+  rmarkdown::render(paste0(paths$templates, "/Summary_template.Rmd"), output_file = paste0(paths$output, "/Summary.pdf"), output_format = "pdf_document", quiet = TRUE)
   print("Summary Table exported successfully!")
 
 }
