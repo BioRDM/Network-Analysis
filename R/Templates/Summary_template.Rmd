@@ -1,0 +1,17 @@
+---
+title: 'Network Analysis Summary Statistics'
+date: \today
+output:
+  pdf_document:
+    latex_engine: xelatex
+    extra_dependencies: ['fontspec', 'float', 'booktabs']
+fontsize: 12pt
+toc: FALSE
+---
+
+Input data: `r report_var$config$input_file`
+
+```{r echo=FALSE}
+knitr::kable(summary_var$summary_stats, format = "latex", booktabs = TRUE, digits = 1)
+```
+More statistics in csv format can be found in `data/Summary_statistics.csv`.

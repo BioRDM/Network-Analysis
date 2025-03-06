@@ -1,4 +1,5 @@
 report_var <<- list() # Global variable to store report variables
+summary_var <<- list() # Global variable to store summary variables
 
 #' @export
 assemble_report <- function(config) {
@@ -24,6 +25,9 @@ assemble_report <- function(config) {
   years <- get_years_from_to(data, config)
   years_from <- years$years_from
   years_to <- years$years_to
+
+  # Initialize the summary table
+  summary_stats <- data.frame()
 
   # Create the report(s)
   for (i in seq_along(years_from)) {
@@ -63,15 +67,7 @@ assemble_report <- function(config) {
     save_centrality_data(interactions, paste0(paths$centrality_data, date_range, ".csv"))
 
     # Generate the summary statistics and save as csv
-    summary_stats <- get_summary_stats(interactions)
-    if (i == 1) {
-      col_names <- TRUE
-      append <- FALSE
-    } else {
-      col_names <- FALSE
-      append <- TRUE
-    }
-    write.table(summary_stats, paths$summary_table, sep = ",", row.names = FALSE, col.names = col_names, append = append)
+    summary_stats <- rbind(summary_stats, get_summary_stats(interactions))
 
     # Generate the pdf report
     print("Exporting PDF...")
@@ -79,10 +75,12 @@ assemble_report <- function(config) {
     print("PDF exported successfully!")
   }
 
-}
+  # Write the summary stats csv table
+  write.table(summary_stats, paths$summary_table, sep = ",", row.names = FALSE, col.names = TRUE)
 
-add_to_report_var <- function(item_list, prefix = "") {
-  for (name in names(item_list)) {
-    report_var[[paste0(prefix, name)]] <- item_list[[name]]
-  }
+  summary_var$summary_stats <- format_summary_stats(summary_stats)
+  print("Exporting Summary Table...")
+  rmarkdown::render("R/Templates/Summary_template.Rmd", output_file = paste0("../../", paths$output, "/Summary.pdf"), output_format = "pdf_document", quiet = TRUE)
+  print("Summary Table exported successfully!")
+
 }

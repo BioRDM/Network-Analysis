@@ -19,5 +19,6 @@ Suggests:
     statnet,
     testthat (>= 3.0.0),
     tidyverse,
-    knitr
+    knitr,
+    kableExtra
 Config/testthat/edition: 3
