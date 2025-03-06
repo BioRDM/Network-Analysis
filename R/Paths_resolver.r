@@ -54,5 +54,5 @@ get_summary_table_path <- function(config) {
 }
 
 get_templates_path <- function(config) {
-  return(paste0(system.file(package = "NetworkAnalysis"), "/data/Templates"))
+  return(paste0(system.file(package = "NetworkAnalysis"), "/data"))
 }
