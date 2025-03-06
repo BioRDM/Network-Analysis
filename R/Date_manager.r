@@ -31,6 +31,7 @@ year_parser <- function(data, year_column_name) {
                                                            orders = date_formats,
                                                            quiet = TRUE)) %>%
     dplyr::mutate(!!year_col := lubridate::year(!!year_col)) %>%
-    dplyr::mutate(!!year_col := as.numeric(!!year_col))
+    dplyr::mutate(!!year_col := as.numeric(!!year_col)) %>%
+    dplyr::filter(!is.na(!!year_col))
   return(data)
 }

@@ -47,36 +47,44 @@ plot_graph <- function(interactions, centrality, output_file) {
 #' @export
 plot_cutpoints.Interactions <- function(interactions, centrality = "degree", output_file = "output/cutpoint_graph.png") {
   cutpoints <- sna::cutpoints(interactions$network, mode = "graph", return.indicator = TRUE)
-  vertex_colors <- ifelse(cutpoints, "red", "lightblue")
-  vertex_colors <- grDevices::adjustcolor(vertex_colors, alpha.f = 0.4)
-
-  size_metric <- switch(centrality,
-                        "degree" = get_centrality(interactions)$degree,
-                        "betweenness" = get_centrality(interactions)$betweenness,
-                        "harmonic" = get_centrality(interactions)$harmonic,
-                        "none" = rep(1, igraph::vcount(interactions$graph)))
-  if (centrality == "none") {
-    vertex_size <- 0.1 * size_metric
+  if (sum(cutpoints) == 0) {
+    grDevices::png(filename = output_file, width = 100, height = 100, res = 72)
+    graphics::par(mar = c(0, 0, 0, 0))
+    graphics::plot(1, type = "n", xlab = "", ylab = "", axes = FALSE, xlim = c(0, 1), ylim = c(0, 1))
+    graphics::rect(0, 0, 1, 1, col = "white", border = "white")
+    dev.off()
   } else {
-    vertex_size <- 1 + (size_metric / max(size_metric)) * 15
+    vertex_colors <- ifelse(cutpoints, "red", "lightblue")
+    vertex_colors <- grDevices::adjustcolor(vertex_colors, alpha.f = 0.4)
+
+    size_metric <- switch(centrality,
+                          "degree" = get_centrality(interactions)$degree,
+                          "betweenness" = get_centrality(interactions)$betweenness,
+                          "harmonic" = get_centrality(interactions)$harmonic,
+                          "none" = rep(1, igraph::vcount(interactions$graph)))
+    if (centrality == "none") {
+      vertex_size <- 0.1 * size_metric
+    } else {
+      vertex_size <- 1 + (size_metric / max(size_metric)) * 15
+    }
+
+    grDevices::png(filename = output_file, width = 2500, height = 1800, res = 360)
+
+    graphics::par(mfrow = c(1, 1), mar = c(1, 1, 1, 10))
+    graphics::plot(
+      interactions$graph,
+      vertex.label = NA,
+      vertex.size = vertex_size,
+      vertex.color = vertex_colors,
+      edge.width = 0.8,
+      edge.color = "gray",
+      layout = interactions$layout_coords
+    )
+
+    add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = c("Other node", "Cutpoint"), leg_colors = c("lightblue", "red"), leg_title = "")
+
+    dev.off()
   }
-
-  grDevices::png(filename = output_file, width = 2500, height = 1800, res = 360)
-
-  graphics::par(mfrow = c(1, 1), mar = c(1, 1, 1, 10))
-  graphics::plot(
-    interactions$graph,
-    vertex.label = NA,
-    vertex.size = vertex_size,
-    vertex.color = vertex_colors,
-    edge.width = 0.8,
-    edge.color = "gray",
-    layout = interactions$layout_coords
-  )
-
-  add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = c("Other node", "Cutpoint"), leg_colors = c("lightblue", "red"), leg_title = "")
-
-  dev.off()
   return(output_file)
 }
 
@@ -88,6 +96,9 @@ plot_cutpoints <- function(interactions, centrality, output_file) {
 plot_top_authors.Interactions <- function(interactions, n = 10, output_file = "output/top_authors.png") {
   # Identify the top n authors based on centrality
   centrality <- get_centrality(interactions)$degree
+  if (length(centrality) < n) {
+    n <- length(centrality)
+  }
   top_authors <- order(centrality, decreasing = TRUE)[1:n]
 
   # Create a subgraph with the top n authors

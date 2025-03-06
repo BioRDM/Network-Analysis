@@ -40,6 +40,9 @@ Interactions <- function(data,
                               delimiter = author_delimiter,
                               column_name = author_column_name,
                               directed = directed)
+  if (is.null(graph)) {
+    return(NULL)
+  }
 
   # Create network object from the graph
   network <- intergraph::asNetwork(graph)
@@ -182,8 +185,10 @@ get_reachability <- function(interactions) {
 get_cutpoints.Interactions <- function(interactions) {
   cutpoints <- sna::cutpoints(interactions$network, mode = "graph", return.indicator = TRUE)
   cutpoint_names <- network::network.vertex.names(interactions$network)[which(cutpoints == TRUE)]
-  cutpoint_names <- format_names(cutpoint_names)
-  cutpoint_names <- sort(cutpoint_names)
+  if (length(cutpoint_names) > 0) {
+    cutpoint_names <- format_names(cutpoint_names)
+    cutpoint_names <- sort(cutpoint_names)
+  }
   return(cutpoint_names)
 }
 

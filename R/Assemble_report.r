@@ -17,7 +17,7 @@ assemble_report <- function(config) {
   check_author_column(data, config$author_column_name)
 
   # Tidy the author column
-  data <- tidy_authors(data, author_column = config$author_column_name)  # Tidy the author names
+  data <- tidy_authors(data, author_column = config$author_column_name, delimiter = config$author_delimiter)  # Tidy the author names
 
   # Calculate the year intervals for the reports
   years <- get_years_from_to(data, config)
@@ -48,6 +48,9 @@ assemble_report <- function(config) {
                                  directed = config$directed,
                                  from_year = from_year,
                                  to_year = to_year)
+    if (is.null(interactions)) {
+      next
+    }
 
     # Retrieve authors statistics after filtering
     report_var$postfilter_author_stats <- get_author_stats(interactions$data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)

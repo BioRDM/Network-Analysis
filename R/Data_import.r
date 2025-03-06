@@ -14,7 +14,8 @@ make_graph_from_df <- function(data, delimiter = ";", column_name = "Author", di
              dplyr::filter(purrr::map_int(item_list, length) > 1))  # Remove papers with less than 2 authors
 
   if (data %>% nrow() < 1) {
-    stop("No papers with more than one author were found in the dataset. Check that the author delimiter is correctly set.")
+    print("No papers with more than one author were found in the dataset. Skipping report.")
+    return(NULL)
   }
 
   # Create edges: pairwise combinations of co-authors
@@ -34,7 +35,7 @@ make_graph_from_df <- function(data, delimiter = ";", column_name = "Author", di
 }
 
 #' @export
-tidy_authors <- function(data, author_column = "Author", source_column = "Source") {
+tidy_authors <- function(data, author_column = "Author", source_column = "Source", delimiter = ";") {
   if ("Source" %in% colnames(data)) {
     author_col <- rlang::sym(author_column)
     source_col <- rlang::sym(source_column)
@@ -45,10 +46,17 @@ tidy_authors <- function(data, author_column = "Author", source_column = "Source
         TRUE ~ !!author_col
       )) %>%
       dplyr::mutate(!!author_col := stringi::stri_trans_general(!!author_col, "Latin-ASCII")) %>%  # Convert special characters
-      dplyr::mutate(!!author_col := stringr::str_replace_all(!!author_col, "[^A-Za-z;]", "")) %>%  # Remove non-letter characters except semicolons
-      dplyr::mutate(!!author_col := stringr::str_replace_all(!!author_col, "\\s+", ""))  # Remove all white spaces
+      dplyr::mutate(!!author_col := stringr::str_replace_all(!!author_col, paste0("[^A-Za-z", delimiter, "]"), "")) %>%  # Remove non-letter characters except semicolons
+      dplyr::mutate(!!author_col := stringr::str_replace_all(!!author_col, "\\s+", "")) %>% # Remove all white spaces
+      dplyr::filter(!is.na(!!author_col))
   } else {
-    print("No source column found. Skipping author tidying.")
+    author_col <- rlang::sym(author_column)
+
+    data <- data %>%
+      dplyr::mutate(!!author_col := stringi::stri_trans_general(!!author_col, "Latin-ASCII")) %>%  # Convert special characters
+      dplyr::mutate(!!author_col := stringr::str_replace_all(!!author_col, paste0("[^A-Za-z", delimiter, "]"), "")) %>%  # Remove non-letter characters except delimiters
+      dplyr::mutate(!!author_col := stringr::str_replace_all(!!author_col, "\\s+", "")) %>% # Remove all white spaces
+      dplyr::filter(!is.na(!!author_col))
   }
   return(data)
 }
