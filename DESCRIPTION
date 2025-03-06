@@ -17,7 +17,9 @@ Imports:
     rmarkdown,
     statnet,
     tidyverse,
-    knitr
+    knitr,
+    tinytex,
+    pandoc
 Suggests:
     testthat (>= 3.0.0),
     mockery

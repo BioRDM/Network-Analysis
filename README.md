@@ -25,12 +25,6 @@ install.packages("pak")
 pak::pkg_install("BioRDM/Network-Analysis")
 ```
 
-The package uses pandoc to produce the report in pdf format. If you have not already, [install pandoc](https://pandoc.org/installing.html) on your system.
-
-#### For Linux users
-Additional dependencies might be needed. On Debian-based systems, they can be installed with this command:
-`sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev libtiff5-dev texlive-xetex`
-
 ### 3. Generating the report
 
 Download the [generate_report.R](https://github.com/BioRDM/Network-Analysis/blob/main/Generate_report.r) script.
