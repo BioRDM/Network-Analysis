@@ -85,8 +85,6 @@ network_weight_text <- if (report_var$interactions$weighted == TRUE) {
 - **Number of Nodes**: The network consists of `r report_var$interactions$cohesion$size` nodes (authors), representing the total entities analysed.
 
 # Density and Transitivity
-
-# Density and Transitivity
 ## Density
 Density measures the proportion of realised connections compared to all possible connections. It is calculated as:
 
@@ -164,7 +162,7 @@ Cutpoint authors, also known as 'articulation points,' are critical nodes in the
 Identifying cutpoint authors helps us understand who plays a pivotal role in sustaining collaboration across the network. Their removal could disrupt communication and collaboration between research groups, highlighting their strategic importance in the network's structure.
 
 ## List of cutpoint authors
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE}
 if (length(report_var$interactions$cutpoints) == 0) {
   cutpoint_text <- "There are no cutpoint authors in the network."
 } else {
@@ -173,7 +171,7 @@ if (length(report_var$interactions$cutpoints) == 0) {
 }
 ```
 `r cutpoint_text`
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE}
 if (length(report_var$interactions$cutpoints) > 0) {
   knitr::kable(cutpoint_table, col.names = c("", "", "", ""), format = "markdown")
 }
