@@ -12,6 +12,10 @@ toc: TRUE
 # Introduction
 This report presents an analysis of a network dataset, focusing on key structural characteristics, group collaboration dynamics, and interdisciplinarity.
 
+Input data: `r report_var$config$input_file`
+
+Date range: `r report_var$interactions$from_year` to `r report_var$interactions$to_year`
+
 # Data filtering
 ```{r, echo=FALSE}
 max_authors_text <- if (report_var$interactions$papers_removed > 0) {
