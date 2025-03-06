@@ -38,8 +38,8 @@ The code includes various filter functions that you may adjust depending on your
 - Whether to split the analysis into smaller time intervals. 
 
 #### 3.3 Output folder:
-After running the code, the output (including figures, PDFs, and additional CSV files) will be saved in a folder named `output`. This folder will be created automatically if it does not already exist.
-If you analyse multiple CSV files, a separate subfolder (under the same name of the csv file) will be created within the output folder for each dataset, containing the relevant results.
+After running the code, the output (including figures, PDFs, and additional CSV files) will be saved in a folder named `output` in the current directory (alternatively, use an absolute path to save to another directory). This folder will be created automatically if it does not already exist.
+If you analyse multiple CSV files, a separate subfolder (under the same name as the csv file) will be created within the output folder for each dataset, containing the relevant results.
 
 ##### Generated outcomes: 
       1. `Report_YYYY_YYYY.pdf`  
@@ -76,7 +76,7 @@ If you analyse multiple CSV files, a separate subfolder (under the same name of 
 |---------------- assets         
             (Stores additional resources, such as the .ttf file for the font type used in the PDF report.)              
 |---------------- data           
-            (Contains datasets from the Centre for Engineering Biology at the University of Edinburgh.)            
+            (Contains the Rmarkdown template for the reports.)            
 |---------------- tests  
             (Contains unit-tests for the package.)  
 |------- .Rbuildignore  
