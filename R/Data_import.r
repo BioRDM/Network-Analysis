@@ -56,7 +56,9 @@ tidy_authors <- function(data, author_column = "Author", source_column = "Source
 #' @export
 read_config <- function(config) {
   # Define default values for the configuration options
+  input_file <- tools::file_path_sans_ext(basename(config$file_path))
   default_config <- list(
+    input_file = input_file,
     author_column_name = "Author",
     author_delimiter = ";",
     year_column_name = "Year",

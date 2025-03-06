@@ -28,6 +28,7 @@ assemble_report <- function(config) {
   # Create the report(s)
   for (i in seq_along(years_from)) {
     report_var <<- list() # Clear the report variables at each iteration
+    report_var$config <- config
     from_year <- years_from[i]
     to_year <- years_to[i]
     date_range <- paste0(from_year, "-", to_year)
@@ -59,7 +60,7 @@ assemble_report <- function(config) {
     report_var$figures <- generate_figures(interactions, paths, date_range)
 
     # Save centrality data as csv
-    save_centrality_data(interactions, paste0(paths$output, "/centrality_data_", date_range, ".csv"))
+    save_centrality_data(interactions, paste0(paths$centrality_data, date_range, ".csv"))
 
     # Generate the summary statistics and save as csv
     summary_stats <- get_summary_stats(interactions)

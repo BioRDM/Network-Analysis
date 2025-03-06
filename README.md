@@ -5,6 +5,9 @@ This project focuses on *co-authorship network analysis*, a powerful method for 
 
 This repository provides tools and code to perform social network analysis, generate insightful reports, and visualise interactions within a network.
 
+## Authors
+- Haya Deeb (hdeeb@ed.ac.uk), BioRDM team (University of Edinburgh)
+- Daniel Thedie (daniel.thedie@ed.ac.uk), BioRDM team (University of Edinburgh)
 
 ---
 
@@ -49,16 +52,17 @@ If you analyse multiple CSV files, a separate subfolder (under the same name of 
       This is the main output of the automated code: a PDF report containing the analysis results. It includes a table of contents, detailed interpretations of the findings, and visualisations with captions. 
       The corresponding markdown file, `Report_YYYY_YYYY.md`, is also generated.
 
-      2. `centrality_data_YYY-YYYY.csv`
-      This CSV file contains centrality metrics for all authors in the co-authorship network. It includes four columns:
-      - Author: Each row represents an author in the network, along with their centrality metrics.
-      - Degree: The number of direct co-authorship connections an author has in the network.
-      - Harmonic: Indicates how quickly an author can reach others in the network, reflecting their proximity to all other authors.
-      - Betweenness: Measures the extent to which an author acts as a bridge between other researchers, highlighting their role in connecting different parts of the network.
+      2. `data` folder
+      This folder contains two .csv tables;
+      - `centrality_data_YYY-YYYY.csv`: This CSV file contains centrality metrics for all authors in the co-authorship network. It includes four columns:
+            - Author: Each row represents an author in the network, along with their centrality metrics.
+            - Degree: The number of direct co-authorship connections an author has in the network.
+            - Harmonic: Indicates how quickly an author can reach others in the network, reflecting their proximity to all other authors.
+            - Betweenness: Measures the extent to which an author acts as a bridge between other researchers, highlighting their role in connecting different parts of the network.
+            - Use this file to identify influential authors (high degree), those central to information flow (high harmonicity), and key connectors (high betweenness).
+      - `Summary_statistics.csv`: a table listing the main report statistics, with one line per date range (as defined by the `split_per_year` option)
       
-      Use this file to identify influential authors (high degree), those central to information flow (high harmonicity), and key connectors (high betweenness).
-      
-      3. `figures` Folder 
+      3. `figures` folder 
       This folder contains three PNG images:
       - graph.png (Figure 1 in the report): Visualisation of the co-authorship network.
       - top_authors.png (Figure 2 in the report): Direct connections between the top 15 most central authors.
