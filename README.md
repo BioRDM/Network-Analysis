@@ -5,6 +5,9 @@ This project focuses on *co-authorship network analysis*, a powerful method for 
 
 This repository provides tools and code to perform social network analysis, generate insightful reports, and visualise interactions within a network.
 
+## Authors
+- Haya Deeb (hdeeb@ed.ac.uk), BioRDM team (University of Edinburgh)
+- Daniel Thedie (daniel.thedie@ed.ac.uk), BioRDM team (University of Edinburgh)
 
 ---
 
