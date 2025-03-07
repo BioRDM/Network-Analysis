@@ -81,3 +81,23 @@ read_config <- function(config) {
 
   return(config)
 }
+
+#' @export
+read_metadata <- function(metadata) {
+  # Define default values for the configuration options
+  default_metadata <- list(
+    Author = "Not provided",
+    Email = "Not provided",
+    Data_description = "Not provided",
+    Data_access_date = "Not provided",
+    Data_source = "Not provided",
+    Data_source_url = ""
+  )
+
+  metadata <- modifyList(default_metadata, metadata, keep.null = TRUE)
+  metadata$Data_source <- paste0("\\href{", metadata$Data_source_url, "}", " {", metadata$Data_source, "}")
+  metadata$Data_source_url <- NULL
+  names(metadata) <- gsub("_", " ", names(metadata))
+
+  return(metadata)
+}

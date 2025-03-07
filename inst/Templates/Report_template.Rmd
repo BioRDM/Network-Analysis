@@ -4,9 +4,22 @@ date: \today
 output:
   pdf_document:
     latex_engine: xelatex
-    extra_dependencies: ['fontspec', 'float', 'fancyhdr']
+    extra_dependencies: ['fontspec', 'float', 'fancyhdr', 'hyperref']
 fontsize: 12pt
+urlcolor: blue
 toc: TRUE
+header-includes:
+  - \usepackage{hyperref}
+  - \hypersetup{
+      colorlinks=true,
+      linkcolor=blue,
+      filecolor=blue,
+      urlcolor=blue,
+      citecolor=blue,
+      pdftitle={Network Analysis Report},
+      pdfkeywords={Network Analysis, Co-Authorship, Social Network Analysis},
+      pdfsubject={Network Analysis Report}
+    }
 ---
 
 \pagestyle{fancy}
@@ -19,9 +32,19 @@ toc: TRUE
 # Introduction
 This report presents the results of a Co-Authorship Social Network Analysis (SNA), focusing on the collaborative relationships among researchers. By constructing a co-authorship network — where nodes represent authors and edges signify co-authored publications — this analysis reveals the structure of academic collaboration within the dataset. 
 
-Input data: `r report_var$config$input_name`
+## About this data
+```{r, echo=FALSE}
+metadata_text <- ""
+for (key in names(report_var$metadata)) {
+  value <- report_var$metadata[[key]]
+  metadata_text <- paste0(metadata_text, key, ": ", value, "\n\n")
+}
+```
+Input data: `r paste0(report_var$config$input_name, ".csv")`
 
 Date range: `r report_var$interactions$from_year` to `r report_var$interactions$to_year`
+
+`r metadata_text`
 
 # Data filtering
 ```{r, echo=FALSE}

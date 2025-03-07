@@ -1,7 +1,8 @@
 #' @export
-assemble_report <- function(config) {
+assemble_report <- function(config, metadata) {
   summary_var <<- list() # Global variable to store summary variables
   config <- read_config(config)
+  metadata <- read_metadata(metadata)
 
   # Create output folders
   paths <- Paths(config)
@@ -31,6 +32,7 @@ assemble_report <- function(config) {
   for (i in seq_along(years_from)) {
     report_var <<- list() # Global variable to store report variables
     report_var$config <- config
+    report_var$metadata <- metadata
     from_year <- years_from[i]
     to_year <- years_to[i]
     date_range <- paste0(from_year, "-", to_year)

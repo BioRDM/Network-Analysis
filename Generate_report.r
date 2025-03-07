@@ -1,6 +1,17 @@
 library(NetworkAnalysis)
 library(tidyverse)
 
+# Report metadata
+# Additional fields can be added to the list, and will be displayed in the Introduction section of the report.
+metadata <- list(
+  Author = "Daniel Thedie",
+  Email = "daniel.thedie@ed.ac.uk",
+  Data_description = "Articles published in the School of Biological Sciences (SBS) at the University of Edinburgh between 2023 and 2024, downloaded from the Pure Research Information System (University of Edinburgh).",
+  Data_access_date = "26th February 2025",
+  Data_source = "Pure (University of Edinburgh)",
+  Data_source_url = "https://library.ed.ac.uk/research-support/research-information-management/pure"
+)
+
 # Configuration list for the analysis
 config <- list(
   #Copy and Paste the file path
@@ -45,4 +56,4 @@ config <- list(
 )
 
 # Run the analysis and generate the report using the provided configuration.
-assemble_report(config)
+assemble_report(config, metadata)
