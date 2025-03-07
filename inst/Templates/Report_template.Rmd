@@ -14,7 +14,7 @@ toc: TRUE
 # Introduction
 This report presents the results of a Co-Authorship Social Network Analysis (SNA), focusing on the collaborative relationships among researchers. By constructing a co-authorship network — where nodes represent authors and edges signify co-authored publications — this analysis reveals the structure of academic collaboration within the dataset. 
 
-Input data: `r report_var$config$input_file`
+Input data: `r report_var$config$input_name`
 
 Date range: `r report_var$interactions$from_year` to `r report_var$interactions$to_year`
 

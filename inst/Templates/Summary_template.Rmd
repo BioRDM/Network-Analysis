@@ -9,7 +9,7 @@ fontsize: 12pt
 toc: FALSE
 ---
 
-Input data: `r report_var$config$input_file`
+Input data: `r report_var$config$input_name`
 
 ```{r echo=FALSE}
 knitr::kable(summary_var$summary_stats, format = "latex", booktabs = TRUE, digits = 1)
