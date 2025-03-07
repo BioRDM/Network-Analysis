@@ -112,6 +112,10 @@ test_that("assemble_report works correctly", {
     )
   }
 
+  mock_write <- function(text, file) {
+    writeLines("Mock Config Content", con = file)
+  }
+
   mockery::stub(write.table, "write.table", function(summary_stats, file, sep, row.names, col.names, append) {
     writeLines("Mock Summary Stats Content", con = file)
   })
@@ -122,6 +126,7 @@ test_that("assemble_report works correctly", {
   }
 
   mockery::stub(assemble_report, "rmarkdown::render", mock_rmarkdown_render)
+  mockery::stub(assemble_report, "write", mock_write)
 
   # Use with_mock to override the functions
   testthat::with_mocked_bindings(
