@@ -147,7 +147,7 @@ plot_top_authors <- function(interactions, n, output_file) {
 #' @export
 add_graph_legend <- function(leg_x, leg_y, leg_items, leg_colors, leg_title = "") {
   par(xpd = NA)
-  leg_spread <- 0.12 * length(leg_items) / 2
+  leg_spread <- 0.11 * length(leg_items) / 2
   leg_y <- seq(leg_y - leg_spread, leg_y + leg_spread, length.out = length(leg_items))
   text(x = leg_x,
        y = max(leg_y) + 0.12,

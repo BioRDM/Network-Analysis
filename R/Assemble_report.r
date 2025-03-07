@@ -6,12 +6,12 @@ assemble_report <- function(config) {
   # Create output folders
   paths <- Paths(config)
 
+  # Save the config as a json file
+  json_config <- jsonlite::toJSON(config, pretty = TRUE, auto_unbox = TRUE, null = "null")
+  write(json_config, file = paste0(paths$dataset, "/config.json"))
+
   # Import the data
   data <- import_csv_data(paths$input_file)
-
-  # Replace spaces with dots in column names to match R column names
-  config$author_column_name <- gsub(" ", ".", config$author_column_name)
-  config$year_column_name <- gsub(" ", ".", config$year_column_name)
 
   # Check that the author column exists
   check_author_column(data, config$author_column_name)
@@ -29,12 +29,15 @@ assemble_report <- function(config) {
 
   # Create the report(s)
   for (i in seq_along(years_from)) {
-    report_var <<- list() # Clear the report variables at each iteration
+    report_var <<- list() # Global variable to store report variables
     report_var$config <- config
     from_year <- years_from[i]
     to_year <- years_to[i]
     date_range <- paste0(from_year, "-", to_year)
     print(paste0("Creating report for the period ", from_year, " to ", to_year))
+
+    # Save raw data before filtering
+    write.csv(data, paste0(paths$data, "/Raw_data_", date_range, ".csv"), row.names = FALSE)
 
     # Retrieve authors statistics before filtering
     report_var$prefilter_author_stats <- get_author_stats(data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)
@@ -49,8 +52,11 @@ assemble_report <- function(config) {
                                  from_year = from_year,
                                  to_year = to_year)
     if (is.null(interactions)) {
-      next
+      next  # Skip the report if graph building failed (because there were not enough authors)
     }
+
+    # Save raw data after filtering
+    write.csv(interactions$data, paste0(paths$data, "/Filtered_data_", date_range, ".csv"), row.names = FALSE)
 
     # Retrieve authors statistics after filtering
     report_var$postfilter_author_stats <- get_author_stats(interactions$data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)

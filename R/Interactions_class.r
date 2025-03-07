@@ -198,14 +198,12 @@ get_cutpoints <- function(interactions) {
 
 #' @export
 get_most_central_per_community.Interactions <- function(interactions, centrality = "degree") {
-  if (centrality == "none") {
-    return(NULL)
-  }
   comm <- interactions$communities
   centrality_metric <- switch(centrality,
                               "degree" = get_centrality(interactions)$degree,
                               "betweenness" = get_centrality(interactions)$betweenness,
-                              "harmonic" = get_centrality(interactions)$harmonic)
+                              "harmonic" = get_centrality(interactions)$harmonic,
+                              "none" = get_centrality(interactions)$degree)  # If no centrality is specified, use degree
   most_central_authors <- sapply(unique(comm$membership), function(group) {
     group_vertices <- which(comm$membership == group)
     group_centrality <- centrality_metric[group_vertices]
