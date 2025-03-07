@@ -54,8 +54,8 @@ In total, `r report_var$interactions$n_papers` papers and `r report_var$postfilt
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network Analysis", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
 knitr::include_graphics(report_var$figures$fig1)
 ```
-Each color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. Centrality, in this context, reflects an author's influence based on their position in the network — those with higher centrality are more interconnected and play a larger role in facilitating collaboration. 
-The legend identifies the most central authors from each cluster, providing insight into key contributors within their respective groups.
+Each color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the degree centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. Centrality, in this context, reflects an author's influence based on their position in the network — those with higher centrality are more interconnected and play a larger role in facilitating collaboration. 
+The legend identifies the most central authors from each cluster depending on degree centrality, providing insight into key contributors within their respective groups.
 
 # Network Description
 ```{r, echo=FALSE}
@@ -119,7 +119,7 @@ Betweenness centrality quantifies how often a node acts as a bridge in the short
 - **Median**: `r round(median(report_var$interactions$centrality$betweenness))`
 
 ## Harmonic Centrality
-Harmonic centrality measures how close a node is to all other nodes in a network. Harmonic centrality is a variation of closeness centrality that works better when the graph has disconnected components. A node with high harmonic centrality can reach many other nodes quickly, even if some nodes are disconnected. Low harmonic centrality means the node is either far from others or isolated.
+Harmonic centrality measures how close a node is to all other nodes in a network. A node with high harmonic centrality can reach many other nodes quickly, even if some nodes are disconnected. Low harmonic centrality means the node is either far from others or isolated.
 
 - **Min**: `r round(min(report_var$interactions$centrality$harmonic), digits = 5)` (The most distant node, or those in isolated groups with few reachable neighbors.).
 - **Max**: `r round(max(report_var$interactions$centrality$harmonic), digits = 5)` (The most central node, can quickly reach others, even across disconnected parts of the graph.)
@@ -127,10 +127,12 @@ Harmonic centrality measures how close a node is to all other nodes in a network
 - **Median**: `r round(median(report_var$interactions$centrality$harmonic), digits = 5)`
 
 ## Network diameter
-The network diameter is the maximum distance (in terms of edges or steps) required to connect any two nodes in the network through the shortest possible path.
+The network diameter is is a measure of the largest distance between any two nodes in the network. Specifically, it represents the longest of all the shortest paths — the maximum number of steps needed to connect the two most distant nodes (authors) through their co-authorship links.
 
-- In our network: **the diameter is `r report_var$interactions$diameter$diameter`**, it indicates that the farthest two nodes in the co-authorship network can be linked in `r report_var$interactions$diameter$diameter` steps at shortest.
-- In practical terms, the two most distantly connected authors in the network are separated by `r report_var$interactions$diameter$diameter` intermediates (co-authors).
+- In our network: **the diameter is `r report_var$interactions$diameter$diameter`**, This means that the greatest distance between any two authors, using the shortest possible path, spans `r report_var$interactions$diameter$diameter` step.
+
+- Practically speaking, the two most distantly connected authors can be linked through a path involving `r report_var$interactions$diameter$diameter - 1` intermediates (co-authors).
+
 - The average shortest path between two authors in the network is `r round(report_var$interactions$diameter$average_shortest_path, digits = 1)` steps.
 
 ## Centrality Data CSV outcome:
@@ -203,5 +205,6 @@ The legend identifies the authors with high harmonic centrality that  can reach 
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network Analysis without centrality indicator", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
 knitr::include_graphics(report_var$figures$fig6)
 ```
-Each color represents a cluster of authors who are strongly connected within the network, highlighting the spread of the clusters within the network.
-All nodes here are equal in size without reflecting any centrality metrics.  
+Each color represents a cluster of authors who are strongly connected within the network, illustrating the distribution of these clusters across the network.
+
+In this visualisation, all nodes are of equal size and do not reflect any centrality metrics. However, the legend highlights the most central authors from each cluster based on degree centrality, without the node size conveying any additional significance.
