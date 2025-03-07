@@ -4,22 +4,10 @@ date: \today
 output:
   pdf_document:
     latex_engine: xelatex
-    extra_dependencies: ['fontspec', 'float', 'fancyhdr', 'hyperref']
+    extra_dependencies: ['fontspec', 'float', 'fancyhdr']
 fontsize: 12pt
 urlcolor: blue
 toc: TRUE
-header-includes:
-  - \usepackage{hyperref}
-  - \hypersetup{
-      colorlinks=true,
-      linkcolor=blue,
-      filecolor=blue,
-      urlcolor=blue,
-      citecolor=blue,
-      pdftitle={Network Analysis Report},
-      pdfkeywords={Network Analysis, Co-Authorship, Social Network Analysis},
-      pdfsubject={Network Analysis Report}
-    }
 ---
 
 \pagestyle{fancy}
