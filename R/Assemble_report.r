@@ -34,6 +34,7 @@ assemble_report <- function(config) {
     from_year <- years_from[i]
     to_year <- years_to[i]
     date_range <- paste0(from_year, "-", to_year)
+    report_var$date_range <- date_range
     print(paste0("Creating report for the period ", from_year, " to ", to_year))
 
     # Save raw data before filtering

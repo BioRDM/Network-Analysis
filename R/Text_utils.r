@@ -78,3 +78,17 @@ format_summary_stats <- function(summary_stats) {
 
   return(summary_stats)
 }
+
+escape_latex <- function(text) {
+  text <- gsub("\\\\", "\\\\textbackslash{}", text)
+  text <- gsub("\\$", "\\\\$", text)
+  text <- gsub("#", "\\\\#", text)
+  text <- gsub("%", "\\\\%", text)
+  text <- gsub("&", "\\\\&", text)
+  text <- gsub("_", "\\\\_", text)
+  text <- gsub("\\{", "\\\\{", text)
+  text <- gsub("\\}", "\\\\}", text)
+  text <- gsub("\\^", "\\\\textasciicircum{}", text)
+  text <- gsub("~", "\\\\textasciitilde{}", text)
+  return(text)
+}
