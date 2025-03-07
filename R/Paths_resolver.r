@@ -1,12 +1,13 @@
 #' @export
 Paths <- function(config) {
 
-  config$cur_dir <- getwd()
-  create_output_paths(config)
+  config <- create_output_paths(config)
 
-  paths <- list(input_file = config$file_path,
+  paths <- list(input_file = get_input_path(config),
                 output = get_output_path(config),
+                dataset = get_dataset_path(config),
                 figures = get_figures_path(config),
+                data = get_data_path(config),
                 summary_table = get_summary_table_path(config),
                 centrality_data = get_centrality_data_path(config),
                 templates = get_templates_path(config))
@@ -18,9 +19,13 @@ Paths <- function(config) {
 }
 
 create_output_paths <- function(config) {
-  output_path <- get_output_path(config)
-  if (!dir.exists(output_path)) {
-    dir.create(output_path, recursive = TRUE)
+  if (!dir.exists(config$output_path)) {
+    dir.create(config$output_path)
+  }
+  config$output_path <- get_output_path(config)
+  dataset_path <- get_dataset_path(config)
+  if (!dir.exists(dataset_path)) {
+    dir.create(dataset_path, recursive = TRUE)
   }
   figures_path <- get_figures_path(config)
   if (!dir.exists(figures_path)) {
@@ -30,19 +35,27 @@ create_output_paths <- function(config) {
   if (!dir.exists(data_path)) {
     dir.create(data_path, recursive = TRUE)
   }
-  return(list(output = output_path, figures = figures_path, data = data_path))
+  return(config)
+}
+
+get_input_path <- function(config) {
+  return(normalizePath(config$file_path, winslash = "/"))
 }
 
 get_output_path <- function(config) {
-  return(paste0(config$cur_dir, "/", config$output_path, "/", config$input_file))
+  return(normalizePath(config$output_path, winslash = "/"))
+}
+
+get_dataset_path <- function(config) {
+  return(paste0(config$output_path, "/", config$input_name))
 }
 
 get_figures_path <- function(config) {
-  return(paste0(get_output_path(config), "/figures"))
+  return(paste0(get_dataset_path(config), "/figures"))
 }
 
 get_data_path <- function(config) {
-  return(paste0(get_output_path(config), "/data"))
+  return(paste0(get_dataset_path(config), "/data"))
 }
 
 get_centrality_data_path <- function(config) {
@@ -54,5 +67,5 @@ get_summary_table_path <- function(config) {
 }
 
 get_templates_path <- function(config) {
-  return(paste0(system.file(package = "NetworkAnalysis"), "/data"))
+  return(system.file("Templates", package = "NetworkAnalysis"))
 }
