@@ -20,7 +20,8 @@ Imports:
     knitr,
     tinytex,
     pandoc,
-    magrittr
+    magrittr,
+    jsonlite
 Suggests:
     testthat (>= 3.0.0),
     mockery

@@ -64,6 +64,7 @@ read_config <- function(config) {
   # Define default values for the configuration options
   default_config <- list(
     input_name = tools::file_path_sans_ext(basename(config$file_path)),
+    output_path = "output",
     author_column_name = "Author",
     author_delimiter = ";",
     year_column_name = "Year",
@@ -72,12 +73,11 @@ read_config <- function(config) {
     directed = FALSE,
     from_year = NULL,
     to_year = NULL,
-    output_path = "output",
-    figures_path = "figures"
+    split_per_year = NULL
   )
 
   # Merge the provided config with the default config
-  config <- modifyList(default_config, config)
+  config <- modifyList(default_config, config, keep.null = TRUE)
 
   return(config)
 }

@@ -6,6 +6,10 @@ assemble_report <- function(config) {
   # Create output folders
   paths <- Paths(config)
 
+  # Save the config as a json file
+  json_config <- jsonlite::toJSON(config, pretty = TRUE, auto_unbox = TRUE, null = "null")
+  write(json_config, file = paste0(paths$dataset, "/config.json"))
+
   # Import the data
   data <- import_csv_data(paths$input_file)
 
@@ -48,9 +52,8 @@ assemble_report <- function(config) {
                                  from_year = from_year,
                                  to_year = to_year)
     if (is.null(interactions)) {
-      next
+      next  # Skip the report if graph building failed (because there were not enough authors)
     }
-    View(interactions$data)
 
     # Save raw data after filtering
     write.csv(interactions$data, paste0(paths$data, "/Filtered_data_", date_range, ".csv"), row.names = FALSE)
