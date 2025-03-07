@@ -13,7 +13,7 @@ toc: TRUE
 \pagestyle{fancy}
 \fancyhead[]{}
 \renewcommand{\headrulewidth}{0pt}
-\fancyfoot[LEO]{`r escape_latex(paste0(report_var$config$input_name, "  --  ", report_var$date_range))`}
+\fancyfoot[LEO]{`r escape_latex(report_var$date_range)`}
 \fancyfoot[ROE]{Network Analysis Report}
 \pagebreak
 
