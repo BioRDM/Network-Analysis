@@ -36,33 +36,31 @@ make_graph_from_df <- function(data, delimiter = ";", column_name = "Author", di
 
 #' @export
 tidy_authors <- function(data, author_column = "Author", source_column = "Source", delimiter = ";") {
+  author_col <- rlang::sym(author_column)
   if ("Source" %in% colnames(data)) {
-    author_col <- rlang::sym(author_column)
     source_col <- rlang::sym(source_column)
 
     data <- data %>%
       dplyr::mutate(!!author_col := dplyr::case_when(
         toupper(!!source_col) == "PUBMED" ~ stringr::str_replace_all(!!author_col, ",", ";"),
         TRUE ~ !!author_col
-      )) %>%
-      dplyr::mutate(!!author_col := stringi::stri_trans_general(!!author_col, "Latin-ASCII")) %>%  # Convert special characters
-      dplyr::mutate(!!author_col := stringr::str_replace_all(!!author_col, paste0("[^A-Za-z", delimiter, "]"), "")) %>%  # Remove non-letter characters except semicolons
-      dplyr::mutate(!!author_col := stringr::str_replace_all(!!author_col, "\\s+", "")) %>% # Remove all white spaces
-      dplyr::filter(!is.na(!!author_col))
-  } else {
-    author_col <- rlang::sym(author_column)
-
-    data <- data %>%
-      dplyr::mutate(!!author_col := stringi::stri_trans_general(!!author_col, "Latin-ASCII")) %>%  # Convert special characters
-      dplyr::mutate(!!author_col := stringr::str_replace_all(!!author_col, paste0("[^A-Za-z", delimiter, "]"), "")) %>%  # Remove non-letter characters except delimiters
-      dplyr::mutate(!!author_col := stringr::str_replace_all(!!author_col, "\\s+", "")) %>% # Remove all white spaces
-      dplyr::filter(!is.na(!!author_col))
+      ))
   }
+
+  data <- data %>%
+    dplyr::mutate(!!author_col := stringi::stri_trans_general(!!author_col, "Latin-ASCII")) %>%  # Convert special characters
+    dplyr::mutate(!!author_col := stringr::str_replace_all(!!author_col, paste0("[^A-Za-z", delimiter, "]"), "")) %>%  # Remove non-letter characters except delimiters
+    dplyr::mutate(!!author_col := stringr::str_replace_all(!!author_col, "\\s+", "")) %>% # Remove all white spaces
+    dplyr::filter(!is.na(!!author_col))
+
   return(data)
 }
 
 #' @export
 read_config <- function(config) {
+  # Replace spaces with dots in column names to match R column names
+  config$author_column_name <- gsub(" ", ".", config$author_column_name)
+  config$year_column_name <- gsub(" ", ".", config$year_column_name)
   # Define default values for the configuration options
   default_config <- list(
     input_name = tools::file_path_sans_ext(basename(config$file_path)),

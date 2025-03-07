@@ -33,6 +33,9 @@ filter_papers_by_authors <- function(data, column_name = "Author", delimiter = "
   }
   filtered_data <- filtered_data %>% dplyr::filter(Num_items <= max_authors & Num_items > 1)
   print(paste0(nrow(filtered_data), " papers were included in the network analysis."))
+
+  filtered_data <- filtered_data %>% dplyr::select(-item_list, -Num_items)
+
   return(list(filtered_data, too_many, too_few))
 }
 
@@ -74,6 +77,8 @@ filter_infrequent_authors <- function(data, column_name = "Author", delimiter = 
   if (removed_authors > 0) {
     print(paste0("Removed ", removed_authors, " authors that appeared less than ", min_occurrences, " times."))
   }
+
+  filtered_data <- filtered_data %>% dplyr::select(-item_list)
 
   return(list(filtered_data, removed_authors))
 }
