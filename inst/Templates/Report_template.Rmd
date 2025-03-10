@@ -67,8 +67,8 @@ In total, `r report_var$interactions$n_papers` papers and `r report_var$postfilt
 - Minimum authors per paper: `r report_var$postfilter_author_stats$min`
 - Maximum authors per paper: `r report_var$postfilter_author_stats$max`
 
-```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network Analysis", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-knitr::include_graphics(report_var$figures$fig1)
+```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network Analysis", echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
+knitr::include_graphics(report_var$figures$fig1, rel_path = FALSE)
 ```
 Each color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the degree centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. Centrality, in this context, reflects an author's influence based on their position in the network — those with higher centrality are more interconnected and play a larger role in facilitating collaboration. 
 The legend identifies the most central authors from each cluster depending on degree centrality, providing insight into key contributors within their respective groups.
@@ -166,7 +166,7 @@ Reachability measures the proportion of pairs of nodes that are reachable in the
 - **Interpretation**: A high percentage of unreachable pairs may indicate a fragmented network or isolated nodes that are not connected to the main network.
 
 ```{r, fig.pos = 'H', fig.cap = "Direct connections between the 15 most central authors", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-knitr::include_graphics(report_var$figures$fig2)
+knitr::include_graphics(report_var$figures$fig2, rel_path = FALSE)
 ```
 This figure highlights the direct connections between the 15 most central authors in the network. Nodes positioned around the circle represent these top authors, and the thickness of the connecting lines indicates the strength of their collaboration (thicker lines represent stronger connections). 
 
@@ -196,7 +196,7 @@ if (length(report_var$interactions$cutpoints) > 0) {
 ```
 
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of the Author network with cutpoints highlighted", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-knitr::include_graphics(report_var$figures$fig3)
+knitr::include_graphics(report_var$figures$fig3, rel_path = FALSE)
 ```
 This figure builds on Figure 1, with the addition of highlighting cutpoint authors in red. Cutpoints are authors whose removal would fragment the network, indicating their critical role in maintaining connectivity. 
 The node size, as in Figure 1, still reflects the centrality of each author — larger nodes indicate more central figures within the network. 
@@ -204,7 +204,7 @@ The names of these cutpoint authors are listed above.
 
 # Appendix
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of betweenness centrality in the Co-Authorship Network Analysis", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-knitr::include_graphics(report_var$figures$fig4)
+knitr::include_graphics(report_var$figures$fig4, rel_path = FALSE)
 ```
 Each color represents a cluster of authors who are strongly connected within the network.
 The size of each node corresponds to the betweenness centrality of the author, a measure of how often an author appears on the shortest path between two other authors. 
@@ -212,14 +212,14 @@ The legend identifies the authors with high betweenness centrality act as bridge
 
 
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of harmonic centrality in the Co-Authorship Network Analysis", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-knitr::include_graphics(report_var$figures$fig5)
+knitr::include_graphics(report_var$figures$fig5, rel_path = FALSE)
 ```
 Each color represents a cluster of authors who are strongly connected within the network.
 The size of each node corresponds to the harmonic centrality of the author, which reflects how close a node is to all other nodes in a network 
 The legend identifies the authors with high harmonic centrality that  can reach many other nodes quickly, even if some nodes are disconnected.
 
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network Analysis without centrality indicator", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-knitr::include_graphics(report_var$figures$fig6)
+knitr::include_graphics(report_var$figures$fig6, rel_path = FALSE)
 ```
 Each color represents a cluster of authors who are strongly connected within the network, illustrating the distribution of these clusters across the network.
 
