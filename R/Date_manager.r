@@ -14,7 +14,7 @@ get_years_from_to <- function(data, config) {
   year_to <- min(max(data[[year_col]]), config$to_year)
   if (!is.null(config$split_per_year)) {
     years_from <- seq(year_from, year_to, by = config$split_per_year)
-    years_to <- c(years_from[-1] - 1, max(data[[year_col]]))
+    years_to <- c(years_from[-1] - 1, year_to)
   } else {
     years_from <- year_from
     years_to <- year_to
