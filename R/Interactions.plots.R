@@ -1,7 +1,7 @@
 #' @export
 plot_graph.Interactions <- function(interactions, centrality = "degree", output_file = "output/graph.png") {
   comm <- interactions$communities
-  colors <- grDevices::rainbow(length(unique(comm$membership)), alpha = 0.4)
+  colors <- get_palette(alpha = 0.6)
 
   size_metric <- switch(centrality,
                         "degree" = get_centrality(interactions)$degree,
@@ -12,7 +12,7 @@ plot_graph.Interactions <- function(interactions, centrality = "degree", output_
   if (centrality == "none") {
     vertex_size <- 4 * size_metric
   } else {
-    vertex_size <- 1 + (size_metric / max(size_metric)) * 15
+    vertex_size <- 3 + (size_metric / max(size_metric)) * 10
   }
 
   grDevices::png(filename = output_file, width = 2500, height = 1800, res = 360)
@@ -47,6 +47,9 @@ plot_graph <- function(interactions, centrality, output_file) {
 #' @export
 plot_cutpoints.Interactions <- function(interactions, centrality = "degree", output_file = "output/cutpoint_graph.png") {
   cutpoints <- sna::cutpoints(interactions$network, mode = "graph", return.indicator = TRUE)
+  cutpoint_names <- get_cutpoints(interactions)
+  colors <- get_palette(alpha = 1)
+
   if (sum(cutpoints) == 0) {
     grDevices::png(filename = output_file, width = 100, height = 100, res = 72)
     graphics::par(mar = c(0, 0, 0, 0))
@@ -54,8 +57,8 @@ plot_cutpoints.Interactions <- function(interactions, centrality = "degree", out
     graphics::rect(0, 0, 1, 1, col = "white", border = "white")
     dev.off()
   } else {
-    vertex_colors <- ifelse(cutpoints, "red", "lightblue")
-    vertex_colors <- grDevices::adjustcolor(vertex_colors, alpha.f = 0.4)
+    vertex_colors <- rep(grDevices::adjustcolor("grey", alpha.f = 0.4), length(cutpoints))
+    vertex_colors[cutpoints] <- colors[1:sum(cutpoints)]
 
     size_metric <- switch(centrality,
                           "degree" = get_centrality(interactions)$degree,
@@ -63,9 +66,9 @@ plot_cutpoints.Interactions <- function(interactions, centrality = "degree", out
                           "harmonic" = get_centrality(interactions)$harmonic,
                           "none" = rep(1, igraph::vcount(interactions$graph)))
     if (centrality == "none") {
-      vertex_size <- 0.1 * size_metric
+      vertex_size <- 4 * size_metric
     } else {
-      vertex_size <- 1 + (size_metric / max(size_metric)) * 15
+      vertex_size <- 3 + (size_metric / max(size_metric)) * 10
     }
 
     grDevices::png(filename = output_file, width = 2500, height = 1800, res = 360)
@@ -81,7 +84,11 @@ plot_cutpoints.Interactions <- function(interactions, centrality = "degree", out
       layout = interactions$layout_coords
     )
 
-    add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = c("Other node", "Cutpoint"), leg_colors = c("lightblue", "red"), leg_title = "")
+    if (length(cutpoint_names) > 20) {
+      print(paste0("Cutpoint plot: removing legend because there are too many cutpoint authors (", length(cutpoint_names), ")."))
+    } else if (length(cutpoint_names) > 0) {
+      add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = cutpoint_names, leg_colors = colors[1:sum(cutpoints)], leg_title = "Cutpoint authors")
+    }
 
     dev.off()
   }
@@ -107,7 +114,7 @@ plot_top_authors.Interactions <- function(interactions, n = 10, output_file = "o
   # Get community membership for the top authors
   comm <- interactions$communities
   top_authors_communities <- comm$membership[top_authors]
-  colors <- grDevices::rainbow(length(unique(comm$membership)), alpha = 0.4)
+  colors <- get_palette(alpha = 0.6)
   vertex_colors <- colors[top_authors_communities]
 
   # Calculate label degrees to position labels outside the circle
@@ -172,4 +179,15 @@ add_graph_legend <- function(leg_x, leg_y, leg_items, leg_colors, leg_title = ""
 #' @export
 get_graph_coords <- function(graph) {
   return(igraph::layout_(graph, igraph::with_drl(options = list(simmer.attraction = 0))))
+}
+
+#' @export
+get_palette <- function(alpha = 1) {
+  return(grDevices::adjustcolor(c(
+    "#1E90FF", "#E31A1C", "#008000", "#6A3D9A", "#FF7F00",
+    "#FFD700", "#87CEEB", "#FB9A99", "#98FB98", "#CAB2D6",
+    "#FDBF6F", "#B3B3B3", "#F0E68C", "#800000", "#DA70D6",
+    "#FF1493", "#0000FF", "#000000", "#4682B4", "#00CED1",
+    "#00FF00", "#808000", "#FFFF00", "#FF8C00", "#A52A2A"
+  ), alpha.f = alpha))
 }
