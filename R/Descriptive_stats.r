@@ -30,6 +30,7 @@ get_summary_stats <- function(interactions) {
   author_stats <- get_author_stats(interactions$data, author_column_name = interactions$author_column_name, delimiter = interactions$author_delimiter)
   centrality <- get_centrality(interactions)
   diameter <- get_diameter(interactions)
+  cutpoints <- get_cutpoints(interactions)
 
   # Create a summary table
   summary_table <- data.frame(
@@ -47,7 +48,8 @@ get_summary_stats <- function(interactions) {
     "Mean_betweenness_centrality" = round(mean(centrality$betweenness), digits = 3),
     "Mean_harmonic_centrality" = round(mean(centrality$harmonic), digits = 3),
     "Mean_shortest_path" = diameter$average_shortest_path,
-    "Number_of_cutpoints" = length(get_cutpoints(interactions))
+    "Number_of_cutpoints" = length(cutpoints),
+    "Cutpoint_authors" = paste(cutpoints, collapse = "; ")
   )
   return(summary_table)
 }
