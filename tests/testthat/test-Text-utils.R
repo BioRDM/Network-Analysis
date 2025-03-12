@@ -17,6 +17,7 @@ test_that("format_summary_stats works correctly", {
     End_year = c(2001, 2003),
     Total_Papers = c(10, 15),
     Total_Authors = c(5, 7),
+    Average_Authors_per_Paper = c(2, 2.5),
     Density = c(0.5, 0.6),
     Transitivity = c(0.3, 0.4),
     Mean_shortest_path = c(2.5, 2.8),
@@ -27,8 +28,8 @@ test_that("format_summary_stats works correctly", {
   formatted_stats <- format_summary_stats(summary_stats)
 
   # Check the structure of the formatted_stats
-  expect_equal(ncol(formatted_stats), 7)
-  expect_equal(colnames(formatted_stats), c("Dates", "Papers", "Authors", "Density (%)", "Transitivity (%)", "Mean Shortest Path", "Cutpoints"))
+  expect_equal(ncol(formatted_stats), 10)
+  expect_true(all(c("Dates", "Papers", "Authors", "Density (%)", "Transitivity (%)", "Shortest Path", "Cutpoints") %in% colnames(formatted_stats)))
 
   # Check the values of the formatted_stats
   expect_equal(formatted_stats$Dates, c("2000-2001", "2002-2003"))
@@ -36,6 +37,6 @@ test_that("format_summary_stats works correctly", {
   expect_equal(formatted_stats$Authors, c(5, 7))
   expect_equal(formatted_stats$`Density (%)`, c(50, 60))
   expect_equal(formatted_stats$`Transitivity (%)`, c(30, 40))
-  expect_equal(formatted_stats$`Mean Shortest Path`, c(2.5, 2.8))
+  expect_equal(formatted_stats$`Shortest Path`, c(2.5, 2.8))
   expect_equal(formatted_stats$Cutpoints, c(1, 2))
 })

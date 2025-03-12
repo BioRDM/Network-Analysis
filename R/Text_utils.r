@@ -50,31 +50,24 @@ format_summary_stats <- function(summary_stats) {
   # Merge Start_year and End_year into "Date Range"
   summary_stats$Date_Range <- paste(summary_stats$Start_year, summary_stats$End_year, sep = "-")
 
-  # Define the columns to keep
-  columns_to_keep <- c("Date_Range",
-                       "Total_Papers",
-                       "Total_Authors",
-                       "Density",
-                       "Transitivity",
-                       "Mean_shortest_path",
-                       "Number_of_cutpoints")
-
-  # Filter the columns
-  summary_stats <- summary_stats[, columns_to_keep, drop = FALSE]
-
   # Give Density and Transitivity in percentage
   summary_stats$Density <- summary_stats$Density * 100
   summary_stats$Transitivity <- summary_stats$Transitivity * 100
 
   # Rename columns
   summary_stats <- summary_stats %>%
-    dplyr::rename(`Dates` = Date_Range,
-                  `Papers` = Total_Papers,
-                  `Authors` = Total_Authors,
-                  `Density (%)` = Density,
-                  `Transitivity (%)` = Transitivity,
-                  `Mean Shortest Path` = Mean_shortest_path,
-                  `Cutpoints` = Number_of_cutpoints)
+    dplyr::rename_with(dplyr::recode,
+                       "Date_Range" = "Dates",
+                       "Total_Papers" = "Papers",
+                       "Total_Authors" = "Authors",
+                       "Average_Authors_per_Paper" = "Authors per Paper",
+                       "Density" = "Density (%)",
+                       "Transitivity" = "Transitivity (%)",
+                       "Mean_degree_centrality" = "Degree Centrality",
+                       "Mean_betweenness_centrality" = "Betweenness Centrality",
+                       "Mean_harmonic_centrality" = "Harmonic Centrality",
+                       "Mean_shortest_path" = "Shortest Path",
+                       "Number_of_cutpoints" = "Cutpoints")
 
   return(summary_stats)
 }
