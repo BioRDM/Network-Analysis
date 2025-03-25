@@ -67,6 +67,11 @@ test_that("get_centrality_data_path function works correctly", {
   expect_equal(get_centrality_data_path(config), paste0(get_data_path(config), "/Centrality_data_"))
 })
 
+test_that("get_papers_per_author_path function works correctly", {
+  config <- list(output_path = file.path(tempdir(), "output", fsep = "/"), input_name = "input_file")
+  expect_equal(get_papers_per_author_path(config), paste0(get_data_path(config), "/Papers_per_author_"))
+})
+
 test_that("get_summary_table_path function works correctly", {
   config <- list(output_path = file.path(tempdir(), "output", fsep = "/"), input_name = "input_file")
   expect_equal(get_summary_table_path(config), paste0(get_data_path(config), "/Summary_statistics.csv"))

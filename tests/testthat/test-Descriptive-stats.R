@@ -9,6 +9,14 @@ test_that("get_author_stats calculates correct statistics", {
   expect_equal(result$max, 3)
 })
 
+test_that("get_papers_per_author calculates correct statistics", {
+  data <- data.frame(Author = c("Author1;Author2", "Author1", "Author1;Author2;Author3"))
+  result <- get_papers_per_author(data)
+
+  expect_equal(result$Author, c("Author1", "Author2", "Author3"))
+  expect_equal(result$Papers, c(3, 2, 1))
+})
+
 test_that("get_summary_stats works correctly", {
   # Mock data and interactions
   mock_data <- data.frame(
@@ -92,4 +100,42 @@ test_that("get_summary_stats works correctly", {
       expect_equal(summary_stats$Number_of_cutpoints, 2)
     }
   )
+})
+
+test_that("save_papers_per_author works correctly", {
+  # Create sample prefilter and postfilter dataframes
+  prefilter_papers_per_author <- data.frame(
+    Author = c("Author1", "Author2", "Author3"),
+    Papers = c(5, 3, 2),
+    stringsAsFactors = FALSE
+  )
+
+  postfilter_papers_per_author <- data.frame(
+    Author = c("Author1", "Author2"),
+    Papers = c(4, 1),
+    stringsAsFactors = FALSE
+  )
+
+  # Define the output file path
+  output_file <- tempfile(fileext = ".csv")
+
+  # Call the save_papers_per_author function
+  save_papers_per_author(prefilter_papers_per_author, postfilter_papers_per_author, output_file)
+
+  # Read the resulting CSV file
+  result <- read.csv(output_file, stringsAsFactors = FALSE)
+
+  # Check the structure of the result
+  expect_equal(ncol(result), 4)
+  expect_equal(colnames(result), c("Author", "Papers_prefilter", "Papers_postfilter", "Papers_removed"))
+
+  # Check the values of the result
+  expected_result <- data.frame(
+    Author = c("Author2", "Author3", "Author1"),
+    Papers_prefilter = c(3, 2, 5),
+    Papers_postfilter = c(1, 0, 4),
+    Papers_removed = c(2, 2, 1),
+    stringsAsFactors = FALSE
+  )
+  expect_equal(result, expected_result)
 })

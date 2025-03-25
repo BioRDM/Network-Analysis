@@ -42,7 +42,10 @@ assemble_report <- function(config, metadata) {
     # Save raw data before filtering
     write.csv(data, paste0(paths$data, "/Raw_data_", date_range, ".csv"), row.names = FALSE)
 
-    # Retrieve authors statistics before filtering
+    # Retrieve the number of papers per author before filtering
+    prefilter_papers_per_author <- get_papers_per_author(data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)
+
+    # Retrieve authors (per paper) before filtering
     report_var$prefilter_author_stats <- get_author_stats(data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)
 
     interactions <- Interactions(data = data,
@@ -61,7 +64,10 @@ assemble_report <- function(config, metadata) {
     # Save raw data after filtering
     write.csv(interactions$data, paste0(paths$data, "/Filtered_data_", date_range, ".csv"), row.names = FALSE)
 
-    # Retrieve authors statistics after filtering
+    # Retrieve the number of papers per author after filtering
+    postfilter_papers_per_author <- get_papers_per_author(interactions$data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)
+
+    # Retrieve authors (per paper) after filtering
     report_var$postfilter_author_stats <- get_author_stats(interactions$data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)
 
     # Generate network metrics
@@ -76,7 +82,10 @@ assemble_report <- function(config, metadata) {
     # Save centrality data as csv
     save_centrality_data(interactions, paste0(paths$centrality_data, date_range, ".csv"))
 
-    # Generate the summary statistics and save as csv
+    # Save number of papers per author before and after filtering as csv
+    save_papers_per_author(prefilter_papers_per_author, postfilter_papers_per_author, output_file =  paste0(paths$papers_per_author, date_range, ".csv"))
+
+    # Add current report summary stats to summary stats dataframe
     summary_stats <- rbind(summary_stats, get_summary_stats(interactions))
 
     # Generate the pdf report

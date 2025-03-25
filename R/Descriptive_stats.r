@@ -25,6 +25,27 @@ get_author_stats <- function(data, author_column_name = "Author", delimiter = ";
 }
 
 #' @export
+get_papers_per_author <- function(data, author_column_name = "Author", delimiter = ";") {
+  # Extract the author column
+  author_column <- data[[author_column_name]]
+
+  # Split the author column by the delimiter
+  authors <- strsplit(author_column, delimiter)
+
+  # Flatten the list of authors
+  all_authors <- unlist(authors)
+
+  # Remove empty strings
+  all_authors <- all_authors[all_authors != ""]
+
+  # Count the number of occurences of each author in the list
+  author_df <- as.data.frame(table(all_authors), stringsAsFactors = FALSE)
+  colnames(author_df) <- c("Author", "Papers")
+
+  return(author_df)
+}
+
+#' @export
 get_summary_stats <- function(interactions) {
   # Calculate summary statistics
   author_stats <- get_author_stats(interactions$data, author_column_name = interactions$author_column_name, delimiter = interactions$author_delimiter)
@@ -52,4 +73,22 @@ get_summary_stats <- function(interactions) {
     "Cutpoint_authors" = paste(cutpoints, collapse = "; ")
   )
   return(summary_table)
+}
+
+save_papers_per_author <- function(prefilter_papers_per_author, postfilter_papers_per_author, output_file = "output/centrality_data.csv") {
+  # Merge prefilter and postfilter dataframes
+  merged_papers_per_author <- dplyr::full_join(
+    prefilter_papers_per_author %>% dplyr::rename(Papers_prefilter = Papers),
+    postfilter_papers_per_author %>% dplyr::rename(Papers_postfilter = Papers),
+    by = "Author"
+  ) %>%
+    dplyr::mutate(
+      Papers_prefilter = tidyr::replace_na(Papers_prefilter, 0),
+      Papers_postfilter = tidyr::replace_na(Papers_postfilter, 0)
+    ) %>%
+    dplyr::mutate(Papers_removed = Papers_prefilter - Papers_postfilter) %>%
+    dplyr::arrange(dplyr::desc(Papers_removed))
+
+  # Save the merged dataframe as a CSV
+  write.csv(merged_papers_per_author, output_file, row.names = FALSE)
 }
