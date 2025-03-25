@@ -22,33 +22,34 @@ assemble_report <- function(config, metadata) {
 
   # Calculate the year intervals for the reports
   years <- get_years_from_to(data, config)
-  years_from <- years$years_from
-  years_to <- years$years_to
 
   # Initialize the summary table
   summary_stats <- data.frame()
 
   # Create the report(s)
-  for (i in seq_along(years_from)) {
+  for (i in seq_along(years$years_from)) {
     report_var <<- list() # Global variable to store report variables
     report_var$config <- config
     report_var$metadata <- metadata
-    from_year <- years_from[i]
-    to_year <- years_to[i]
+
+    # Filter for the current year range
+    from_year <- years$years_from[i]
+    to_year <- years$years_to[i]
     date_range <- paste0(from_year, "-", to_year)
     report_var$date_range <- date_range
+    current_data <- filter_by_year(data, config$year_column_name, from_year, to_year)
     print(paste0("Creating report for the period ", from_year, " to ", to_year))
 
     # Save raw data before filtering
-    write.csv(data, paste0(paths$data, "/Raw_data_", date_range, ".csv"), row.names = FALSE)
+    write.csv(current_data, paste0(paths$data, "/Raw_data_", date_range, ".csv"), row.names = FALSE)
 
     # Retrieve the number of papers per author before filtering
-    prefilter_papers_per_author <- get_papers_per_author(data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)
+    prefilter_papers_per_author <- get_papers_per_author(current_data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)
 
     # Retrieve authors (per paper) before filtering
-    report_var$prefilter_author_stats <- get_author_stats(data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)
+    report_var$prefilter_author_stats <- get_author_stats(current_data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)
 
-    interactions <- Interactions(data = data,
+    interactions <- Interactions(data = current_data,
                                  author_delimiter = config$author_delimiter,
                                  author_column_name = config$author_column_name,
                                  year_column_name = config$year_column_name,

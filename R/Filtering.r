@@ -1,5 +1,6 @@
 #' @export
 filter_by_year <- function(data, year_column_name, from_year, to_year) {
+  check_year_column(data, year_column_name)
   check_year_filter(from_year, to_year)
   col <- rlang::sym(year_column_name)
   if (!is.null(from_year) && !is.null(to_year)) {

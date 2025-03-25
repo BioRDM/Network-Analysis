@@ -9,12 +9,6 @@ Interactions <- function(data,
                          from_year = NULL,
                          to_year = NULL) {
 
-  # Filter data by year if specified
-  if (!is.null(from_year) || !is.null(to_year)) {
-    check_year_column(data, year_column_name)
-    data <- filter_by_year(data, year_column_name, from_year, to_year)
-  }
-
   # Initial number of papers before author filtering
   initial_papers <- nrow(data)
 
