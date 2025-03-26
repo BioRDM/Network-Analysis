@@ -138,7 +138,7 @@ plot_top_authors.Interactions <- function(interactions, n = 10, output_file = "o
     vertex.size = 10,
     vertex.color = vertex_colors,
     vertex.frame.color = "black",
-    edge.width = log2(igraph::E(subgraph)$weight),
+    edge.width = log2(igraph::E(subgraph)$weight + 0.01),
     edge.color = "gray",
     edge.curved = 0.2
   )
