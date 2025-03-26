@@ -59,6 +59,11 @@ test_that("communities work", {
 })
 
 test_that("most_central_authors works", {
+  author_list <- get_most_central_authors(interactions, n = 10, centrality = "degree")
+  expect_true(author_list["Author1"] == "Author1")
+})
+
+test_that("most_central_authors_per_community works", {
   author_list <- get_most_central_per_community(interactions)
   expect_equal(author_list, "Author1")
 })

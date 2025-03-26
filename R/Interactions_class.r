@@ -85,6 +85,9 @@ generate_network_metrics.Interactions <- function(interactions) {
   interactions$diameter <- get_diameter(interactions)
   interactions$unreachable_percentage <- get_reachability(interactions) * 100
   interactions$cutpoints <- get_cutpoints(interactions)
+  interactions$top_authors_degree <- get_most_central_authors(interactions, centrality = "degree", n = 15)
+  interactions$top_authors_betweenness <- get_most_central_authors(interactions, centrality = "betweenness", n = 15)
+  interactions$top_authors_harmonic <- get_most_central_authors(interactions, centrality = "harmonic", n = 15)
   return(interactions)
 }
 
@@ -188,6 +191,20 @@ get_cutpoints.Interactions <- function(interactions) {
 
 get_cutpoints <- function(interactions) {
   UseMethod("get_cutpoints", interactions)
+}
+
+#' @export
+get_most_central_authors.Interactions <- function(interactions, centrality = "degree", n = 10) {
+  centrality_metric <- switch(centrality,
+                              "degree" = get_centrality(interactions)$degree,
+                              "betweenness" = get_centrality(interactions)$betweenness,
+                              "harmonic" = get_centrality(interactions)$harmonic)
+  most_central_authors <- format_names(igraph::V(interactions$graph)$name[order(-centrality_metric)[1:n]])
+  return(most_central_authors)
+}
+
+get_most_central_authors <- function(interactions, centrality, n) {
+  UseMethod("get_most_central_authors", interactions)
 }
 
 #' @export

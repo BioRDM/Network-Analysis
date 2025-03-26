@@ -159,11 +159,11 @@ Alongside this report, there is a CSV file titled centrality_data.csv. This file
 - **Betweenness Centrality:** A measure of how often the author appears on the shortest paths between other pairs of nodes. A high betweenness score indicates the author plays a bridge role, connecting different parts of the network.
 - **Harmonic Centrality:** A centrality measure that accounts for the distance to all other reachable nodes, giving partial credit to distant nodes. (Reflects how close an author is to all others in the network, even accounting for unreachable nodes.) Higher scores suggest the author can efficiently interact with many others, even in fragmented networks.
 
-# Reachability
-Reachability measures the proportion of pairs of nodes that are reachable in the network.
-
-- **Unreachable Pairs**: `r round(report_var$interactions$unreachable_percentage)`% of all possible pairs of nodes are unreachable in the network.
-- **Interpretation**: A high percentage of unreachable pairs may indicate a fragmented network or isolated nodes that are not connected to the main network.
+15 most central authors in the network, based on degree centrality (see appendix for other centrality metrics):
+```{r, echo=FALSE}
+top_authors_table <- matrix(report_var$interactions$top_authors_degree, ncol = 5, byrow = TRUE)
+knitr::kable(top_authors_table, col.names = c("", "", "", "", ""), format = "markdown")
+```
 
 ```{r, fig.pos = 'H', fig.cap = "Direct connections between the 15 most central authors", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
 knitr::include_graphics(report_var$figures$fig2, rel_path = FALSE)
@@ -171,6 +171,12 @@ knitr::include_graphics(report_var$figures$fig2, rel_path = FALSE)
 This figure highlights the direct connections between the 15 most central authors in the network. Nodes positioned around the circle represent these top authors, and the thickness of the connecting lines indicates the strength of their collaboration (thicker lines represent stronger connections). 
 
 A known limitation of this network analysis is reflected in cases where authors share the same last name and first initial, leading to duplicate entries being treated as a single node (in this figures, it looks like the authors connected to themselves). This issue arises when the dataset lacks full names, resulting in potential misrepresentation of distinct authors as one.
+
+# Reachability
+Reachability measures the proportion of pairs of nodes that are reachable in the network.
+
+- **Unreachable Pairs**: `r round(report_var$interactions$unreachable_percentage)`% of all possible pairs of nodes are unreachable in the network.
+- **Interpretation**: A high percentage of unreachable pairs may indicate a fragmented network or isolated nodes that are not connected to the main network.
 
 # Cutpoint Authors
 ## Definition
@@ -210,6 +216,11 @@ Each color represents a cluster of authors who are strongly connected within the
 The size of each node corresponds to the betweenness centrality of the author, a measure of how often an author appears on the shortest path between two other authors. 
 The legend identifies the authors with high betweenness centrality act as bridges, controlling the flow of information between different clusters or groups.
 
+15 most central authors in the network, based on betweenness centrality:
+```{r, echo=FALSE}
+top_authors_table <- matrix(report_var$interactions$top_authors_betweenness, ncol = 5, byrow = TRUE)
+knitr::kable(top_authors_table, col.names = c("", "", "", "", ""), format = "markdown")
+```
 
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of harmonic centrality in the Co-Authorship Network Analysis", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
 knitr::include_graphics(report_var$figures$fig5, rel_path = FALSE)
@@ -217,6 +228,12 @@ knitr::include_graphics(report_var$figures$fig5, rel_path = FALSE)
 Each color represents a cluster of authors who are strongly connected within the network.
 The size of each node corresponds to the harmonic centrality of the author, which reflects how close a node is to all other nodes in a network 
 The legend identifies the authors with high harmonic centrality that  can reach many other nodes quickly, even if some nodes are disconnected.
+
+15 most central authors in the network, based on harmonic centrality:
+```{r, echo=FALSE}
+top_authors_table <- matrix(report_var$interactions$top_authors_harmonic, ncol = 5, byrow = TRUE)
+knitr::kable(top_authors_table, col.names = c("", "", "", "", ""), format = "markdown")
+```
 
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network Analysis without centrality indicator", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
 knitr::include_graphics(report_var$figures$fig6, rel_path = FALSE)
