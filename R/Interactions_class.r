@@ -9,10 +9,8 @@ Interactions <- function(data,
                          from_year = NULL,
                          to_year = NULL) {
 
-  # Initial number of papers before author filtering
   initial_papers <- nrow(data)
 
-  # Filter papers by number of authors
   result <- filter_papers_by_authors(data,
                                      column_name = author_column_name,
                                      delimiter = author_delimiter,
@@ -21,7 +19,6 @@ Interactions <- function(data,
   papers_removed <- result[[2]]
   n_papers <- nrow(data)
 
-  # Remove authors with few papers from data
   result <- filter_infrequent_authors(data,
                                       column_name = author_column_name,
                                       delimiter = author_delimiter,
@@ -29,7 +26,6 @@ Interactions <- function(data,
   data <- result[[1]]
   authors_removed <- result[[2]]
 
-  # Create graph
   graph <- make_graph_from_df(data,
                               delimiter = author_delimiter,
                               column_name = author_column_name,
@@ -38,13 +34,9 @@ Interactions <- function(data,
     return(NULL)
   }
 
-  # Create network object from the graph
   network <- intergraph::asNetwork(graph)
-
-  # Get the layout coordinates for graphs
   layout_coords <- get_graph_coords(graph)
 
-  # Get the community clustering
   if (!directed) {
     communities <- get_communities(graph)
   } else {
@@ -69,7 +61,6 @@ Interactions <- function(data,
                        layout_coords = layout_coords,
                        communities = communities)
 
-  # Assign the class name
   class(interactions) <- "Interactions"
 
   return(interactions)
@@ -124,7 +115,7 @@ get_cohesion <- function(interactions) {
 
 #' @export
 get_density.Interactions <- function(interactions) {
-  return(sna::gden(interactions$network))
+  sna::gden(interactions$network)
 }
 
 get_density <- function(interactions) {
@@ -133,7 +124,7 @@ get_density <- function(interactions) {
 
 #' @export
 get_transitivity.Interactions <- function(interactions) {
-  return(sna::gtrans(interactions$network))
+  sna::gtrans(interactions$network)
 }
 
 get_transitivity <- function(interactions) {
@@ -182,11 +173,14 @@ get_reachability <- function(interactions) {
 get_cutpoints.Interactions <- function(interactions) {
   cutpoints <- sna::cutpoints(interactions$network, mode = "graph", return.indicator = TRUE)
   cutpoint_names <- network::network.vertex.names(interactions$network)[which(cutpoints == TRUE)]
+
   if (length(cutpoint_names) > 0) {
-    cutpoint_names <- format_names(cutpoint_names)
-    cutpoint_names <- sort(cutpoint_names)
+    cutpoint_names |>
+      format_names() |>
+      sort()
+  } else {
+    cutpoint_names
   }
-  return(cutpoint_names)
 }
 
 get_cutpoints <- function(interactions) {
@@ -199,8 +193,7 @@ get_most_central_authors.Interactions <- function(interactions, centrality = "de
                               "degree" = get_centrality(interactions)$degree,
                               "betweenness" = get_centrality(interactions)$betweenness,
                               "harmonic" = get_centrality(interactions)$harmonic)
-  most_central_authors <- format_names(igraph::V(interactions$graph)$name[order(-centrality_metric)[1:n]])
-  return(most_central_authors)
+  format_names(igraph::V(interactions$graph)$name[order(-centrality_metric)[1:n]])
 }
 
 get_most_central_authors <- function(interactions, centrality, n) {
@@ -215,13 +208,12 @@ get_most_central_per_community.Interactions <- function(interactions, centrality
                               "betweenness" = get_centrality(interactions)$betweenness,
                               "harmonic" = get_centrality(interactions)$harmonic,
                               "none" = get_centrality(interactions)$degree)  # If no centrality is specified, use degree
-  most_central_authors <- sapply(unique(comm$membership), function(group) {
+  sapply(unique(comm$membership), function(group) {
     group_vertices <- which(comm$membership == group)
     group_centrality <- centrality_metric[group_vertices]
     most_central_vertex <- group_vertices[which.max(group_centrality)]
     igraph::V(interactions$graph)$name[most_central_vertex]
   })
-  return(most_central_authors)
 }
 
 get_most_central_per_community <- function(interactions, centrality) {
@@ -247,5 +239,5 @@ save_centrality_data <- function(interactions, output_file) {
 
 #' @export
 get_communities <- function(graph) {
-  return(igraph::cluster_louvain(graph))
+  igraph::cluster_louvain(graph)
 }

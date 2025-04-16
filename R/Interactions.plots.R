@@ -101,33 +101,25 @@ plot_cutpoints <- function(interactions, centrality, output_file) {
 
 #' @export
 plot_top_authors.Interactions <- function(interactions, n = 10, output_file = "output/top_authors.png") {
-  # Identify the top n authors based on centrality
   centrality <- get_centrality(interactions)$degree
   if (length(centrality) < n) {
     n <- length(centrality)
   }
   top_authors <- order(centrality, decreasing = TRUE)[1:n]
-
-  # Create a subgraph with the top n authors
   subgraph <- igraph::induced_subgraph(interactions$graph, vids = top_authors)
 
-  # Get community membership for the top authors
   comm <- interactions$communities
   top_authors_communities <- comm$membership[top_authors]
   colors <- get_palette(alpha = 0.6)
   vertex_colors <- colors[top_authors_communities]
 
-  # Calculate label degrees to position labels outside the circle
-  # Adjust vertex-label distance based on the label's position
   layout_coords <- igraph::layout_in_circle(subgraph)
   label_degrees <- -atan2(layout_coords[, 2], layout_coords[, 1])
   vertex_label_dist <- 1 + abs(cos(label_degrees)) * 2
 
-  # Set up the plot
   grDevices::png(filename = output_file, width = 3000, height = 2500, res = 400)
   graphics::par(mfrow = c(1, 1), mar = c(1, 1, 1, 1))
 
-  # Plot the subgraph in a circular layout with weighted edges
   graphics::plot(
     subgraph,
     layout = igraph::layout_in_circle(subgraph),
@@ -153,41 +145,41 @@ plot_top_authors <- function(interactions, n, output_file) {
 
 #' @export
 add_graph_legend <- function(leg_x, leg_y, leg_items, leg_colors, leg_title = "") {
-  par(xpd = NA)
+  graphics::par(xpd = NA)
   leg_spread <- 0.11 * length(leg_items) / 2
   leg_y <- seq(leg_y - leg_spread, leg_y + leg_spread, length.out = length(leg_items))
-  text(x = leg_x,
-       y = max(leg_y) + 0.12,
-       labels = leg_title,
-       adj = c(0, 0.5),
-       cex = 1,
-       font = 2)
-  points(x = rep(leg_x, length(leg_items)),
-         y = leg_y,
-         col = "black",
-         bg = leg_colors,
-         pch = 21,
-         cex = 2)
-  text(x = rep(leg_x + 0.1, length(leg_items)),
-       y = leg_y,
-       col = "black",
-       labels = leg_items,
-       adj = c(0, 0.5),
-       cex = 0.8)
+  graphics::text(x = leg_x,
+                 y = max(leg_y) + 0.12,
+                 labels = leg_title,
+                 adj = c(0, 0.5),
+                 cex = 1,
+                 font = 2)
+  graphics::points(x = rep(leg_x, length(leg_items)),
+                   y = leg_y,
+                   col = "black",
+                   bg = leg_colors,
+                   pch = 21,
+                   cex = 2)
+  graphics::text(x = rep(leg_x + 0.1, length(leg_items)),
+                 y = leg_y,
+                 col = "black",
+                 labels = leg_items,
+                 adj = c(0, 0.5),
+                 cex = 0.8)
 }
 
 #' @export
 get_graph_coords <- function(graph) {
-  return(igraph::layout_(graph, igraph::with_drl(options = list(simmer.attraction = 0))))
+  igraph::layout_(graph, igraph::with_drl(options = list(simmer.attraction = 0)))
 }
 
 #' @export
 get_palette <- function(alpha = 1) {
-  return(grDevices::adjustcolor(c(
+  grDevices::adjustcolor(c(
     "#1E90FF", "#E31A1C", "#008000", "#6A3D9A", "#FF7F00",
     "#FFD700", "#87CEEB", "#FB9A99", "#98FB98", "#CAB2D6",
     "#FDBF6F", "#B3B3B3", "#F0E68C", "#800000", "#DA70D6",
     "#FF1493", "#0000FF", "#000000", "#4682B4", "#00CED1",
     "#00FF00", "#808000", "#FFFF00", "#FF8C00", "#A52A2A"
-  ), alpha.f = alpha))
+  ), alpha.f = alpha)
 }

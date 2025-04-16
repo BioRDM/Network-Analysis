@@ -65,19 +65,12 @@ assemble_report <- function(config, metadata) {
     # Save raw data after filtering
     write.csv(interactions$data, paste0(paths$data, "/Filtered_data_", date_range, ".csv"), row.names = FALSE)
 
-    # Retrieve the number of papers per author after filtering
     postfilter_papers_per_author <- get_papers_per_author(interactions$data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)
-
-    # Retrieve authors (per paper) after filtering
     report_var$postfilter_author_stats <- get_author_stats(interactions$data, author_column_name = config$author_column_name, delimiter = config$author_delimiter)
 
-    # Generate network metrics
     interactions <- generate_network_metrics(interactions)
-
-    # Add all interactions variables to report_var
     report_var$interactions <- interactions
 
-    # Generate report figures
     report_var$figures <- generate_figures(interactions, paths, date_range)
 
     # Save centrality data as csv

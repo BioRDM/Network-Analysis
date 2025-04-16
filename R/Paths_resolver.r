@@ -13,7 +13,6 @@ Paths <- function(config) {
                 papers_per_author = get_papers_per_author_path(config),
                 templates = get_templates_path(config))
 
-  # Assign the class name
   class(paths) <- "Paths"
 
   return(paths)
@@ -40,37 +39,37 @@ create_output_paths <- function(config) {
 }
 
 get_input_path <- function(config) {
-  return(normalizePath(config$file_path, winslash = "/"))
+  normalizePath(config$file_path, winslash = "/")
 }
 
 get_output_path <- function(config) {
-  return(normalizePath(config$output_path, winslash = "/"))
+  normalizePath(config$output_path, winslash = "/")
 }
 
 get_dataset_path <- function(config) {
-  return(paste0(config$output_path, "/", config$input_name))
+  paste0(config$output_path, "/", config$input_name)
 }
 
 get_figures_path <- function(config) {
-  return(paste0(get_dataset_path(config), "/figures"))
+  paste0(get_dataset_path(config), "/figures")
 }
 
 get_data_path <- function(config) {
-  return(paste0(get_dataset_path(config), "/data"))
+  paste0(get_dataset_path(config), "/data")
 }
 
 get_centrality_data_path <- function(config) {
-  return(paste0(get_data_path(config), "/Centrality_data_"))
+  paste0(get_data_path(config), "/Centrality_data_")
 }
 
 get_papers_per_author_path <- function(config) {
-  return(paste0(get_data_path(config), "/Papers_per_author_"))
+  paste0(get_data_path(config), "/Papers_per_author_")
 }
 
 get_summary_table_path <- function(config) {
-  return(paste0(get_data_path(config), "/Summary_statistics.csv"))
+  paste0(get_data_path(config), "/Summary_statistics.csv")
 }
 
 get_templates_path <- function(config) {
-  return(system.file("Templates", package = "NetworkAnalysis"))
+  system.file("Templates", package = "NetworkAnalysis")
 }
