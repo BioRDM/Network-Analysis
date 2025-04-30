@@ -11,13 +11,13 @@ get_author_stats <- function(data, author_column_name = "Author", delimiter = ";
   all_authors <- unique(unlist(strsplit(paste(author_column, collapse = delimiter), delimiter)))
   unique_author_count <- length(all_authors)
 
-  return(list(
+  list(
     sum = unique_author_count,
     average = avg_authors,
     median = median_authors,
     min = min_authors,
     max = max_authors
-  ))
+  )
 }
 
 #' @export

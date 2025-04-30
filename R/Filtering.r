@@ -36,7 +36,7 @@ filter_papers_by_authors <- function(data, column_name = "Author", delimiter = "
     dplyr::select(-item_list, -Num_items)
   print(paste0(nrow(filtered_data), " papers were included in the network analysis."))
 
-  return(list(filtered_data, too_many, too_few))
+  list(filtered_data, too_many, too_few)
 }
 
 #' @export
@@ -70,5 +70,5 @@ filter_infrequent_authors <- function(data, column_name = "Author", delimiter = 
     print(paste0("Removed ", removed_authors, " authors that appeared less than ", min_occurrences, " times."))
   }
 
-  return(list(filtered_data, removed_authors))
+  list(filtered_data, removed_authors)
 }

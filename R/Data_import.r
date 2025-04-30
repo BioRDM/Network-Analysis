@@ -30,7 +30,7 @@ make_graph_from_df <- function(data, delimiter = ";", column_name = "Author", di
 
   graph <- igraph::graph_from_data_frame(edges, directed = directed)
   print(paste0("Constructed network with ", graph |> igraph::vcount(), " authors"))
-  return(graph)
+  graph
 }
 
 #' @export
@@ -93,5 +93,5 @@ read_metadata <- function(metadata) {
   metadata$Data_source_url <- NULL
   names(metadata) <- gsub("_", " ", names(metadata))
 
-  return(metadata)
+  metadata
 }

@@ -16,7 +16,7 @@ get_years_from_to <- function(data, config) {
     years_from <- year_from
     years_to <- year_to
   }
-  return(list(years_from = years_from, years_to = years_to))
+  list(years_from = years_from, years_to = years_to)
 }
 
 #' @export

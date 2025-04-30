@@ -29,9 +29,9 @@ format_names <- function(name_list) {
     } else {
       formatted_name <- name
     }
-    return(formatted_name)
+    formatted_name
   })
-  return(name_list)
+  name_list
 }
 
 #' @export
@@ -67,5 +67,5 @@ escape_latex <- function(text) {
   text <- gsub("\\}", "\\\\}", text)
   text <- gsub("\\^", "\\\\textasciicircum{}", text)
   text <- gsub("~", "\\\\textasciitilde{}", text)
-  return(text)
+  text
 }

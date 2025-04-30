@@ -15,7 +15,7 @@ Paths <- function(config) {
 
   class(paths) <- "Paths"
 
-  return(paths)
+  paths
 }
 
 create_output_paths <- function(config) {
@@ -35,7 +35,7 @@ create_output_paths <- function(config) {
   if (!dir.exists(data_path)) {
     dir.create(data_path, recursive = TRUE)
   }
-  return(config)
+  config
 }
 
 get_input_path <- function(config) {

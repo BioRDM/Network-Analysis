@@ -37,7 +37,7 @@ plot_graph.Interactions <- function(interactions, centrality = "degree", output_
   }
 
   dev.off()
-  return(output_file)
+  output_file
 }
 
 plot_graph <- function(interactions, centrality, output_file) {
@@ -92,7 +92,7 @@ plot_cutpoints.Interactions <- function(interactions, centrality = "degree", out
 
     dev.off()
   }
-  return(output_file)
+  output_file
 }
 
 plot_cutpoints <- function(interactions, centrality, output_file) {
@@ -136,7 +136,7 @@ plot_top_authors.Interactions <- function(interactions, n = 10, output_file = "o
   )
 
   dev.off()
-  return(output_file)
+  output_file
 }
 
 plot_top_authors <- function(interactions, n, output_file) {

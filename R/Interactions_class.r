@@ -63,7 +63,7 @@ Interactions <- function(data,
 
   class(interactions) <- "Interactions"
 
-  return(interactions)
+  interactions
 }
 
 #' @export
@@ -79,7 +79,7 @@ generate_network_metrics.Interactions <- function(interactions) {
   interactions$top_authors_degree <- get_most_central_authors(interactions, centrality = "degree", n = 15)
   interactions$top_authors_betweenness <- get_most_central_authors(interactions, centrality = "betweenness", n = 15)
   interactions$top_authors_harmonic <- get_most_central_authors(interactions, centrality = "harmonic", n = 15)
-  return(interactions)
+  interactions
 }
 
 generate_network_metrics <- function(interactions) {
@@ -94,7 +94,7 @@ generate_figures.Interactions <- function(interactions, paths, date_range) {
   fig4 <- plot_graph(interactions, centrality = "betweenness", output_file = paste0(paths$figures, "/graph_betweenness_", date_range, ".png"))
   fig5 <- plot_graph(interactions, centrality = "harmonic", output_file = paste0(paths$figures, "/graph_harmonic_", date_range, ".png"))
   fig6 <- plot_graph(interactions, centrality = "none", output_file = paste0(paths$figures, "/graph_no_centrality_", date_range, ".png"))
-  return(list(fig1 = fig1, fig2 = fig2, fig3 = fig3, fig4 = fig4, fig5 = fig5, fig6 = fig6))
+  list(fig1 = fig1, fig2 = fig2, fig3 = fig3, fig4 = fig4, fig5 = fig5, fig6 = fig6)
 }
 
 generate_figures <- function(interactions, paths, date_range) {
@@ -106,7 +106,7 @@ get_cohesion.Interactions <- function(interactions) {
   dyadcount <- network::network.dyadcount(interactions$network)
   edgecount <- network::network.edgecount(interactions$network)
   size <- network::network.size(interactions$network)
-  return(list(dyadcount = dyadcount, edgecount = edgecount, size = size))
+  list(dyadcount = dyadcount, edgecount = edgecount, size = size)
 }
 
 get_cohesion <- function(interactions) {
@@ -136,7 +136,7 @@ get_centrality.Interactions <- function(interactions) {
   degree <- igraph::degree(interactions$graph)
   harmonic <- igraph::harmonic_centrality(interactions$graph)
   betweenness <- igraph::betweenness(interactions$graph)
-  return(list(degree = degree, harmonic = harmonic, betweenness = betweenness))
+  list(degree = degree, harmonic = harmonic, betweenness = betweenness)
 }
 
 get_centrality <- function(interactions) {
@@ -148,7 +148,7 @@ get_diameter.Interactions <- function(interactions) {
   diameter <- igraph::diameter(interactions$graph, directed = interactions$directed, weights = NULL)
   shortest_paths <- igraph::distances(interactions$graph)
   average_shortest_path <- mean(shortest_paths[shortest_paths != Inf])
-  return(list(diameter = diameter, average_shortest_path = average_shortest_path))
+  list(diameter = diameter, average_shortest_path = average_shortest_path)
 }
 
 get_diameter <- function(interactions) {
@@ -160,9 +160,7 @@ get_reachability.Interactions <- function(interactions) {
   reachability_matrix <- sna::reachability(interactions$network)
   num_nodes <- nrow(reachability_matrix)
   total_pairs <- num_nodes * (num_nodes - 1)
-  num_unreachable_pairs <- sum(reachability_matrix == 0) - num_nodes
-  unreachable_fraction <- num_unreachable_pairs / total_pairs
-  return(unreachable_fraction)
+  (sum(reachability_matrix == 0) - num_nodes) / total_pairs
 }
 
 get_reachability <- function(interactions) {
