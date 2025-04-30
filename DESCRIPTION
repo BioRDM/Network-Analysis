@@ -24,5 +24,6 @@ Imports:
     jsonlite
 Suggests:
     testthat (>= 3.0.0),
-    mockery
+    mockery,
+    renv
 Config/testthat/edition: 3
