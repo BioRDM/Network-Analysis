@@ -5,12 +5,13 @@ import_csv_data <- function(file_path) {
 }
 
 #' @export
+#' @importFrom rlang .data
 make_graph_from_df <- function(data, delimiter = ";", column_name = "Author", directed = FALSE) {
   col_sym <- rlang::sym(column_name)
 
   data <- (data |>
              dplyr::mutate(item_list = stringr::str_split(!!col_sym, delimiter)) |>
-             dplyr::filter(purrr::map_int(item_list, length) > 1))  # Remove papers with less than 2 authors
+             dplyr::filter(purrr::map_int(.data$item_list, length) > 1))  # Remove papers with less than 2 authors
 
   if (nrow(data) < 1) {
     print("No papers with more than one author were found in the dataset. Skipping report.")
@@ -22,11 +23,11 @@ make_graph_from_df <- function(data, delimiter = ";", column_name = "Author", di
     dplyr::mutate(pairs = purrr::map(stringr::str_split(!!col_sym, delimiter), ~utils::combn(.x, 2, simplify = FALSE))) |>  # Generate all pairs of items
     tidyr::unnest(pairs) |>
     tidyr::unnest_wider(pairs, names_sep = "_") |>
-    dplyr::mutate(pairs_1 = trimws(pairs_1), pairs_2 = trimws(pairs_2)) |>
+    dplyr::mutate(pairs_1 = trimws(.data$pairs_1), pairs_2 = trimws(.data$pairs_2)) |>
     dplyr::rowwise() |>
-    dplyr::mutate(item1 = min(pairs_1, pairs_2), item2 = max(pairs_1, pairs_2)) |>  # Order item pairs alphabetically
+    dplyr::mutate(item1 = min(.data$pairs_1, .data$pairs_2), item2 = max(.data$pairs_1, .data$pairs_2)) |>  # Order item pairs alphabetically
     dplyr::ungroup() |>
-    dplyr::count(item1, item2, name = "weight")
+    dplyr::count(.data$item1, .data$item2, name = "weight")
 
   graph <- igraph::graph_from_data_frame(edges, directed = directed)
   print(paste0("Constructed network with ", graph |> igraph::vcount(), " authors"))
@@ -34,6 +35,8 @@ make_graph_from_df <- function(data, delimiter = ";", column_name = "Author", di
 }
 
 #' @export
+#' @importFrom rlang .data
+#' @importFrom data.table :=
 tidy_authors <- function(data, author_column = "Author", source_column = "Source", delimiter = ";") {
   author_col <- rlang::sym(author_column)
   if ("Source" %in% colnames(data)) {

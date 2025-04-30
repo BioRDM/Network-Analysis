@@ -57,18 +57,19 @@ get_summary_stats <- function(interactions) {
   )
 }
 
+#' @importFrom rlang .data
 save_papers_per_author <- function(prefilter_papers_per_author, postfilter_papers_per_author, output_file = "output/centrality_data.csv") {
   merged_papers_per_author <- dplyr::full_join(
-    prefilter_papers_per_author |> dplyr::rename(Papers_prefilter = Papers),
-    postfilter_papers_per_author |> dplyr::rename(Papers_postfilter = Papers),
+    prefilter_papers_per_author |> dplyr::rename(Papers_prefilter = "Papers"),
+    postfilter_papers_per_author |> dplyr::rename(Papers_postfilter = "Papers"),
     by = "Author"
   ) |>
     dplyr::mutate(
-      Papers_prefilter = tidyr::replace_na(Papers_prefilter, 0),
-      Papers_postfilter = tidyr::replace_na(Papers_postfilter, 0)
+      Papers_prefilter = tidyr::replace_na(.data$Papers_prefilter, 0),
+      Papers_postfilter = tidyr::replace_na(.data$Papers_postfilter, 0)
     ) |>
-    dplyr::mutate(Papers_removed = Papers_prefilter - Papers_postfilter) |>
-    dplyr::arrange(dplyr::desc(Papers_removed))
+    dplyr::mutate(Papers_removed = .data$Papers_prefilter - .data$Papers_postfilter) |>
+    dplyr::arrange(dplyr::desc(.data$Papers_removed))
 
   write.csv(merged_papers_per_author, output_file, row.names = FALSE)
 }

@@ -20,6 +20,7 @@ get_years_from_to <- function(data, config) {
 }
 
 #' @export
+#' @importFrom data.table :=
 year_parser <- function(data, year_column_name) {
   date_formats <- c("Y", "y", "ymd", "mdy", "dmy", "Ymd", "mdY", "dmY")
   year_col <- rlang::sym(year_column_name)
