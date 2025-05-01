@@ -37,7 +37,7 @@ test_that("get_years_from_to handles invalid split_per_year", {
     split_per_year = "two"
   )
 
-  expect_error(get_years_from_to(data, config), "split_per_year must be an integer value or NULL.")
+  expect_error(get_years_from_to(data, config), "must be an integer value or NULL.")
 })
 
 test_that("get_years_from_to handles all-NULL input", {

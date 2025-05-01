@@ -25,8 +25,8 @@ config <- list(
       output_path = "E:/Daniel/Network_Analysis/Outputs",
   
   # Delimiter used to separate author names in the "Author" column.
-  # - For example, if authors are separated by semicolons, use ";".
-      author_delimiter = " // ",
+  # - For example, if authors are separated by semicolons, use ";"
+      author_delimiter = "//",
   
   # Name of the column in the CSV file that contains the author names.
   # - Ensure the column name matches exactly, including capitalisation and pluralisation.
@@ -38,11 +38,11 @@ config <- list(
   
   # Filter 1: Maximum number of authors per paper to include in the analysis.
   # - Papers with more than this number of authors will be excluded.
-      max_authors_per_paper = 50,
+      max_authors_per_paper = NULL,
   
   # Filter 2: Minimum number of papers an author must have to be included in the analysis.
   # - Authors with fewer than this number of papers will be excluded.
-      min_papers_per_author = 2,
+      min_papers_per_author = NULL,
   
   # Timeframe for the analysis: specify the start and end years.
   # - Use `NULL` to include all the years in your csv.

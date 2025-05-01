@@ -39,6 +39,11 @@ make_graph_from_df <- function(data, delimiter = ";", column_name = "Author", di
 #' @importFrom data.table :=
 tidy_authors <- function(data, author_column = "Author", source_column = "Source", delimiter = ";") {
   author_col <- rlang::sym(author_column)
+
+  if (suppressWarnings(!all(is.na(as.numeric(data[[author_column]]))))) {
+    return(data)
+  }
+
   if ("Source" %in% colnames(data)) {
     source_col <- rlang::sym(source_column)
 

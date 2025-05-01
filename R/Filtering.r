@@ -4,13 +4,15 @@ filter_by_year <- function(data, year_column_name, from_year, to_year) {
   check_year_filter(from_year, to_year)
 
   data <- year_parser(data, year_column_name)
+  from_year <- as.Date(from_year, format = "%Y")
+  to_year <- as.Date(to_year, format = "%Y")
 
   col <- rlang::sym(year_column_name)
-  if (!is.null(from_year) && !is.null(to_year)) {
+  if (length(from_year) > 0 && length(to_year) > 0) {
     data |> dplyr::filter(!!col >= from_year & !!col <= to_year)
-  } else if (!is.null(from_year)) {
+  } else if (length(from_year) > 0) {
     data |> dplyr::filter(!!col >= from_year)
-  } else if (!is.null(to_year)) {
+  } else if (length(to_year) > 0) {
     data |> dplyr::filter(!!col <= to_year)
   } else {
     data
@@ -21,6 +23,8 @@ filter_by_year <- function(data, year_column_name, from_year, to_year) {
 #' @importFrom rlang .data
 filter_papers_by_authors <- function(data, column_name = "Author", delimiter = ";", max_authors) {
   col_sym <- rlang::sym(column_name)
+
+  max_authors <- ifelse(is.null(max_authors), 9999, max_authors)
 
   filtered_data <- data |>
     dplyr::mutate(item_list = stringr::str_split(!!col_sym, delimiter)) |>
@@ -48,6 +52,8 @@ filter_papers_by_authors <- function(data, column_name = "Author", delimiter = "
 #' @importFrom data.table :=
 filter_infrequent_authors <- function(data, column_name = "Author", delimiter = ";", min_occurrences = 5) {
   col_sym <- rlang::sym(column_name)
+
+  min_occurrences <- ifelse(is.null(min_occurrences), 0, min_occurrences)
 
   author_list <- data |>
     dplyr::mutate(item_list = stringr::str_split(!!col_sym, delimiter)) |>
