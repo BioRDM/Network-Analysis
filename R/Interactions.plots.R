@@ -36,7 +36,7 @@ plot_graph.Interactions <- function(interactions, centrality = "degree", output_
     add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = most_central_authors, leg_colors = colors, leg_title = "Most central author")
   }
 
-  dev.off()
+  grDevices::dev.off()
   output_file
 }
 
@@ -55,7 +55,7 @@ plot_cutpoints.Interactions <- function(interactions, centrality = "degree", out
     graphics::par(mar = c(0, 0, 0, 0))
     graphics::plot(1, type = "n", xlab = "", ylab = "", axes = FALSE, xlim = c(0, 1), ylim = c(0, 1))
     graphics::rect(0, 0, 1, 1, col = "white", border = "white")
-    dev.off()
+    grDevices::dev.off()
   } else {
     vertex_colors <- rep(grDevices::adjustcolor("grey", alpha.f = 0.4), length(cutpoints))
     vertex_colors[cutpoints] <- colors[1:sum(cutpoints)]
@@ -90,7 +90,7 @@ plot_cutpoints.Interactions <- function(interactions, centrality = "degree", out
       add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = cutpoint_names, leg_colors = colors[1:sum(cutpoints)], leg_title = "Cutpoint authors")
     }
 
-    dev.off()
+    grDevices::dev.off()
   }
   output_file
 }
@@ -135,7 +135,7 @@ plot_top_authors.Interactions <- function(interactions, n = 10, output_file = "o
     edge.curved = 0.2
   )
 
-  dev.off()
+  grDevices::dev.off()
   output_file
 }
 

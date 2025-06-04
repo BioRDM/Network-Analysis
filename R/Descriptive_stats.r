@@ -4,7 +4,7 @@ get_author_stats <- function(data, author_column_name = "Author", delimiter = ";
   author_counts <- sapply(author_column, function(x) length(strsplit(x, delimiter)[[1]]))
 
   avg_authors <- mean(author_counts)
-  median_authors <- median(author_counts)
+  median_authors <- stats::median(author_counts)
   min_authors <- min(author_counts)
   max_authors <- max(author_counts)
 
@@ -71,5 +71,5 @@ save_papers_per_author <- function(prefilter_papers_per_author, postfilter_paper
     dplyr::mutate(Papers_removed = .data$Papers_prefilter - .data$Papers_postfilter) |>
     dplyr::arrange(dplyr::desc(.data$Papers_removed))
 
-  write.csv(merged_papers_per_author, output_file, row.names = FALSE)
+  utils::write.csv(merged_papers_per_author, output_file, row.names = FALSE)
 }

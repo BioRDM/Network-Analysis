@@ -20,9 +20,10 @@ make_graph_from_df <- function(data, delimiter = ";", column_name = "Author", di
 
   # Create edges: pairwise combinations of co-authors
   edges <- data |>
-    dplyr::mutate(pairs = purrr::map(stringr::str_split(!!col_sym, delimiter), ~utils::combn(.x, 2, simplify = FALSE))) |>  # Generate all pairs of items
-    tidyr::unnest(pairs) |>
-    tidyr::unnest_wider(pairs, names_sep = "_") |>
+    dplyr::mutate(pairs = purrr::map(stringr::str_split(!!col_sym, delimiter),
+                                     ~utils::combn(.x, 2, simplify = FALSE))) |>  # Generate all pairs of items
+    tidyr::unnest(.data$pairs) |>
+    tidyr::unnest_wider(.data$pairs, names_sep = "_") |>
     dplyr::mutate(pairs_1 = trimws(.data$pairs_1), pairs_2 = trimws(.data$pairs_2)) |>
     dplyr::rowwise() |>
     dplyr::mutate(item1 = min(.data$pairs_1, .data$pairs_2), item2 = max(.data$pairs_1, .data$pairs_2)) |>  # Order item pairs alphabetically
@@ -82,7 +83,7 @@ read_config <- function(config) {
   )
 
   # Merge the provided config with the default config
-  modifyList(default_config, config, keep.null = TRUE)
+  utils::modifyList(default_config, config, keep.null = TRUE)
 }
 
 #' @export
@@ -96,7 +97,7 @@ read_metadata <- function(metadata) {
     Data_source_url = ""
   )
 
-  metadata <- modifyList(default_metadata, metadata, keep.null = TRUE)
+  metadata <- utils::modifyList(default_metadata, metadata, keep.null = TRUE)
   metadata$Data_source <- paste0("\\href{", metadata$Data_source_url, "}", " {", metadata$Data_source, "}")
   metadata$Data_source_url <- NULL
   names(metadata) <- gsub("_", " ", names(metadata))

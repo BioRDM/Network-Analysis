@@ -7,10 +7,9 @@ metadata <- list(
   Author = "Daniel Thedie",
   Email = "daniel.thedie@ed.ac.uk",
   Data_description = "Articles published at the School of Biological Sciences (SBS) in 2023-2024, downloaded from the Pure Research Information System (University of Edinburgh).",
-  Data_access_date = "29th April 2025",
+  Data_access_date = "20th May 2025",
   Data_source = "Pure (University of Edinburgh)",
-  Data_source_url = "https://library.ed.ac.uk/research-support/research-information-management/pure",
-  Source_data_author = "Rogan Dixon"
+  Data_source_url = "https://library.ed.ac.uk/research-support/research-information-management/pure"
 )
 
 # Configuration list for the analysis
@@ -18,11 +17,11 @@ config <- list(
   #Copy and Paste the file path
   # File path to the CSV file containing the data.
   # - Use double backslashes (\\) or forward slashes (/) in the file path.
-      file_path = "E:/Daniel/Network_Analysis/Data/SBS_PURE_with_IDs/20250428_Pure-Publication-Date-with-IDs_23-24.csv",
+      file_path = "/media/Store/Daniel/Network_Analysis/Data/SBS_PURE_with_IDs/20250520_SBS_author_names_and_Pure_IDs_23-24.csv",
       
   # Output directory where the results (PDFs, figures, CSV files, etc.) will be saved.
   # - A folder named "output" will be created if it doesn't already exist.
-      output_path = "E:/Daniel/Network_Analysis/Outputs",
+      output_path = "/media/Store/Daniel/Network_Analysis/Outputs",
   
   # Delimiter used to separate author names in the "Author" column.
   # - For example, if authors are separated by semicolons, use ";"
@@ -34,7 +33,7 @@ config <- list(
  
   # Name of the column in the CSV file that contains the publication year.
   # - Ensure the column name matches exactly, including capitalisation and pluralisation.
-      year_column_name = "Earliest published date",
+      year_column_name = "Published_date",
   
   # Filter 1: Maximum number of authors per paper to include in the analysis.
   # - Papers with more than this number of authors will be excluded.
