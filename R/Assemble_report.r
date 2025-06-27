@@ -1,6 +1,6 @@
 #' @export
 assemble_report <- function(config, metadata) {
-  summary_var <<- list() # Global variable to store summary variables
+  summary_var <- list() # Store summary variables for the report
   config <- read_config(config)
   metadata <- read_metadata(metadata)
 
@@ -28,7 +28,7 @@ assemble_report <- function(config, metadata) {
 
   # Create the report(s)
   for (i in seq_along(years$years_from)) {
-    report_var <<- list() # Global variable to store report variables
+    report_var <- list() # Store report variables
     report_var$config <- config
     report_var$metadata <- metadata
 
@@ -124,7 +124,8 @@ assemble_report <- function(config, metadata) {
     paste0(paths$templates, "/Summary_template.Rmd"),
     output_file = paste0(paths$dataset, "/Summary.pdf"),
     output_format = "pdf_document",
-    quiet = TRUE
+    quiet = TRUE,
+    params = list(report_var = report_var, summary_var = summary_var)
   )
   print("Summary Table exported successfully!")
 
