@@ -1,147 +1,144 @@
 #' @export
-plot <- function(interactions, ...) UseMethod("plot")
+plot <- function(graph, ...) UseMethod("plot")
 #' @export
-plot.graph <- function(graph, centrality_method = "degree", output_file = "output/graph.png") {
-  colors <- get_palette(alpha = 0.6)
+plot.graph <- function(graph, centrality_method = "degree") {
+  colors <- get_palette(graph, attr = "community", alpha = 0.6)
   centrality <- get_centrality(graph, method = centrality_method)
 
   if (centrality_method == "none") {
     vertex_size <- 4 * rep(1, igraph::vcount(graph$graph))
   } else {
     vertex_size <- 3 + (centrality / max(centrality)) * 10
-    most_central_authors <- get_most_central_per_community(graph, method = centrality_method) |>
-      format_names()
   }
+  igraph::V(graph$graph)$size <- vertex_size
 
   layout_df <- graph$layout
-  layout_df$community <- as.factor(get_communities(graph))
-  layout_df$size <- vertex_size
 
   ggraph::ggraph(graph$graph, layout = "manual", x = layout_df$x, y = layout_df$y) +
     ggraph::geom_edge_link(color = "gray", width = 0.8, alpha = 0.7) +
-    ggraph::geom_node_point(ggplot2::aes(x = .data$x, y = .data$y, color = .data$community, size = .data$size), show.legend = FALSE) +
+    ggraph::geom_node_point(ggplot2::aes(color = community, size = size), show.legend = FALSE) +
     ggplot2::scale_color_manual(values = colors) +
     ggplot2::theme_void()
 }
-#' @export
-plot_cutpoints <- function(interactions, ...) UseMethod("plot_cutpoints")
-#' @export
-plot_cutpoints.Interactions <- function(interactions, centrality = "degree", output_file = "output/cutpoint_graph.png") {
-  cutpoints <- sna::cutpoints(interactions$network, mode = "graph", return.indicator = TRUE)
-  cutpoint_names <- get_cutpoints(interactions)
-  colors <- get_palette(alpha = 1)
 
-  if (sum(cutpoints) == 0) {
-    grDevices::png(filename = output_file, width = 100, height = 100, res = 72)
-    graphics::par(mar = c(0, 0, 0, 0))
-    graphics::plot(1, type = "n", xlab = "", ylab = "", axes = FALSE, xlim = c(0, 1), ylim = c(0, 1))
-    graphics::rect(0, 0, 1, 1, col = "white", border = "white")
-    grDevices::dev.off()
+
+#' @export
+plot_cutpoints <- function(graph, ...) UseMethod("plot_cutpoints")
+#' @export
+plot_cutpoints.graph <- function(graph, centrality_method = "degree") {
+  cutpoints <- get_cutpoints(graph)
+  n_cutpoints <- length(cutpoints)
+  
+  vertex_colors <- rep(grDevices::adjustcolor("grey", alpha.f = 0.6), igraph::vcount(graph$graph))
+  if (n_cutpoints > 0) {
+    colors <- get_palette(alpha = 1)[seq_len(n_cutpoints)]
+    vertex_colors[as.integer(cutpoints)] <- colors
   } else {
-    vertex_colors <- rep(grDevices::adjustcolor("grey", alpha.f = 0.4), length(cutpoints))
-    vertex_colors[cutpoints] <- colors[1:sum(cutpoints)]
-
-    size_metric <- switch(centrality,
-                          "degree" = get_centrality(interactions)$degree,
-                          "betweenness" = get_centrality(interactions)$betweenness,
-                          "harmonic" = get_centrality(interactions)$harmonic,
-                          "none" = rep(1, igraph::vcount(interactions$graph)))
-    if (centrality == "none") {
-      vertex_size <- 4 * size_metric
-    } else {
-      vertex_size <- 3 + (size_metric / max(size_metric)) * 10
-    }
-
-    grDevices::png(filename = output_file, width = 2500, height = 1800, res = 360)
-
-    graphics::par(mfrow = c(1, 1), mar = c(1, 1, 1, 10))
-    graphics::plot(
-      interactions$graph,
-      vertex.label = NA,
-      vertex.size = vertex_size,
-      vertex.color = vertex_colors,
-      edge.width = 0.8,
-      edge.color = "gray",
-      layout = interactions$layout_coords
-    )
-
-    if (length(cutpoint_names) > 20) {
-      print(paste0("Cutpoint plot: removing legend because there are too many cutpoint authors (", length(cutpoint_names), ")."))
-    } else if (length(cutpoint_names) > 0) {
-      add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = cutpoint_names, leg_colors = colors[1:sum(cutpoints)], leg_title = "Cutpoint authors")
-    }
-
-    grDevices::dev.off()
+    colors <- character(0)
   }
-  output_file
+  igraph::V(graph$graph)$cutpoint_color <- vertex_colors
+
+  centrality <- get_centrality(graph, method = centrality_method)
+  if (centrality_method == "none") {
+    vertex_size <- 4 * rep(1, igraph::vcount(graph$graph))
+  } else {
+    vertex_size <- 3 + (centrality / max(centrality)) * 10
+  }
+  igraph::V(graph$graph)$size <- vertex_size
+
+  layout_df <- graph$layout
+  rownames(layout_df) <- igraph::V(graph$graph)$name
+
+  p <- ggraph::ggraph(graph$graph, layout = "manual", x = layout_df$x, y = layout_df$y) +
+    ggraph::geom_edge_link(color = "gray", width = 0.8, alpha = 0.7) +
+    ggraph::geom_node_point(ggplot2::aes(color = cutpoint_color, size = size), show.legend = TRUE) +
+    ggplot2::scale_color_identity(guide = "legend",
+                                  labels = names(cutpoints),
+                                  breaks = igraph::V(graph$graph)$cutpoint_color[as.integer(cutpoints)]) +
+    ggplot2::theme_void()
+
+  if (n_cutpoints > 0 && n_cutpoints <= 20) {
+    legend_df <- data.frame(
+      name = names(cutpoints),
+      color = igraph::V(graph$graph)$cutpoint_color[as.integer(cutpoints)]
+    )
+    p <- p + ggplot2::guides(
+      size = "none",
+      color = ggplot2::guide_legend(
+        override.aes = list(
+          color = legend_df$color,
+          size = 6
+        ),
+        title = "Cutpoint authors",
+        label.theme = ggplot2::element_text(size = 10)
+      )
+    )
+  }
+  p
 }
 
+
 #' @export
-plot_top_authors <- function(interactions, ...) UseMethod("plot_top_authors")
+plot_top_authors <- function(graph, ...) UseMethod("plot_top_authors")
 #' @export
-plot_top_authors.Interactions <- function(interactions, n = 10, output_file = "output/top_authors.png") {
-  centrality <- get_centrality(interactions)$degree
+plot_top_authors.graph <- function(graph, n = 10) {
+  centrality <- get_centrality(graph, method = "degree")
   if (length(centrality) < n) {
     n <- length(centrality)
   }
   top_authors <- order(centrality, decreasing = TRUE)[1:n]
-  subgraph <- igraph::induced_subgraph(interactions$graph, vids = top_authors)
+  subgraph <- igraph::induced_subgraph(graph$graph, vids = top_authors)
 
-  comm <- interactions$communities
-  top_authors_communities <- comm$membership[top_authors]
-  colors <- get_palette(alpha = 0.6)
-  vertex_colors <- colors[top_authors_communities]
+  comm <- get_communities(graph)
+  top_authors_communities <- comm[top_authors]
+  igraph::V(subgraph)$community <- as.factor(top_authors_communities)
+
+  colors <- get_palette(graph, attr = "community", alpha = 0.6)
 
   layout_coords <- igraph::layout_in_circle(subgraph)
+  colnames(layout_coords) <- c("x", "y")
+  rownames(layout_coords) <- igraph::V(subgraph)$name
   label_degrees <- -atan2(layout_coords[, 2], layout_coords[, 1])
   vertex_label_dist <- 1 + abs(cos(label_degrees)) * 2
 
-  grDevices::png(filename = output_file, width = 3000, height = 2500, res = 400)
-  graphics::par(mfrow = c(1, 1), mar = c(1, 1, 1, 1))
+  layout_df <- as.data.frame(layout_coords)
+  layout_df$name <- rownames(layout_coords)
+  layout_df$label_degree <- label_degrees
+  layout_df$label_dist <- vertex_label_dist
 
-  graphics::plot(
-    subgraph,
-    layout = igraph::layout_in_circle(subgraph),
-    vertex.label = format_names(igraph::V(subgraph)$name),
-    vertex.label.dist = vertex_label_dist,
-    vertex.label.degree = label_degrees,
-    vertex.label.color = "black",
-    vertex.size = 10,
-    vertex.color = vertex_colors,
-    vertex.frame.color = "black",
-    edge.width = log2(igraph::E(subgraph)$weight + 0.1),
-    edge.color = "gray",
-    edge.curved = 0.2
-  )
+  edge_df <- igraph::as_data_frame(subgraph, what = "edges")
+  if ("weight" %in% colnames(edge_df)) {
+    igraph::E(subgraph)$edge_width <- log2(igraph::E(subgraph)$weight + 0.1)
+  } else {
+    igraph::E(subgraph)$edge_width <- 1
+  }
 
-  grDevices::dev.off()
-  output_file
+  ggraph::ggraph(subgraph, layout = "manual", x = layout_df$x, y = layout_df$y) +
+    ggraph::geom_edge_arc(
+      ggplot2::aes(circular = TRUE, edge_width = edge_width),
+      color = "gray",
+      alpha = 0.7
+    ) +
+    ggraph::geom_node_point(ggplot2::aes(color = community, size = 6), show.legend = FALSE) +
+    ggplot2::scale_color_manual(values = colors) +
+    ggplot2::scale_size_identity() +
+    ggraph::geom_node_text(
+      ggplot2::aes(
+        label = format_names(name),
+        hjust = ifelse(layout_df$label_degree > pi/2 | layout_df$label_degree < -pi/2, 1.2, -0.2)
+      ),
+      size = 3,
+      color = "black",
+      show.legend = FALSE
+    ) +
+    ggplot2::theme_void() +
+    ggplot2::guides(size = "none", edge_width = "none") +
+    ggplot2::theme(
+      plot.margin = ggplot2::margin(t = 0, r = 100, b = 0, l = 100)
+    ) +
+    ggplot2::coord_cartesian(clip = "off")
 }
 
-#' @export
-add_graph_legend <- function(leg_x, leg_y, leg_items, leg_colors, leg_title = "") {
-  graphics::par(xpd = NA)
-  leg_spread <- 0.11 * length(leg_items) / 2
-  leg_y <- seq(leg_y - leg_spread, leg_y + leg_spread, length.out = length(leg_items))
-  graphics::text(x = leg_x,
-                 y = max(leg_y) + 0.12,
-                 labels = leg_title,
-                 adj = c(0, 0.5),
-                 cex = 1,
-                 font = 2)
-  graphics::points(x = rep(leg_x, length(leg_items)),
-                   y = leg_y,
-                   col = "black",
-                   bg = leg_colors,
-                   pch = 21,
-                   cex = 2)
-  graphics::text(x = rep(leg_x + 0.1, length(leg_items)),
-                 y = leg_y,
-                 col = "black",
-                 labels = leg_items,
-                 adj = c(0, 0.5),
-                 cex = 0.8)
-}
 
 #' @export
 get_coords <- function(graph, ...) UseMethod("get_coords")
@@ -163,8 +160,11 @@ get_coords.igraph <- function(graph, layout_method = "auto", ...) {
   layout_df
 }
 
+
 #' @export
-get_palette <- function(alpha = 1) {
+get_palette <- function(...) UseMethod("get_palette")
+#' @export
+get_palette.default <- function(alpha = 1) {
   grDevices::adjustcolor(c(
     "#1E90FF", "#E31A1C", "#008000", "#6A3D9A", "#FF7F00",
     "#FFD700", "#87CEEB", "#FB9A99", "#98FB98", "#CAB2D6",
@@ -172,4 +172,18 @@ get_palette <- function(alpha = 1) {
     "#FF1493", "#0000FF", "#000000", "#4682B4", "#00CED1",
     "#00FF00", "#808000", "#FFFF00", "#FF8C00", "#A52A2A"
   ), alpha.f = alpha)
+}
+#' @export
+get_palette.graph <- function(graph, attr = "community", alpha = 1) {
+  attr_vals <- igraph::get.vertex.attribute(graph$graph, attr)
+  if (is.factor(attr_vals)) {
+    n <- nlevels(attr_vals)
+    levs <- levels(attr_vals)
+  } else {
+    levs <- sort(unique(attr_vals))
+    n <- length(levs)
+  }
+  colors <- get_palette(alpha = alpha)[seq_len(n)]
+  names(colors) <- levs
+  colors
 }

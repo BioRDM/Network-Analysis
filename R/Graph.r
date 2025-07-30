@@ -13,12 +13,13 @@ graph <- function(data,
 }
 
 #' @export
-build_graph <- function(graph, ...) UseMethod("build_graph")
+build <- function(graph, ...) UseMethod("build")
 #' @export
-build_graph.graph <- function(graph, vertices, edges, edge_attr = NULL) {
+build.graph <- function(graph, vertices, edges, edge_attr = NULL) {
   edges <- get_edges(graph$data, vertices, edges, edge_attr)
   graph$graph <- igraph::graph_from_data_frame(edges, directed = graph$directed)
   graph$layout <- get_coords(graph, layout_method = "drl", options = list(simmer.attraction = 0))
+  graph
 }
 
 #' @export
@@ -92,9 +93,9 @@ get_cutpoints.graph <- function(graph) {
 }
 
 #' @export
-get_most_central_vertex <- function(graph, ...) UseMethod("get_most_central_vertex")
+get_most_central_vertices <- function(graph, ...) UseMethod("get_most_central_vertices")
 #' @export
-get_most_central_vertex.graph <- function(graph, method = "degree", n = 10) {
+get_most_central_vertices.graph <- function(graph, method = "degree", n = 10) {
   centrality <- get_centrality(graph, method = method)
   format_names(igraph::V(graph$graph)$name[order(-centrality)[1:n]])
 }
@@ -105,14 +106,14 @@ set_communities <- function(graph, ...) UseMethod("set_communities")
 set_communities.graph <- function(graph, vertex_attr = NULL) {
   if (is.null(vertex_attr)) {
     comm <- igraph::cluster_louvain(graph$graph)
-    igraph::V(graph$graph)$community <- comm$membership
+    igraph::V(graph$graph)$community <- as.factor(comm$membership)
   } else {
     if (!vertex_attr %in% igraph::vertex_attr_names(graph$graph)) {
       cli::cli_abort("Vertex attribute {.val {vertex_attr}} not found in graph.")
     }
-    igraph::V(graph$graph)$community <- igraph::vertex_attr(graph$graph, vertex_attr)
+    igraph::V(graph$graph)$community <- as.factor(igraph::vertex_attr(graph$graph, vertex_attr))
   }
-  invisible(NULL)
+  graph
 }
 
 #' @export
@@ -149,11 +150,10 @@ get_most_central_per_community.graph <- function(graph, method = "degree") {
 save_centrality_data <- function(graph, output_file) UseMethod("save_centrality_data")
 #' @export
 save_centrality_data.graph <- function(graph, output_file = "output/centrality_data.csv") {
-  centrality <- get_centrality(graph)
   output_data <- data.frame(
-    degree = centrality$degree,
-    harmonic = centrality$harmonic,
-    betweenness = centrality$betweenness
+    degree = get_centrality(graph, method = "degree"),
+    harmonic = get_centrality(graph, method = "harmonic"),
+    betweenness = get_centrality(graph, method = "betweenness")
   )
   rownames(output_data) <- format_names(igraph::V(graph$graph)$name)
   output_data <- output_data[statnet.common::order(-output_data$degree), ]
