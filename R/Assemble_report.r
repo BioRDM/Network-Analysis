@@ -12,13 +12,16 @@ assemble_report <- function(config, metadata) {
   write(json_config, file = paste0(paths$dataset, "/config.json"))
 
   # Import the data
-  data <- import_csv_data(paths$input_file)
+  data <- utils::read.csv(paths$input_file, stringsAsFactor = FALSE)
 
   # Check that the author column exists
   check_author_column(data, config$author_column_name)
 
+  # Unnest the author column
+  data <- unnest_column(data, "Author", config$author_delimiter)
+
   # Tidy the author column
-  data <- tidy_authors(data, author_column = config$author_column_name, delimiter = config$author_delimiter)  # Tidy the author names
+  data <- tidy_author_names(data, author_column = config$author_column_name, delimiter = config$author_delimiter)
 
   # Calculate the year intervals for the reports
   years <- get_years_from_to(data, config)
@@ -57,41 +60,49 @@ assemble_report <- function(config, metadata) {
       delimiter = config$author_delimiter
     )
 
-    interactions <- Interactions(data = current_data,
-                                 author_delimiter = config$author_delimiter,
-                                 author_column_name = config$author_column_name,
-                                 year_column_name = config$year_column_name,
-                                 max_authors_per_paper = config$max_authors_per_paper,
-                                 min_papers_per_author = config$min_papers_per_author,
-                                 directed = config$directed,
-                                 from_year = from_year,
-                                 to_year = to_year)
+    result <- filter_papers_by_authors(current_data,
+                                       column_name = config$author_column_name,
+                                       delimiter = config$author_delimiter,
+                                       max_authors = config$max_authors_per_paper)
+    current_data <- result[[1]]
+    papers_removed <- result[[2]]
 
-    if (is.null(interactions)) {
+    result <- filter_infrequent_authors(current_data,
+                                        column_name = config$author_column_name,
+                                        delimiter = config$author_delimiter,
+                                        min_occurrences = config$min_papers_per_author)
+    current_data <- result[[1]]
+    authors_removed <- result[[2]]
+
+    filtering_stats <- list(
+      papers_removed = papers_removed,
+      authors_removed = authors_removed
+    )
+
+    # Save raw data after filtering
+    utils::write.csv(current_data, paste0(paths$data, "/Filtered_data_", date_range, ".csv"), row.names = FALSE)
+
+    postfilter_papers_per_author <- get_papers_per_author(
+      current_data,
+      author_column_name = config$author_column_name
+    )
+    report_var$postfilter_author_stats <- get_authors_per_paper(
+      current_data,
+      edge_id = config$edge_id
+    )
+
+    graph <- graph(current_data, directed = config$directed)
+
+    if (is.null(graph$graph)) {
       next  # Skip the report if graph building failed (because there were not enough authors)
     }
 
-    # Save raw data after filtering
-    utils::write.csv(interactions$data, paste0(paths$data, "/Filtered_data_", date_range, ".csv"), row.names = FALSE)
-
-    postfilter_papers_per_author <- get_papers_per_author(
-      interactions$data,
-      author_column_name = config$author_column_name,
-      delimiter = config$author_delimiter
-    )
-    report_var$postfilter_author_stats <- get_author_stats(
-      interactions$data,
-      author_column_name = config$author_column_name,
-      delimiter = config$author_delimiter
-    )
-
-    interactions <- generate_network_metrics(interactions)
-    report_var$interactions <- interactions
+    interactions <- get_graph_metrics(graph)
 
     report_var$figures <- generate_figures(interactions, paths, date_range)
 
     # Save centrality data as csv
-    save_centrality_data(interactions, paste0(paths$centrality_data, date_range, ".csv"))
+    save_centrality_data(graph, paste0(paths$centrality_data, date_range, ".csv"))
 
     # Save number of papers per author before and after filtering as csv
     save_papers_per_author(
@@ -101,7 +112,15 @@ assemble_report <- function(config, metadata) {
     )
 
     # Add current report summary stats to summary stats dataframe
-    summary_stats <- rbind(summary_stats, get_summary_stats(interactions))
+    current_stats <- get_summary_stats(
+      graph = graph,
+      data = current_data,
+      edge_id = config$edge_id,
+      author_column_name = config$author_column_name,
+      from_year = from_year,
+      to_year = to_year
+    )
+    summary_stats <- rbind(summary_stats, current_stats)
 
     # Generate the pdf report
     print("Exporting PDF...")

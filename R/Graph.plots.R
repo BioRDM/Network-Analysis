@@ -1,49 +1,30 @@
 #' @export
-plot_graph.Interactions <- function(interactions, centrality = "degree", output_file = "output/graph.png") {
-  comm <- interactions$communities
+plot <- function(interactions, ...) UseMethod("plot")
+#' @export
+plot.graph <- function(graph, centrality_method = "degree", output_file = "output/graph.png") {
   colors <- get_palette(alpha = 0.6)
+  centrality <- get_centrality(graph, method = centrality_method)
 
-  size_metric <- switch(centrality,
-                        "degree" = get_centrality(interactions)$degree,
-                        "betweenness" = get_centrality(interactions)$betweenness,
-                        "harmonic" = get_centrality(interactions)$harmonic,
-                        "none" = rep(1, igraph::vcount(interactions$graph)))
-
-  if (centrality == "none") {
-    vertex_size <- 4 * size_metric
+  if (centrality_method == "none") {
+    vertex_size <- 4 * rep(1, igraph::vcount(graph$graph))
   } else {
-    vertex_size <- 3 + (size_metric / max(size_metric)) * 10
+    vertex_size <- 3 + (centrality / max(centrality)) * 10
+    most_central_authors <- get_most_central_per_community(graph, method = centrality_method) |>
+      format_names()
   }
 
-  grDevices::png(filename = output_file, width = 2500, height = 1800, res = 360)
+  layout_df <- graph$layout
+  layout_df$community <- as.factor(get_communities(graph))
+  layout_df$size <- vertex_size
 
-  graphics::par(mfrow = c(1, 1), mar = c(1, 1, 1, 10))
-  graphics::plot(
-    interactions$graph,
-    vertex.label = NA,
-    vertex.size = vertex_size,
-    vertex.color = colors[comm$membership],
-    edge.width = 0.8,
-    edge.color = "gray",
-    layout = interactions$layout_coords
-  )
-
-  most_central_authors <- get_most_central_per_community(interactions, centrality = centrality)
-  most_central_authors <- format_names(most_central_authors)
-  if (length(most_central_authors) > 20) {
-    print(paste0("Graph plot: removing legend because there are too many communities (", length(most_central_authors), ")."))
-  } else if (length(most_central_authors) > 0) {
-    add_graph_legend(leg_x = 1.3, leg_y = 0, leg_items = most_central_authors, leg_colors = colors, leg_title = "Most central author")
-  }
-
-  grDevices::dev.off()
-  output_file
+  ggraph::ggraph(graph$graph, layout = "manual", x = layout_df$x, y = layout_df$y) +
+    ggraph::geom_edge_link(color = "gray", width = 0.8, alpha = 0.7) +
+    ggraph::geom_node_point(ggplot2::aes(x = .data$x, y = .data$y, color = .data$community, size = .data$size), show.legend = FALSE) +
+    ggplot2::scale_color_manual(values = colors) +
+    ggplot2::theme_void()
 }
-
-plot_graph <- function(interactions, centrality, output_file) {
-  UseMethod("plot_graph", interactions)
-}
-
+#' @export
+plot_cutpoints <- function(interactions, ...) UseMethod("plot_cutpoints")
 #' @export
 plot_cutpoints.Interactions <- function(interactions, centrality = "degree", output_file = "output/cutpoint_graph.png") {
   cutpoints <- sna::cutpoints(interactions$network, mode = "graph", return.indicator = TRUE)
@@ -95,10 +76,8 @@ plot_cutpoints.Interactions <- function(interactions, centrality = "degree", out
   output_file
 }
 
-plot_cutpoints <- function(interactions, centrality, output_file) {
-  UseMethod("plot_cutpoints", interactions)
-}
-
+#' @export
+plot_top_authors <- function(interactions, ...) UseMethod("plot_top_authors")
 #' @export
 plot_top_authors.Interactions <- function(interactions, n = 10, output_file = "output/top_authors.png") {
   centrality <- get_centrality(interactions)$degree
@@ -139,10 +118,6 @@ plot_top_authors.Interactions <- function(interactions, n = 10, output_file = "o
   output_file
 }
 
-plot_top_authors <- function(interactions, n, output_file) {
-  UseMethod("plot_top_authors", interactions)
-}
-
 #' @export
 add_graph_legend <- function(leg_x, leg_y, leg_items, leg_colors, leg_title = "") {
   graphics::par(xpd = NA)
@@ -169,8 +144,23 @@ add_graph_legend <- function(leg_x, leg_y, leg_items, leg_colors, leg_title = ""
 }
 
 #' @export
-get_graph_coords <- function(graph) {
-  igraph::layout_(graph, igraph::with_drl(options = list(simmer.attraction = 0)))
+get_coords <- function(graph, ...) UseMethod("get_coords")
+#' @export
+get_coords.graph <- function(graph, layout_method = "auto", ...) {
+  get_coords.igraph(graph$graph, layout_method = layout_method, ...)
+}
+#' @export
+get_coords.igraph <- function(graph, layout_method = "auto", ...) {
+  coords <- switch(
+    layout_method,
+    "fr" = igraph::layout_with_fr(graph, ...),
+    "kk" = igraph::layout_with_kk(graph, ...),
+    "drl" = igraph::layout_with_drl(graph, ...),
+    igraph::layout_nicely(graph, ...)
+  )
+  layout_df <- as.data.frame(coords)
+  colnames(layout_df) <- c("x", "y")
+  layout_df
 }
 
 #' @export

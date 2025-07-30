@@ -1,12 +1,3 @@
-check_file_format <- function(file_path) {
-  if (!grepl(".csv$", file_path)) {
-    cli::cli_abort(c(
-      "x" = ".{tools::file_ext(file_path)} format is not supported.",
-      "i" = "Please upload a table in CSV format."
-    ))
-  }
-}
-
 check_split_per_year <- function(split_per_year) {
   if (!is.numeric(split_per_year) && !is.null(split_per_year)) {
     cli::cli_abort(c(
@@ -16,27 +7,26 @@ check_split_per_year <- function(split_per_year) {
   }
 }
 
-check_author_column <- function(data, author_column_name) {
-  if (!author_column_name %in% colnames(data)) {
+check_column <- function(data, column) {
+  if (!column %in% colnames(data)) {
     cli::cli_abort(c(
-      "x" = "{.arg author_column_name} {.val {author_column_name}} not found in the input table.",
-      "i" = "Please check the author column name in your table.",
+      "x" = "{.arg column} {.val {column}} not found in the input table.",
+      "i" = "Please check the vertex column name in your table.",
       "i" = "Ensure the column name matches case and pluralisation."
     ))
   }
 }
 
-check_year_column <- function(data, year_column_name) {
-  if (!year_column_name %in% colnames(data)) {
+check_delimiter <- function(delimiter) {
+  if (is.null(delimiter) || !is.character(delimiter) || nchar(delimiter) == 0) {
     cli::cli_abort(c(
-      "x" = "{.arg year_column_name} {.val {year_column_name}} not found in the input table.",
-      "i" = "Please check the year column name in your table.",
-      "i" = "Ensure the column name matches case and pluralisation."
+      "x" = "{.arg delimiter} must be a non-empty string.",
+      "i" = "Current delimiter: {.var {delimiter}}."
     ))
   }
 }
 
-check_year_filter <- function(from_year, to_year) {
+check_year_range <- function(from_year, to_year) {
   if (!is.null(from_year) && !is.numeric(from_year)) {
     cli::cli_abort(c(
       "x" = "{.arg from_year} must be a numeric value or NULL.",

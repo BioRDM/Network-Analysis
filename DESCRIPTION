@@ -28,7 +28,8 @@ Imports:
     tidyr,
     sna,
     statnet.common,
-    network
+    network,
+    ggraph
 Suggests:
     testthat (>= 3.0.0),
     mockery,

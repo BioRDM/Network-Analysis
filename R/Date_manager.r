@@ -19,16 +19,11 @@ get_years_from_to <- function(data, config) {
   list(years_from = years_from, years_to = years_to)
 }
 
-#' @export
-#' @importFrom data.table :=
-year_parser <- function(data, year_column_name) {
+parse_year <- function(vector) {
   date_formats <- c("Y", "y", "ymd", "mdy", "dmy", "Ymd", "mdY", "dmY")
-  year_col <- rlang::sym(year_column_name)
-  data |>
-    dplyr::mutate(!!year_col := lubridate::parse_date_time(!!year_col,
-                                                           orders = date_formats,
-                                                           quiet = TRUE)) |>
-    dplyr::mutate(!!year_col := lubridate::year(!!year_col)) |>
-    dplyr::mutate(!!year_col := as.numeric(!!year_col)) |>
-    dplyr::filter(!is.na(!!year_col))
+  vector |>
+    lubridate::parse_date_time(orders = date_formats, quiet = TRUE) |>
+    lubridate::year() |>
+    as.numeric() |>
+    na.omit()
 }
