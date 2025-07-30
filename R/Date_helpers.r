@@ -5,7 +5,7 @@ get_years_from_to <- function(data, config) {
   check_split_per_year(config$split_per_year)
   check_year_column(data, year_col)
 
-  data <- year_parser(data, year_col)
+  data[[year_col]] <- year_parser(data[[year_col]])
 
   year_from <- max(min(data[[year_col]]), config$from_year)
   year_to <- min(max(data[[year_col]]), config$to_year)
@@ -16,7 +16,7 @@ get_years_from_to <- function(data, config) {
     years_from <- year_from
     years_to <- year_to
   }
-  list(years_from = years_from, years_to = years_to)
+  list(from = years_from, to = years_to)
 }
 
 parse_year <- function(vector) {

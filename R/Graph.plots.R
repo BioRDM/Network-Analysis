@@ -141,27 +141,6 @@ plot_top_authors.graph <- function(graph, n = 10) {
 
 
 #' @export
-get_coords <- function(graph, ...) UseMethod("get_coords")
-#' @export
-get_coords.graph <- function(graph, layout_method = "auto", ...) {
-  get_coords.igraph(graph$graph, layout_method = layout_method, ...)
-}
-#' @export
-get_coords.igraph <- function(graph, layout_method = "auto", ...) {
-  coords <- switch(
-    layout_method,
-    "fr" = igraph::layout_with_fr(graph, ...),
-    "kk" = igraph::layout_with_kk(graph, ...),
-    "drl" = igraph::layout_with_drl(graph, ...),
-    igraph::layout_nicely(graph, ...)
-  )
-  layout_df <- as.data.frame(coords)
-  colnames(layout_df) <- c("x", "y")
-  layout_df
-}
-
-
-#' @export
 get_palette <- function(...) UseMethod("get_palette")
 #' @export
 get_palette.default <- function(alpha = 1) {

@@ -23,17 +23,37 @@ build.graph <- function(graph, vertices, edges, edge_attr = NULL) {
 }
 
 #' @export
-generate_figures <- function(graph, ...) UseMethod("generate_figures")
+get_coords <- function(graph, ...) UseMethod("get_coords")
 #' @export
-generate_figures.graph <- function(graph, paths, date_range) {
-  fig1 <- plot_graph(graph, output_file = paste0(paths$figures, "/graph_", date_range, ".png"))
-  fig2 <- plot_top_authors(graph, n = 15, output_file = paste0(paths$figures, "/top_authors_", date_range, ".png"))
-  fig3 <- plot_cutpoints(graph, output_file = paste0(paths$figures, "/cutpoints_", date_range, ".png"))
-  fig4 <- plot_graph(graph, centrality = "betweenness", output_file = paste0(paths$figures, "/graph_betweenness_", date_range, ".png"))
-  fig5 <- plot_graph(graph, centrality = "harmonic", output_file = paste0(paths$figures, "/graph_harmonic_", date_range, ".png"))
-  fig6 <- plot_graph(graph, centrality = "none", output_file = paste0(paths$figures, "/graph_no_centrality_", date_range, ".png"))
-  list(fig1 = fig1, fig2 = fig2, fig3 = fig3, fig4 = fig4, fig5 = fig5, fig6 = fig6)
+get_coords.graph <- function(graph, layout_method = "auto", ...) {
+  get_coords.igraph(graph$graph, layout_method = layout_method, ...)
 }
+#' @export
+get_coords.igraph <- function(graph, layout_method = "auto", ...) {
+  coords <- switch(
+    layout_method,
+    "fr" = igraph::layout_with_fr(graph, ...),
+    "kk" = igraph::layout_with_kk(graph, ...),
+    "drl" = igraph::layout_with_drl(graph, ...),
+    igraph::layout_nicely(graph, ...)
+  )
+  layout_df <- as.data.frame(coords)
+  colnames(layout_df) <- c("x", "y")
+  layout_df
+}
+
+# #' @export
+# generate_figures <- function(graph, ...) UseMethod("generate_figures")
+# #' @export
+# generate_figures.graph <- function(graph, paths, date_range) {
+#   fig1 <- plot_graph(graph, output_file = paste0(paths$figures, "/graph_", date_range, ".png"))
+#   fig2 <- plot_top_authors(graph, n = 15, output_file = paste0(paths$figures, "/top_authors_", date_range, ".png"))
+#   fig3 <- plot_cutpoints(graph, output_file = paste0(paths$figures, "/cutpoints_", date_range, ".png"))
+#   fig4 <- plot_graph(graph, centrality = "betweenness", output_file = paste0(paths$figures, "/graph_betweenness_", date_range, ".png"))
+#   fig5 <- plot_graph(graph, centrality = "harmonic", output_file = paste0(paths$figures, "/graph_harmonic_", date_range, ".png"))
+#   fig6 <- plot_graph(graph, centrality = "none", output_file = paste0(paths$figures, "/graph_no_centrality_", date_range, ".png"))
+#   list(fig1 = fig1, fig2 = fig2, fig3 = fig3, fig4 = fig4, fig5 = fig5, fig6 = fig6)
+# }
 
 #' @export
 get_density <- function(graph, ...) UseMethod("get_density")
@@ -147,7 +167,7 @@ get_most_central_per_community.graph <- function(graph, method = "degree") {
 }
 
 #' @export
-save_centrality_data <- function(graph, output_file) UseMethod("save_centrality_data")
+save_centrality_data <- function(graph, ...) UseMethod("save_centrality_data")
 #' @export
 save_centrality_data.graph <- function(graph, output_file = "output/centrality_data.csv") {
   output_data <- data.frame(

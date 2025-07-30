@@ -18,7 +18,7 @@ config <- list(
   output_path = "/media/Store/Daniel/Network_Analysis/Outputs",
   author_delimiter = "//",
   author_column_name = "Investigator",
-  edge_id = "Pure.ID",
+  edge_id = "Project_ID",
   year_column_name = "Academic.Year",
   max_authors_per_paper = NULL,
   min_papers_per_author = NULL,

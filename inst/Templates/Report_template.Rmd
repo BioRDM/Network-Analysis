@@ -23,31 +23,31 @@ This report presents the results of a Co-Authorship Social Network Analysis (SNA
 ## About this data
 ```{r, echo=FALSE}
 metadata_text <- ""
-for (key in names(report_var$metadata)) {
-  value <- report_var$metadata[[key]]
+for (key in names(metadata)) {
+  value <- metadata[[key]]
   metadata_text <- paste0(metadata_text, key, ": ", value, "\n\n")
 }
 ```
-Input data: `r paste0(report_var$config$input_name, ".csv")`
+Input data: `r paste0(config$input_name, ".csv")`
 
-Date range: `r report_var$interactions$from_year` to `r report_var$interactions$to_year`
+Date range: `r network$from_year` to `r network$to_year`
 
 `r metadata_text`
 
 # Data filtering
 ```{r, echo=FALSE}
-max_authors_text <- if (report_var$interactions$papers_removed > 0) {
-  paste0(report_var$interactions$papers_removed, " papers were removed from the dataset due to having more than ", report_var$interactions$max_authors, " authors.")
+max_authors_text <- if (network$n_too_many_vertices > 0) {
+  paste0(network$n_too_many_vertices, " papers were removed from the dataset due to having more than ", config$max_authors_per_paper, " authors.")
 } else {
-  paste0("All papers in the dataset had less than ", report_var$interactions$max_authors, " authors and were included in the network analysis.")
+  paste0("All papers in the dataset had less than ", config$max_authors_per_paper, " authors and were included in the network analysis.")
 }
-min_papers_text <- if (report_var$interactions$authors_removed > 0) {
-  paste0(report_var$interactions$authors_removed, " authors were removed from the dataset because they appeared in less than ", report_var$interactions$min_papers, " papers.")
+min_papers_text <- if (network$n_infrequent_vertices_removed > 0) {
+  paste0(network$n_infrequent_vertices_removed, " authors were removed from the dataset because they appeared in less than ", config$min_papers_per_author, " papers.")
 } else {
-  paste0("All authors in the dataset appeared in at least ", report_var$interactions$min_papers, " papers and were included in the network analysis.")
+  paste0("All authors in the dataset appeared in at least ", config$min_papers_per_author, " papers and were included in the network analysis.")
 }
 ```
-The initial dataset contained `r report_var$interactions$initial_papers` papers and `r report_var$prefilter_author_stats$sum` authors from `r report_var$interactions$from_year` to `r report_var$interactions$to_year`.
+The initial dataset contained `r length(unique(network$raw[[network$edge_id]]))` papers and `r length(unique(network$raw[[network$author_column_name]]))` authors from `r min(network$raw[[network$year_column]])` to `r max(network$raw[[network$year_column]])`.
 
 `r max_authors_text`
 
