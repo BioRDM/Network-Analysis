@@ -12,6 +12,7 @@ network <- function(data,
     edge_id = edge_id,
     year_column = year_column,
     n_too_many_vertices = 0,
+    n_too_few_vertices = 0,
     n_infrequent_vertices_removed = 0
   )
 

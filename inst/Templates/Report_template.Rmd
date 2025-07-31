@@ -42,14 +42,14 @@ Date range: `r network$from_year` to `r network$to_year`
 # Data filtering
 ```{r, echo=FALSE}
 max_authors_text <- if (is.null(config$max_authors_per_paper)) {
-  "No limit on authors per paper was applied to the dataset."
+  "No limit on the number of authors per paper was applied."
 } else if (network$n_too_many_vertices > 0) {
   paste0(network$n_too_many_vertices, " papers were removed from the dataset due to having more than ", config$max_authors_per_paper, " authors.")
 } else {
   paste0("All papers in the dataset had less than ", config$max_authors_per_paper, " authors and were included in the network analysis.")
 }
 min_papers_text <- if (is.null(config$min_papers_per_author)) {
-  "No limit on the minimum number of papers per author was applied to the dataset."
+  "No limit on the minimum number of papers per author was applied."
 } else if (network$n_infrequent_vertices_removed > 0) {
   paste0(network$n_infrequent_vertices_removed, " authors were removed from the dataset because they appeared in less than ", config$min_papers_per_author, " papers.")
 } else {
@@ -57,6 +57,8 @@ min_papers_text <- if (is.null(config$min_papers_per_author)) {
 }
 ```
 The initial dataset contained `r raw_stats$Total_Papers` papers and `r raw_stats$Total_Authors` authors from `r raw_stats$Start_year` to `r raw_stats$End_year`.
+
+`r network$n_too_few_vertices` papers were removed from the dataset because they had only one author.
 
 `r max_authors_text`
 

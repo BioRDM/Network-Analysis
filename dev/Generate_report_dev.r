@@ -18,11 +18,11 @@ config <- list(
   author_delimiter = NULL,
   author_column_name = "Investigator",
   edge_id = "Project_ID",
-  year_column_name = "Academic.Year",
+  year_column_name = "Academic Year",
   max_authors_per_paper = NULL,
   min_papers_per_author = NULL,
-  from_year = NULL,
-  to_year = NULL,
+  from_year = 2019,
+  to_year = 2020,
   split_per_year = 2
 )
 

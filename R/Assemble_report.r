@@ -29,13 +29,12 @@ assemble_report <- function(config, metadata) {
                        vertex_delimiter = config$author_delimiter,
                        edge_id = config$edge_id,
                        year_column = config$year_column_name)
+    network <- filter_single_vertices(network)
     if (!is.null(config$max_authors_per_paper)) {
-      network <- network |>
-        filter_by_vertex_occurences(config$max_authors_per_paper)
+      network <- filter_by_vertex_occurrences(network, config$max_authors_per_paper)
     }
     if (!is.null(config$min_papers_per_author)) {
-      network <- network |>
-        filter_infrequent_vertices(config$min_papers_per_author)
+      network <- filter_infrequent_vertices(network, config$min_papers_per_author)
     }
 
     # Build the graph

@@ -30,11 +30,11 @@ filter_by_year.data.frame <- function(data, year_column, from_year, to_year) {
 
 
 #' @export
-filter_by_vertex_occurences <- function(...) UseMethod("filter_by_vertex_occurences")
+filter_by_vertex_occurrences <- function(...) UseMethod("filter_by_vertex_occurrences")
 
 #' @importFrom rlang .data
 #' @export
-filter_by_vertex_occurences.network <- function(network, max_vertices = Inf) {
+filter_by_vertex_occurrences.network <- function(network, max_vertices = Inf) {
   check_column(network$filtered, network$vertex_column)
   check_column(network$filtered, network$edge_id)
   group_col <- network$edge_id
@@ -46,9 +46,8 @@ filter_by_vertex_occurences.network <- function(network, max_vertices = Inf) {
     dplyr::summarise(vertex_count = dplyr::n(), .groups = "drop")
 
   filtered_data <- network$filtered |>
-    dplyr::left_join(vertex_counts, by = !!col_sym)
+    dplyr::left_join(vertex_counts, by = group_col)
 
-  n_too_few <- filtered_data |> dplyr::filter(.data$vertex_count <= 1) |> dplyr::pull(!!col_sym) |> unique() |> length()
   n_too_many <- filtered_data |> dplyr::filter(.data$vertex_count > max_vertices) |> dplyr::pull(!!col_sym) |> unique() |> length()
 
   filtered_data <- filtered_data |>
@@ -57,14 +56,12 @@ filter_by_vertex_occurences.network <- function(network, max_vertices = Inf) {
 
   network$filtered <- filtered_data
   network$n_too_many_vertices <- n_too_many
-  network$n_too_few_vertices <- n_too_few
 
   network
 }
-
 #' @importFrom rlang .data
 #' @export
-filter_by_vertex_occurences.data.frame <- function(data, vertex_column, edge_id, max_vertices = Inf) {
+filter_by_vertex_occurrences.data.frame <- function(data, vertex_column, edge_id, max_vertices = Inf) {
   col_sym <- rlang::sym(edge_id)
 
   vertex_counts <- data |>
@@ -73,11 +70,38 @@ filter_by_vertex_occurences.data.frame <- function(data, vertex_column, edge_id,
 
   filtered_data <- data |>
     dplyr::left_join(vertex_counts, by = edge_id) |>
-    dplyr::filter(.data$vertex_count <= max_vertices & .data$vertex_count > 1) |>
+    dplyr::filter(.data$vertex_count <= max_vertices) |>
     dplyr::select(-"vertex_count")
 
   filtered_data
 }
+
+
+#' @export
+filter_single_vertices <- function(...) UseMethod("filter_single_vertices")
+#' @export
+filter_single_vertices.network <- function(network) {
+  filtered_data <- filter_single_vertices.data.frame(network$filtered, network$edge_id)
+
+  n_removed <- nrow(network$filtered) - nrow(filtered_data)
+
+  network$filtered <- filtered_data
+  network$n_too_few_vertices <- n_removed
+
+  network
+}
+#' @export
+filter_single_vertices.data.frame <- function(data, edge_id) {
+  col_sym <- rlang::sym(edge_id)
+
+  filtered_data <- data |>
+    dplyr::group_by(!!col_sym) |>
+    dplyr::filter(dplyr::n() > 1) |>
+    dplyr::ungroup()
+
+  filtered_data
+}
+
 
 #' @export
 filter_infrequent_vertices <- function(...) UseMethod("filter_infrequent_vertices")
