@@ -51,7 +51,7 @@ filter_by_vertex_occurrences.network <- function(network, max_vertices = Inf) {
   n_too_many <- filtered_data |> dplyr::filter(.data$vertex_count > max_vertices) |> dplyr::pull(!!col_sym) |> unique() |> length()
 
   filtered_data <- filtered_data |>
-    dplyr::filter(.data$vertex_count <= max_vertices & .data$vertex_count > 1) |>
+    dplyr::filter(.data$vertex_count <= max_vertices) |>
     dplyr::select(-"vertex_count")
 
   network$filtered <- filtered_data

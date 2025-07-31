@@ -1,5 +1,6 @@
 #' @export
 get_authors_per_paper <- function(data, edge_id) {
+  check_column(data, edge_id)
   summary <- data |>
     dplyr::group_by(.data[[edge_id]]) |>
     dplyr::summarise(Authors = dplyr::n(), .groups = "drop")
@@ -19,6 +20,8 @@ compute_metrics <- function(network, graph = NULL, raw = FALSE) {
   } else {
     data <- network$filtered
   }
+  check_column(data, network$year_column)
+  check_column(data, network$vertex_column)
   author_stats <- get_authors_per_paper(data, edge_id = network$edge_id)
   metrics <- list(
     Start_year = min(data[[network$year_column]]),
@@ -49,13 +52,6 @@ compute_metrics <- function(network, graph = NULL, raw = FALSE) {
 
 #' @export
 get_summary_stats <- function(network, graph) {
-  check_column(network$filtered, network$year_column)
-  check_column(network$filtered, network$edge_id)
-  check_column(network$filtered, network$vertex_column)
-  check_column(network$raw, network$year_column)
-  check_column(network$raw, network$edge_id)
-  check_column(network$raw, network$vertex_column)
-
   raw_metrics <- compute_metrics(network, raw = TRUE)
   filtered_metrics <- compute_metrics(network, graph, raw = FALSE)
 

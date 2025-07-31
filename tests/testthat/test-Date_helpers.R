@@ -8,8 +8,8 @@ test_that("get_years_from_to works correctly with split_per_year", {
   )
 
   result <- get_years_from_to(data, config)
-  expect_equal(result$years_from, c(2000, 2002, 2004, 2006, 2008, 2010))
-  expect_equal(result$years_to, c(2001, 2003, 2005, 2007, 2009, 2010))
+  expect_equal(result$from, c(2000, 2002, 2004, 2006, 2008, 2010))
+  expect_equal(result$to, c(2001, 2003, 2005, 2007, 2009, 2010))
 })
 
 test_that("get_years_from_to works correctly without split_per_year", {
@@ -24,8 +24,8 @@ test_that("get_years_from_to works correctly without split_per_year", {
   )
 
   result <- get_years_from_to(data, config)
-  expect_equal(result$years_from, 2002)
-  expect_equal(result$years_to, 2006)
+  expect_equal(result$from, 2002)
+  expect_equal(result$to, 2006)
 })
 
 test_that("get_years_from_to handles invalid split_per_year", {
@@ -52,16 +52,13 @@ test_that("get_years_from_to handles all-NULL input", {
   )
 
   result <- get_years_from_to(data, config)
-  expect_equal(result$years_from, 2000)
-  expect_equal(result$years_to, 2010)
+  expect_equal(result$from, 2000)
+  expect_equal(result$to, 2010)
 })
 
-test_that("year parser gets years", {
-  data <- data.frame(
-    dates = c("2000-01-01", "02/03/2004", "March 5, 2006", "2008.07.09", "2010"),
-    num_dates = c(2000, 2004, 2006, 2008, 2010)
-  )
+test_that("parse_year gets years", {
+  dates <- c("2000-01-01", "02/03/2004", "March 5, 2006", "2008.07.09", "2010")
+  num_dates <- c(2000, 2004, 2006, 2008, 2010)
 
-  expect_equal(year_parser(data, year_column_name = "dates")$dates, data$num_dates)
-  expect_equal(year_parser(data, year_column_name = "num_dates")$num_dates, data$num_dates)
+  expect_equal(parse_year(dates), num_dates)
 })

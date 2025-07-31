@@ -29,6 +29,8 @@ assemble_report <- function(config, metadata) {
                        vertex_delimiter = config$author_delimiter,
                        edge_id = config$edge_id,
                        year_column = config$year_column_name)
+
+    # Filter the network data
     network <- filter_single_vertices(network)
     if (!is.null(config$max_authors_per_paper)) {
       network <- filter_by_vertex_occurrences(network, config$max_authors_per_paper)
@@ -98,5 +100,4 @@ assemble_report <- function(config, metadata) {
     params = list(summary_stats = summary_stats, config = config)
   )
   print("Summary Table exported successfully!")
-
 }

@@ -50,7 +50,8 @@ tidy_names <- function(...) UseMethod("tidy_names")
 #' @export
 tidy_names.network <- function(network, column) {
   check_column(network$filtered, column)
-  tidy_names.data.frame(network$filtered, column = column)
+  network$filtered <- tidy_names.data.frame(network$filtered, column = column)
+  network
 }
 
 #' @importFrom rlang .data

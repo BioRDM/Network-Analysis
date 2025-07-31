@@ -156,7 +156,7 @@ get_palette.default <- function(alpha = 1) {
 }
 #' @export
 get_palette.graph <- function(graph, attr = "community", alpha = 1) {
-  attr_vals <- igraph::get.vertex.attribute(graph$graph, attr)
+  attr_vals <- igraph::vertex_attr(graph$graph, attr)
   if (is.factor(attr_vals)) {
     n <- nlevels(attr_vals)
     levs <- levels(attr_vals)

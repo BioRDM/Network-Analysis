@@ -104,7 +104,7 @@ get_most_central_vertices <- function(graph, ...) UseMethod("get_most_central_ve
 #' @export
 get_most_central_vertices.graph <- function(graph, method = "degree", n = 10) {
   centrality <- get_centrality(graph, method = method)
-  format_names(igraph::V(graph$graph)$name[order(-centrality)[1:n]])
+  igraph::V(graph$graph)$name[order(-centrality)[1:n]]
 }
 
 #' @export
