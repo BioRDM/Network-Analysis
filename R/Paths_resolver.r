@@ -6,7 +6,6 @@ Paths <- function(config) {
   paths <- list(input_file = get_input_path(config),
                 output = get_output_path(config),
                 dataset = get_dataset_path(config),
-                figures = get_figures_path(config),
                 data = get_data_path(config),
                 summary_table = get_summary_table_path(config),
                 centrality_data = get_centrality_data_path(config),
@@ -27,10 +26,6 @@ create_output_paths <- function(config) {
   if (!dir.exists(dataset_path)) {
     dir.create(dataset_path, recursive = TRUE)
   }
-  figures_path <- get_figures_path(config)
-  if (!dir.exists(figures_path)) {
-    dir.create(figures_path, recursive = TRUE)
-  }
   data_path <- get_data_path(config)
   if (!dir.exists(data_path)) {
     dir.create(data_path, recursive = TRUE)
@@ -48,10 +43,6 @@ get_output_path <- function(config) {
 
 get_dataset_path <- function(config) {
   paste0(config$output_path, "/", config$input_name)
-}
-
-get_figures_path <- function(config) {
-  paste0(get_dataset_path(config), "/figures")
 }
 
 get_data_path <- function(config) {
