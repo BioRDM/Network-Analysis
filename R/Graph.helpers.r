@@ -17,19 +17,3 @@ get_edges <- function(data, vertices, edges, edge_attr = NULL) {
     dplyr::summarise(weight = dplyr::n(), .groups = "drop") |>
     dplyr::select("from", "to", dplyr::everything())
 }
-
-get_graph_metrics <- function(graph) {
-  list(
-    weighted = igraph::is_weighted(graph),
-    density = igraph::edge_density(graph),
-    transitivity = igraph::transitivity(graph, type = "global"),
-    centrality = get_centrality(graph),
-    diameter = igraph::diameter(graph, directed = igraph::is_directed(graph), weights = NULL),
-    average_shortest_path = igraph::mean_distance(graph, directed = igraph::is_directed(graph), unconnected = TRUE),
-    unreachable_percentage = get_reachability(graph) * 100,
-    cutpoints = igraph::articulation_points(graph),
-    top_authors_degree = get_most_central_authors(graph, centrality = "degree", n = 15),
-    top_authors_betweenness = get_most_central_authors(graph, centrality = "betweenness", n = 15),
-    top_authors_harmonic = get_most_central_authors(graph, centrality = "harmonic", n = 15)
-  )
-}

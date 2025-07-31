@@ -13,13 +13,18 @@ get_authors_per_paper <- function(data, edge_id) {
 }
 
 #' @export
-compute_metrics <- function(data, graph = NULL) {
+compute_metrics <- function(network, graph = NULL, raw = FALSE) {
+  if (raw) {
+    data <- network$raw
+  } else {
+    data <- network$filtered
+  }
   author_stats <- get_authors_per_paper(data, edge_id = network$edge_id)
   metrics <- list(
     Start_year = min(data[[network$year_column]]),
     End_year = max(data[[network$year_column]]),
     Total_Papers = length(unique(data[[network$edge_id]])),
-    Total_Authors = length(unique(data[[network$author_column_name]])),
+    Total_Authors = length(unique(data[[network$vertex_column]])),
     Average_Authors_per_Paper = author_stats$average,
     Median_Authors_per_Paper = author_stats$median,
     Min_Authors_per_Paper = author_stats$min,
@@ -51,10 +56,10 @@ get_summary_stats <- function(network, graph) {
   check_column(network$raw, network$edge_id)
   check_column(network$raw, network$vertex_column)
 
-  raw_metrics <- compute_metrics(network$raw)
-  filtered_metrics <- compute_metrics(network$filtered, graph)
+  raw_metrics <- compute_metrics(network, raw = TRUE)
+  filtered_metrics <- compute_metrics(network, graph, raw = FALSE)
 
-  stats_df <- rbind(
+  stats_df <- dplyr::bind_rows(
     cbind(Data = "raw", as.data.frame(raw_metrics, stringsAsFactors = FALSE)),
     cbind(Data = "filtered", as.data.frame(filtered_metrics, stringsAsFactors = FALSE))
   )

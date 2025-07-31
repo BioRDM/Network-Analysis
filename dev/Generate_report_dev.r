@@ -1,5 +1,4 @@
-library(devtools)
-load_all()
+devtools::load_all()
 
 # Report metadata
 # Additional fields can be added to the list, and will be displayed in the Introduction section of the report.

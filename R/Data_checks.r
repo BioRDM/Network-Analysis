@@ -1,3 +1,4 @@
+#' @export
 check_split_per_year <- function(split_per_year) {
   if (!is.numeric(split_per_year) && !is.null(split_per_year)) {
     cli::cli_abort(c(
@@ -7,6 +8,7 @@ check_split_per_year <- function(split_per_year) {
   }
 }
 
+#' @export
 check_column <- function(data, column) {
   if (!column %in% colnames(data)) {
     cli::cli_abort(c(
@@ -17,6 +19,7 @@ check_column <- function(data, column) {
   }
 }
 
+#' @export
 check_delimiter <- function(delimiter) {
   if (!is.null(delimiter) && (!is.character(delimiter) || nchar(delimiter) == 0)) {
     cli::cli_abort(c(
@@ -26,6 +29,7 @@ check_delimiter <- function(delimiter) {
   }
 }
 
+#' @export
 check_year_range <- function(from_year, to_year) {
   if (!is.null(from_year) && !is.numeric(from_year)) {
     cli::cli_abort(c(

@@ -20,7 +20,6 @@ assemble_report <- function(config, metadata) {
     from_year <- years$from[i]
     to_year <- years$to[i]
     date_range <- paste0(from_year, "-", to_year)
-    report_var$date_range <- date_range
     current_df <- filter_by_year(df, config$year_column_name, from_year, to_year)
     print(paste0("Creating report for the period ", from_year, " to ", to_year))
 
@@ -29,13 +28,20 @@ assemble_report <- function(config, metadata) {
                        vertex_column = config$author_column_name,
                        vertex_delimiter = config$author_delimiter,
                        edge_id = config$edge_id,
-                       year_column = config$year_column_name) |>
-      filter_by_vertex_occurences(config$max_authors_per_paper) |>
-      filter_infrequent_vertices(config$min_papers_per_author)
+                       year_column = config$year_column_name)
+    if (!is.null(config$max_authors_per_paper)) {
+      network <- network |>
+        filter_by_vertex_occurences(config$max_authors_per_paper)
+    }
+    if (!is.null(config$min_papers_per_author)) {
+      network <- network |>
+        filter_infrequent_vertices(config$min_papers_per_author)
+    }
 
     # Build the graph
     graph <- graph(network$filtered, directed = FALSE) |>
-      build(vertices = network$vertices, edges = config$edge_id)
+      build(vertices = network$vertex_column, edges = network$edge_id) |>
+      set_communities()
 
     # Save raw and filtered data
     utils::write.csv(network$raw, paste0(paths$data, "/Raw_data_", date_range, ".csv"), row.names = FALSE)
@@ -55,7 +61,7 @@ assemble_report <- function(config, metadata) {
       graph = graph,
       network = network
     )
-    summary_stats <- rbind(summary_stats, author_stats |> filter(.data$Data == "filtered"))
+    summary_stats <- rbind(summary_stats, author_stats[author_stats$Data == "filtered", ])
 
     # Generate the pdf report
     print("Exporting PDF...")
@@ -67,6 +73,7 @@ assemble_report <- function(config, metadata) {
       params = list(
         config = config,
         metadata = metadata,
+        date_range = date_range,
         network = network,
         graph = graph,
         author_stats = author_stats

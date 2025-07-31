@@ -55,9 +55,10 @@ plot_cutpoints.graph <- function(graph, centrality_method = "degree") {
     ggplot2::scale_color_identity(guide = "legend",
                                   labels = names(cutpoints),
                                   breaks = igraph::V(graph$graph)$cutpoint_color[as.integer(cutpoints)]) +
-    ggplot2::theme_void()
+    ggplot2::theme_void() +
+    ggplot2::theme(legend.position = "bottom", legend.title.position = "top")
 
-  if (n_cutpoints > 0 && n_cutpoints <= 20) {
+  if (n_cutpoints > 0) {
     legend_df <- data.frame(
       name = names(cutpoints),
       color = igraph::V(graph$graph)$cutpoint_color[as.integer(cutpoints)]
@@ -65,9 +66,10 @@ plot_cutpoints.graph <- function(graph, centrality_method = "degree") {
     p <- p + ggplot2::guides(
       size = "none",
       color = ggplot2::guide_legend(
+        ncol = 3,
         override.aes = list(
           color = legend_df$color,
-          size = 6
+          size = 4
         ),
         title = "Cutpoint authors",
         label.theme = ggplot2::element_text(size = 10)

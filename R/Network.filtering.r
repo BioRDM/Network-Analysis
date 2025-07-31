@@ -46,7 +46,7 @@ filter_by_vertex_occurences.network <- function(network, max_vertices = Inf) {
     dplyr::summarise(vertex_count = dplyr::n(), .groups = "drop")
 
   filtered_data <- network$filtered |>
-    dplyr::left_join(vertex_counts, by = group_col)
+    dplyr::left_join(vertex_counts, by = !!col_sym)
 
   n_too_few <- filtered_data |> dplyr::filter(.data$vertex_count <= 1) |> dplyr::pull(!!col_sym) |> unique() |> length()
   n_too_many <- filtered_data |> dplyr::filter(.data$vertex_count > max_vertices) |> dplyr::pull(!!col_sym) |> unique() |> length()
@@ -85,7 +85,7 @@ filter_infrequent_vertices <- function(...) UseMethod("filter_infrequent_vertice
 #' @importFrom rlang .data
 #' @export
 filter_infrequent_vertices.network <- function(network, min_occurrences = 5) {
-  check_vertex_column(network$filtered, network$vertex_column)
+  check_column(network$filtered, network$vertex_column)
   col_sym <- rlang::sym(network$vertex_column)
 
   vertex_counts <- network$filtered |>

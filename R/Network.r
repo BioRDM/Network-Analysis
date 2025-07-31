@@ -10,7 +10,9 @@ network <- function(data,
     vertex_column = vertex_column,
     vertex_delimiter = vertex_delimiter,
     edge_id = edge_id,
-    year_column = year_column
+    year_column = year_column,
+    n_too_many_vertices = 0,
+    n_infrequent_vertices_removed = 0
   )
 
   class(obj) <- "network"
@@ -72,21 +74,18 @@ get_edges_per_vertex.network <- function(network, raw = FALSE) {
   if (raw) {
     get_edges_per_vertex.data.frame(
       network$raw,
-      vertex_column = network$vertex_column,
-      year_column = network$year_column
+      vertex_column = network$vertex_column
     )
   } else {
     get_edges_per_vertex.data.frame(
       network$filtered,
-      vertex_column = network$vertex_column,
-      year_column = network$year_column
+      vertex_column = network$vertex_column
     )
   }
 }
 #' @export
 get_edges_per_vertex.data.frame <- function(data, vertex_column) {
   check_column(data, vertex_column)
-  check_column(data, year_column)
   data |>
     dplyr::group_by(.data[[vertex_column]]) |>
     dplyr::summarise(Edges = dplyr::n(), .groups = "drop")

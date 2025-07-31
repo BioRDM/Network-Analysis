@@ -42,19 +42,6 @@ get_coords.igraph <- function(graph, layout_method = "auto", ...) {
   layout_df
 }
 
-# #' @export
-# generate_figures <- function(graph, ...) UseMethod("generate_figures")
-# #' @export
-# generate_figures.graph <- function(graph, paths, date_range) {
-#   fig1 <- plot_graph(graph, output_file = paste0(paths$figures, "/graph_", date_range, ".png"))
-#   fig2 <- plot_top_authors(graph, n = 15, output_file = paste0(paths$figures, "/top_authors_", date_range, ".png"))
-#   fig3 <- plot_cutpoints(graph, output_file = paste0(paths$figures, "/cutpoints_", date_range, ".png"))
-#   fig4 <- plot_graph(graph, centrality = "betweenness", output_file = paste0(paths$figures, "/graph_betweenness_", date_range, ".png"))
-#   fig5 <- plot_graph(graph, centrality = "harmonic", output_file = paste0(paths$figures, "/graph_harmonic_", date_range, ".png"))
-#   fig6 <- plot_graph(graph, centrality = "none", output_file = paste0(paths$figures, "/graph_no_centrality_", date_range, ".png"))
-#   list(fig1 = fig1, fig2 = fig2, fig3 = fig3, fig4 = fig4, fig5 = fig5, fig6 = fig6)
-# }
-
 #' @export
 get_density <- function(graph, ...) UseMethod("get_density")
 #' @export
@@ -98,8 +85,8 @@ get_average_shortest_path.graph <- function(graph) {
 get_reachability <- function(graph, ...) UseMethod("get_reachability")
 #' @export
 get_reachability.graph <- function(graph) {
-  dists <- igraph::distances(graph)
-  n <- igraph::vcount(graph)
+  dists <- igraph::distances(graph$graph)
+  n <- igraph::vcount(graph$graph)
   reachable_pairs <- sum(is.finite(dists)) - n
   total_pairs <- n * (n - 1)
   reachable_pairs / total_pairs

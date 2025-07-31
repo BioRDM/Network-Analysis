@@ -11,14 +11,14 @@ toc: TRUE
 ---
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-raw_stats <- author_stats |> filter(.data$Data == "raw")
-filtered_stats <- author_stats |> filter(.data$Data == "filtered")
+raw_stats <- author_stats[author_stats$Data == "raw", ]
+filtered_stats <- author_stats[author_stats$Data == "filtered", ]
 ```
 
 \pagestyle{fancy}
 \fancyhead[]{}
 \renewcommand{\headrulewidth}{0pt}
-\fancyfoot[LEO]{`r escape_latex(report_var$date_range)`}
+\fancyfoot[LEO]{`r escape_latex(date_range)`}
 \fancyfoot[ROE]{Network Analysis Report}
 \pagebreak
 
@@ -41,12 +41,16 @@ Date range: `r network$from_year` to `r network$to_year`
 
 # Data filtering
 ```{r, echo=FALSE}
-max_authors_text <- if (network$n_too_many_vertices > 0) {
+max_authors_text <- if (is.null(config$max_authors_per_paper)) {
+  "No limit on authors per paper was applied to the dataset."
+} else if (network$n_too_many_vertices > 0) {
   paste0(network$n_too_many_vertices, " papers were removed from the dataset due to having more than ", config$max_authors_per_paper, " authors.")
 } else {
   paste0("All papers in the dataset had less than ", config$max_authors_per_paper, " authors and were included in the network analysis.")
 }
-min_papers_text <- if (network$n_infrequent_vertices_removed > 0) {
+min_papers_text <- if (is.null(config$min_papers_per_author)) {
+  "No limit on the minimum number of papers per author was applied to the dataset."
+} else if (network$n_infrequent_vertices_removed > 0) {
   paste0(network$n_infrequent_vertices_removed, " authors were removed from the dataset because they appeared in less than ", config$min_papers_per_author, " papers.")
 } else {
   paste0("All authors in the dataset appeared in at least ", config$min_papers_per_author, " papers and were included in the network analysis.")
@@ -72,6 +76,7 @@ In total, `r filtered_stats$Total_Papers` papers and `r filtered_stats$Total_Aut
 - Minimum authors per paper: `r filtered_stats$Min_Authors_per_Paper`
 - Maximum authors per paper: `r filtered_stats$Max_Authors_per_Paper`
 
+
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network Analysis", echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
 plot(graph, centrality_method = "degree")
 ```
@@ -80,9 +85,9 @@ The legend identifies the most central authors from each cluster depending on de
 
 # Network Description
 ```{r, echo=FALSE}
-network_direction_text <- if (network$directed) {
+network_direction_text <- if (graph$directed) {
   "**Directed**: The network is directed, meaning edges have a direction (e.g., A → B but not necessarily B → A). Examples include citation networks or hierarchical structures."
-} else if (!network$directed) {
+} else if (!graph$directed) {
   "**Undirected**: The network is undirected, meaning all connections are mutual. This is common in co-authorship or collaboration networks. In an undirected network, connections do not have a direction (e.g., if A is connected to B, then B is also connected to A by definition)."
 } else {
   "**Unknown directionality**: This could be due to an error in the data or the data is not available."
@@ -109,7 +114,7 @@ Transitivity, or the clustering coefficient, measures the tendency of nodes to f
 - **Value**: `r round(filtered_stats$Transitivity * 100, digits = 0)`%
 - **Interpretation**: The value of Transitivity is in percentage. High Transitivity: Close to 100%, indicating a high level of clustering. Nodes tend to form tight-knit groups. Low Transitivity: low percentage, indicating a lack of clustering. A higher Transitivity value suggests that networks tend to collaborate in groups, forming cohesive communities.
 
-# Node Centrality and Centralisation
+# Node Centrality
 ## Degree Centrality
 Degree centrality measures the number of direct connections each node has in the network. Nodes with higher degree centrality are likely to be influential or well-connected individuals/entities.
 
@@ -129,10 +134,10 @@ Betweenness centrality quantifies how often a node acts as a bridge in the short
 ## Harmonic Centrality
 Harmonic centrality measures how close a node is to all other nodes in a network. A node with high harmonic centrality can reach many other nodes quickly, even if some nodes are disconnected. Low harmonic centrality means the node is either far from others or isolated.
 
-- **Min**: `r round(min(get_centrality(graph, "harmonic")), digits = 5)` (The most distant node, or those in isolated groups with few reachable neighbors)
-- **Max**: `r round(max(get_centrality(graph, "harmonic")), digits = 5)` (The most central node, can quickly reach others)
-- **Mean**: `r round(mean(get_centrality(graph, "harmonic")), digits = 5)` (If the mean is high, the network is compact and well-connected. A low mean suggests the graph is fragmented, with many weakly connected groups.)
-- **Median**: `r round(median(get_centrality(graph, "harmonic")), digits = 5)`
+- **Min**: `r round(min(get_centrality(graph, "harmonic")), digits = 2)` (The most distant node, or those in isolated groups with few reachable neighbors)
+- **Max**: `r round(max(get_centrality(graph, "harmonic")), digits = 2)` (The most central node, can quickly reach others)
+- **Mean**: `r round(mean(get_centrality(graph, "harmonic")), digits = 2)` (If the mean is high, the network is compact and well-connected. A low mean suggests the graph is fragmented, with many weakly connected groups.)
+- **Median**: `r round(median(get_centrality(graph, "harmonic")), digits = 2)`
 
 ## Network diameter
 The network diameter is a measure of the largest distance between any two nodes in the network. Specifically, it represents the longest of all the shortest paths — the maximum number of steps needed to connect the two most distant nodes (authors) through their co-authorship links.
@@ -149,7 +154,7 @@ Alongside this report, there is a CSV file titled centrality_data.csv. This file
 - **Author Name:** The name of the author (node).
 - **Degree Centrality:** A number representing how many direct connections (edges) the author has with others. Higher values mean the author has many direct connections, suggesting popularity or influence in their immediate circle.
 - **Betweenness Centrality:** A measure of how often the author appears on the shortest paths between other pairs of nodes. A high betweenness score indicates the author plays a bridge role, connecting different parts of the network.
-- **Harmonic Centrality:** A centrality measure that accounts for the distance to all other reachable nodes, giving partial credit to distant nodes. (Reflects how close an author is to all others in the network, even accounting for unreachable nodes.) Higher scores suggest the author can efficiently interact with many others, even in fragmented networks.
+- **Harmonic Centrality:** A centrality measure that accounts for the distance to all other reachable nodes, giving partial credit to distant nodes (reflects how close an author is to all others in the network, even accounting for unreachable nodes). Higher scores suggest the author can efficiently interact with many others, even in fragmented networks.
 
 15 most central authors in the network, based on degree centrality (see appendix for other centrality metrics):
 ```{r, echo=FALSE}
@@ -178,30 +183,15 @@ Cutpoint authors, also known as 'articulation points,' are critical nodes in the
 Identifying cutpoint authors helps us understand who plays a pivotal role in sustaining collaboration across the network. Their removal could disrupt communication and collaboration between research groups, highlighting their strategic importance in the network's structure.
 
 ## List of cutpoint authors
-```{r, echo=FALSE, warning=FALSE}
-if (length(get_cutpoints(graph)) == 0) {
-  cutpoint_text <- "There are no cutpoint authors in the network."
-} else {
-  cutpoint_text <- paste0("The following authors have been identified as cutpoints in this network:")
-  cutpoint_table <- matrix(names(get_cutpoints(graph)), ncol = 4, byrow = TRUE)
-}
-```
-`r cutpoint_text`
-```{r, echo=FALSE, warning=FALSE}
-if (length(get_cutpoints(graph)) > 0) {
-  knitr::kable(cutpoint_table, col.names = c("", "", "", ""), format = "markdown")
-}
-```
-
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of the Author network with cutpoints highlighted", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
 plot_cutpoints(graph, centrality_method = "none")
 ```
-This figure builds on Figure 1, with the addition of highlighting cutpoint authors in red. Cutpoints are authors whose removal would fragment the network, indicating their critical role in maintaining connectivity.  
+This figure builds on Figure 1, with the addition of highlighting cutpoint authors in colour. Cutpoints are authors whose removal would fragment the network, indicating their critical role in maintaining connectivity.  
 The names of these cutpoint authors are listed above.
 
 # Appendix
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of betweenness centrality in the Co-Authorship Network Analysis", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-plot_graph(graph, centrality = "betweenness")
+plot(graph, centrality_method = "betweenness")
 ```
 Each color represents a cluster of authors who are strongly connected within the network.
 The size of each node corresponds to the betweenness centrality of the author, a measure of how often an author appears on the shortest path between two other authors. 
@@ -209,12 +199,12 @@ The legend identifies the authors with high betweenness centrality act as bridge
 
 15 most central authors in the network, based on betweenness centrality:
 ```{r, echo=FALSE}
-top_authors_table <- matrix(get_most_central_vertices(graph, n = 15, centrality = "betweenness"), ncol = 5, byrow = TRUE)
+top_authors_table <- matrix(get_most_central_vertices(graph, n = 15, method = "betweenness"), ncol = 5, byrow = TRUE)
 knitr::kable(top_authors_table, col.names = c("", "", "", "", ""), format = "markdown")
 ```
 
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of harmonic centrality in the Co-Authorship Network Analysis", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-plot_graph(graph, centrality = "harmonic")
+plot(graph, centrality_method = "harmonic")
 ```
 Each color represents a cluster of authors who are strongly connected within the network.
 The size of each node corresponds to the harmonic centrality of the author, which reflects how close a node is to all other nodes in a network
@@ -222,12 +212,12 @@ The legend identifies the authors with high harmonic centrality that can reach m
 
 15 most central authors in the network, based on harmonic centrality:
 ```{r, echo=FALSE}
-top_authors_table <- matrix(get_most_central_vertices(graph, n = 15, centrality = "harmonic"), ncol = 5, byrow = TRUE)
+top_authors_table <- matrix(get_most_central_vertices(graph, n = 15, method = "harmonic"), ncol = 5, byrow = TRUE)
 knitr::kable(top_authors_table, col.names = c("", "", "", "", ""), format = "markdown")
 ```
 
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network Analysis without centrality indicator", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-plot_graph(graph, centrality = "none")
+plot(graph, centrality_method = "none")
 ```
 Each color represents a cluster of authors who are strongly connected within the network, illustrating the distribution of these clusters across the network.
 
