@@ -31,11 +31,14 @@ unnest_vertex_column.network <- function(network) {
   network
 }
 #' @export
-unnest_vertex_column.data.frame <- function(data, column, delimiter) {
+unnest_vertex_column.data.frame <- function(data, column, delimiter = NULL) {
   check_column(data, column)
   check_delimiter(delimiter)
-  data |>
-    tidyr::separate_longer_delim(!!rlang::sym(column), delim = delimiter)
+  if (!is.null(delimiter)) {
+    data <- data |>
+      tidyr::separate_longer_delim(!!rlang::sym(column), delim = delimiter)
+  }
+  data
 }
 
 
@@ -99,7 +102,7 @@ save_edges_per_vertex.network <- function(network, output_file = "output/edges_p
     get_edges_per_vertex(network, raw = FALSE),
     by = network$vertex_column,
     suffix = c("_prefilter", "_postfilter")
-    ) |>
+  ) |>
     dplyr::mutate(
       Edges_prefilter = tidyr::replace_na(.data$Edges_prefilter, 0),
       Edges_postfilter = tidyr::replace_na(.data$Edges_postfilter, 0),

@@ -28,7 +28,7 @@ plot_cutpoints <- function(graph, ...) UseMethod("plot_cutpoints")
 plot_cutpoints.graph <- function(graph, centrality_method = "degree") {
   cutpoints <- get_cutpoints(graph)
   n_cutpoints <- length(cutpoints)
-  
+
   vertex_colors <- rep(grDevices::adjustcolor("grey", alpha.f = 0.6), igraph::vcount(graph$graph))
   if (n_cutpoints > 0) {
     colors <- get_palette(alpha = 1)[seq_len(n_cutpoints)]

@@ -18,7 +18,7 @@ check_column <- function(data, column) {
 }
 
 check_delimiter <- function(delimiter) {
-  if (is.null(delimiter) || !is.character(delimiter) || nchar(delimiter) == 0) {
+  if (!is.null(delimiter) && (!is.character(delimiter) || nchar(delimiter) == 0)) {
     cli::cli_abort(c(
       "x" = "{.arg delimiter} must be a non-empty string.",
       "i" = "Current delimiter: {.var {delimiter}}."

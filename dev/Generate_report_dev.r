@@ -14,9 +14,9 @@ metadata <- list(
 
 # Configuration list for the analysis
 config <- list(
-  file_path = "/media/Store/Daniel/Network_Analysis/Data/Grant_application_data/SBS_Research_Applications_GROUPEDdata2019-24.csv",
+  file_path = "/media/Store/Daniel/Network_Analysis/Data/Grant_application_data/SBS_Research_Applications_RAWdata2019-24.csv",
   output_path = "/media/Store/Daniel/Network_Analysis/Outputs",
-  author_delimiter = "//",
+  author_delimiter = NULL,
   author_column_name = "Investigator",
   edge_id = "Project_ID",
   year_column_name = "Academic.Year",

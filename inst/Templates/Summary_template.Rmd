@@ -9,7 +9,7 @@ fontsize: 12pt
 toc: FALSE
 ---
 
-Input data: `r report_var$config$input_name`
+Input data: `r config$input_name`
 
 # General information
 ```{r echo=FALSE, warning=FALSE}
@@ -17,7 +17,7 @@ columns_to_keep <- c("Dates",
                      "Papers",
                      "Authors",
                      "Authors per Paper")
-df <- summary_var$summary_stats[, columns_to_keep, drop = FALSE]
+df <- summary_stats[, columns_to_keep, drop = FALSE]
 knitr::kable(df, format = "latex", booktabs = TRUE, digits = 1)
 ```
 
@@ -28,7 +28,7 @@ columns_to_keep <- c("Dates",
                      "Transitivity (%)",
                      "Shortest Path",
                      "Cutpoints")
-df <- summary_var$summary_stats[, columns_to_keep, drop = FALSE]
+df <- summary_stats[, columns_to_keep, drop = FALSE]
 knitr::kable(df, format = "latex", booktabs = TRUE, digits = 1)
 ```
 
@@ -38,7 +38,7 @@ columns_to_keep <- c("Dates",
                      "Degree Centrality",
                      "Betweenness Centrality",
                      "Harmonic Centrality")
-df <- summary_var$summary_stats[, columns_to_keep, drop = FALSE]
+df <- summary_stats[, columns_to_keep, drop = FALSE]
 knitr::kable(df, format = "latex", booktabs = TRUE, digits = 1)
 ```
 
