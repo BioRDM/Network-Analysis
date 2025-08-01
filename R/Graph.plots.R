@@ -2,7 +2,7 @@
 plot <- function(graph, ...) UseMethod("plot")
 #' @export
 plot.graph <- function(graph, centrality_method = "degree") {
-  colors <- get_palette(graph, attr = "community", alpha = 0.6)
+  colors <- get_palette(graph, vertex_attr = "community", alpha = 0.6)
   centrality <- get_centrality(graph, method = centrality_method)
 
   if (centrality_method == "none") {
@@ -81,32 +81,36 @@ plot_cutpoints.graph <- function(graph, centrality_method = "degree") {
 
 
 #' @export
-plot_top_authors <- function(graph, ...) UseMethod("plot_top_authors")
+plot_top_vertices <- function(graph, ...) UseMethod("plot_top_vertices")
 #' @export
-plot_top_authors.graph <- function(graph, n = 10, edge_color = NULL) {
+plot_top_vertices.graph <- function(
+  graph,
+  n = 10,
+  edge_color = NULL,
+  edge_width = "weight",
+  log_edge_width = FALSE,
+  custom_palette = NULL
+) {
   centrality <- get_centrality(graph, method = "degree")
   if (length(centrality) < n) {
     n <- length(centrality)
   }
-  top_authors <- order(centrality, decreasing = TRUE)[1:n]
-  subgraph <- igraph::induced_subgraph(graph$graph, vids = top_authors)
+  top_vertices <- order(centrality, decreasing = TRUE)[1:n]
+  subgraph <- igraph::induced_subgraph(graph$graph, vids = top_vertices)
 
   comm <- get_communities(graph)
-  top_authors_communities <- comm[top_authors]
-  igraph::V(subgraph)$community <- as.factor(top_authors_communities)
-
+  top_vertices_communities <- comm[top_vertices]
+  igraph::V(subgraph)$community <- as.factor(top_vertices_communities)
   colors <- get_palette(graph, vertex_attr = "community", alpha = 0.6)
 
   layout_coords <- igraph::layout_in_circle(subgraph)
   colnames(layout_coords) <- c("x", "y")
   rownames(layout_coords) <- igraph::V(subgraph)$name
-  label_degrees <- -atan2(layout_coords[, 2], layout_coords[, 1])
-  vertex_label_dist <- 1 + abs(cos(label_degrees)) * 2
 
   layout_df <- as.data.frame(layout_coords)
   layout_df$name <- rownames(layout_coords)
-  layout_df$label_degree <- label_degrees
-  layout_df$label_dist <- vertex_label_dist
+  layout_df$label_degree <- -atan2(layout_coords[, 2], layout_coords[, 1])
+  layout_df$label_dist <- 1 + abs(cos(layout_df$label_degree)) * 2
   layout_df$label_angle <- ifelse(
     (cos(layout_df$label_degree) > 0 & sin(layout_df$label_degree) > 0) |
       (cos(layout_df$label_degree) < 0 & sin(layout_df$label_degree) < 0),
@@ -114,18 +118,13 @@ plot_top_authors.graph <- function(graph, n = 10, edge_color = NULL) {
     45
   )
 
-  if ("weight" %in% igraph::edge_attr_names(subgraph)) {
-    igraph::E(subgraph)$edge_width <- log2(igraph::E(subgraph)$weight + 0.1)
-  } else {
-    igraph::E(subgraph)$edge_width <- 1
-  }
-
-  subgraph <- set_edge_color(subgraph, edge_color = edge_color)
+  subgraph <- set_edge_width(subgraph, edge_width = edge_width, log_edge_width = log_edge_width)
+  subgraph <- set_edge_color(subgraph, edge_color = edge_color, custom_palette = custom_palette)
 
   ggraph::ggraph(subgraph, layout = "manual", x = layout_df$x, y = layout_df$y) +
     ggraph::geom_edge_arc(
       ggplot2::aes(circular = TRUE,
-                   edge_width = edge_width,
+                   edge_width = width,
                    color = color),
       alpha = 0.7,
       show.legend = TRUE
@@ -155,7 +154,7 @@ plot_top_authors.graph <- function(graph, n = 10, edge_color = NULL) {
     ) +
     ggplot2::theme(
       plot.margin = ggplot2::margin(t = 50, r = 250, b = 50, l = 100),
-      legend.position = c(1.15, 0.5)
+      legend.position.inside = c(1.15, 0.5)
     ) +
     ggplot2::coord_cartesian(clip = "off")
 
@@ -206,13 +205,13 @@ get_palette.igraph <- function(graph, vertex_attr = NULL, edge_attr = NULL, alph
 
 
 #' @export
-set_edge_color <- function(graph, edge_color = NULL) UseMethod("set_edge_color")
+set_edge_color <- function(graph, edge_color = NULL, custom_palette = NULL) UseMethod("set_edge_color")
 #' @export
-set_edge_color.graph <- function(graph, edge_color = NULL) {
-  set_edge_color.igraph(graph$graph, edge_color = edge_color)
+set_edge_color.graph <- function(graph, edge_color = NULL, custom_palette = NULL) {
+  set_edge_color.igraph(graph$graph, edge_color = edge_color, custom_palette = custom_palette)
 }
 #' @export
-set_edge_color.igraph <- function(graph, edge_color = NULL) {
+set_edge_color.igraph <- function(graph, edge_color = NULL, custom_palette = NULL) {
   if (!is.null(edge_color) && edge_color %in% igraph::edge_attr_names(graph)) {
     edge_vals <- igraph::edge_attr(graph, edge_color)
     edge_names <- igraph::edge_attr(graph, edge_color)
@@ -222,14 +221,50 @@ set_edge_color.igraph <- function(graph, edge_color = NULL) {
       edge_names <- edge_names[ord]
       edge_colors <- scales::col_numeric("Blues", domain = NULL)(edge_vals)
     } else {
-      pal <- get_palette.igraph(graph, edge_attr = edge_color, alpha = 0.8)
-      edge_colors <- pal[as.character(edge_vals)]
+      if (is.null(custom_palette)) {
+        pal <- get_palette.igraph(graph, edge_attr = edge_color, alpha = 0.8)
+        edge_colors <- pal[as.character(edge_vals)]
+      } else {
+        pal <- unlist(custom_palette)
+        edge_colors <- pal[as.character(edge_vals)]
+        edge_colors[is.na(edge_colors)] <- "gray"
+      }
     }
   } else {
     edge_colors <- rep("gray", igraph::ecount(graph))
-    edge_names <- NULL
+    edge_names <- rep("", igraph::ecount(graph))
   }
   igraph::E(graph)$color <- edge_colors
   igraph::E(graph)$edge_name <- edge_names
+  graph
+}
+
+
+#' @export
+set_edge_width <- function(graph, edge_width = "weight", log_edge_width = FALSE) UseMethod("set_edge_width")
+#' @export
+set_edge_width.graph <- function(graph, edge_width = "weight", log_edge_width = FALSE) {
+  set_edge_width.igraph(graph$graph, edge_width = edge_width, log_edge_width = log_edge_width)
+}
+#' @export
+set_edge_width.igraph <- function(graph, edge_width = "weight", log_edge_width = FALSE) {
+  if (!is.null(edge_width) && edge_width %in% igraph::edge_attr_names(graph)) {
+    edge_vals <- igraph::edge_attr(graph, edge_width)
+    if (is.numeric(edge_vals)) {
+      if (log_edge_width) {
+        igraph::E(graph)$width <- log2(edge_vals + 0.1)
+      } else {
+        edge_vals <- edge_vals / max(edge_vals) * 5
+        igraph::E(graph)$width <- edge_vals
+      }
+    } else {
+      cli::cli_abort(c(
+        "x" = "The `edge_width` attribute must be numeric.",
+        "i" = "Please provide a numeric attribute for edge widths."
+      ))
+    }
+  } else {
+    igraph::E(graph)$width <- 1
+  }
   graph
 }

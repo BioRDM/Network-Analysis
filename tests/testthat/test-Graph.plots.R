@@ -18,18 +18,18 @@ test_that("plot_cutpoints function works correctly", {
   expect_s3_class(plot_cutpoints(graph), "gg")
 })
 
-test_that("plot_top_authors function works correctly", {
+test_that("plot_top_vertices function works correctly", {
   graph <- graph(data = sample_data, directed = FALSE) |>
     build(vertices = "Author", edges = "Project_ID") |>
     set_communities()
-  expect_s3_class(plot_top_authors(graph, n = 10), "gg")
+  expect_s3_class(plot_top_vertices(graph, n = 10), "gg")
 })
 
 test_that("get_palette function returns a list of colours of the right size", {
   graph <- graph(data = sample_data, directed = FALSE) |>
     build(vertices = "Author", edges = "Project_ID") |>
     set_communities()
-  palette <- get_palette(graph, attr = "community", alpha = 0.6)
+  palette <- get_palette(graph, vertex_attr = "community", alpha = 0.6)
   expect_type(palette, "character")
   expect_length(palette, length(unique(get_communities(graph))))
 })
