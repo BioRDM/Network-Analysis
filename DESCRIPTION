@@ -1,6 +1,6 @@
 Package: NetworkAnalysis
 Title: Generate Reports On Publication Networks
-Version: 0.0.1
+Version: 0.1.0
 Authors@R:
     c(
         person("Daniel", "Thedie", , "daniel.thedie@ed.ac.uk", role = c("aut", "cre")),
@@ -15,7 +15,6 @@ Imports:
     rlang,
     dplyr,
     igraph,
-    intergraph,
     rmarkdown,
     jsonlite,
     tools,
@@ -24,14 +23,15 @@ Imports:
     lubridate,
     stringr,
     stringi,
-    purrr,
     tidyr,
-    sna,
     statnet.common,
-    network,
-    ggraph
+    ggraph,
+    ggplot2
 Suggests:
     testthat (>= 3.0.0),
     mockery,
-    renv
+    renv,
+    tibble
+Depends: 
+    R (>= 4.3)
 Config/testthat/edition: 3

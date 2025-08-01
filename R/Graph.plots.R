@@ -83,7 +83,7 @@ plot_cutpoints.graph <- function(graph, centrality_method = "degree") {
 #' @export
 plot_top_authors <- function(graph, ...) UseMethod("plot_top_authors")
 #' @export
-plot_top_authors.graph <- function(graph, n = 10) {
+plot_top_authors.graph <- function(graph, n = 10, edge_color = NULL) {
   centrality <- get_centrality(graph, method = "degree")
   if (length(centrality) < n) {
     n <- length(centrality)
@@ -95,7 +95,7 @@ plot_top_authors.graph <- function(graph, n = 10) {
   top_authors_communities <- comm[top_authors]
   igraph::V(subgraph)$community <- as.factor(top_authors_communities)
 
-  colors <- get_palette(graph, attr = "community", alpha = 0.6)
+  colors <- get_palette(graph, vertex_attr = "community", alpha = 0.6)
 
   layout_coords <- igraph::layout_in_circle(subgraph)
   colnames(layout_coords) <- c("x", "y")
@@ -107,38 +107,58 @@ plot_top_authors.graph <- function(graph, n = 10) {
   layout_df$name <- rownames(layout_coords)
   layout_df$label_degree <- label_degrees
   layout_df$label_dist <- vertex_label_dist
+  layout_df$label_angle <- ifelse(
+    (cos(layout_df$label_degree) > 0 & sin(layout_df$label_degree) > 0) |
+      (cos(layout_df$label_degree) < 0 & sin(layout_df$label_degree) < 0),
+    -45,
+    45
+  )
 
-  edge_df <- igraph::as_data_frame(subgraph, what = "edges")
-  if ("weight" %in% colnames(edge_df)) {
+  if ("weight" %in% igraph::edge_attr_names(subgraph)) {
     igraph::E(subgraph)$edge_width <- log2(igraph::E(subgraph)$weight + 0.1)
   } else {
     igraph::E(subgraph)$edge_width <- 1
   }
 
+  subgraph <- set_edge_color(subgraph, edge_color = edge_color)
+
   ggraph::ggraph(subgraph, layout = "manual", x = layout_df$x, y = layout_df$y) +
     ggraph::geom_edge_arc(
-      ggplot2::aes(circular = TRUE, edge_width = edge_width),
-      color = "gray",
-      alpha = 0.7
+      ggplot2::aes(circular = TRUE,
+                   edge_width = edge_width,
+                   color = color),
+      alpha = 0.7,
+      show.legend = TRUE
     ) +
     ggraph::geom_node_point(ggplot2::aes(color = community, size = 6), show.legend = FALSE) +
     ggplot2::scale_color_manual(values = colors) +
+    ggraph::scale_edge_color_identity(guide = "legend",
+                                      name = edge_color,
+                                      labels = igraph::E(subgraph)$edge_name,
+                                      breaks = igraph::E(subgraph)$color) +
     ggplot2::scale_size_identity() +
     ggraph::geom_node_text(
       ggplot2::aes(
         label = format_names(name),
-        hjust = ifelse(layout_df$label_degree > pi/2 | layout_df$label_degree < -pi/2, 1.2, -0.2)
+        angle = layout_df$label_angle,
+        hjust = ifelse(layout_df$label_degree > pi / 2 | layout_df$label_degree < -pi / 2, 1.2, -0.2)
       ),
       size = 3,
       color = "black",
       show.legend = FALSE
     ) +
     ggplot2::theme_void() +
-    ggplot2::guides(size = "none", edge_width = "none") +
+    ggplot2::guides(
+      color = "none",
+      size = "none",
+      edge_width = "none"
+    ) +
     ggplot2::theme(
-      plot.margin = ggplot2::margin(t = 0, r = 100, b = 0, l = 100)
+      plot.margin = ggplot2::margin(t = 50, r = 250, b = 50, l = 100),
+      legend.position = c(1.15, 0.5)
     ) +
     ggplot2::coord_cartesian(clip = "off")
+
 }
 
 
@@ -147,7 +167,7 @@ get_palette <- function(...) UseMethod("get_palette")
 #' @export
 get_palette.default <- function(alpha = 1) {
   grDevices::adjustcolor(c(
-    "#1E90FF", "#E31A1C", "#008000", "#6A3D9A", "#FF7F00",
+    "#1E90FF", "#008000", "#E31A1C", "#6A3D9A", "#FF7F00",
     "#FFD700", "#87CEEB", "#FB9A99", "#98FB98", "#CAB2D6",
     "#FDBF6F", "#B3B3B3", "#F0E68C", "#800000", "#DA70D6",
     "#FF1493", "#0000FF", "#000000", "#4682B4", "#00CED1",
@@ -155,8 +175,23 @@ get_palette.default <- function(alpha = 1) {
   ), alpha.f = alpha)
 }
 #' @export
-get_palette.graph <- function(graph, attr = "community", alpha = 1) {
-  attr_vals <- igraph::vertex_attr(graph$graph, attr)
+get_palette.graph <- function(graph, vertex_attr = NULL, edge_attr = NULL, alpha = 1) {
+  get_palette(graph = graph$graph, vertex_attr = vertex_attr, edge_attr = edge_attr, alpha = alpha)
+}
+#' @export
+get_palette.igraph <- function(graph, vertex_attr = NULL, edge_attr = NULL, alpha = 1) {
+  if (!is.null(vertex_attr) && !is.null(edge_attr)) {
+    cli::cli_abort(c(
+      "x" = "You can only pass one of `vertex_attr` or `edge_attr` to get_palette, not both.",
+      "i" = "Please choose one to get the corresponding palette."
+    ))
+  } else if (!is.null(vertex_attr)) {
+    attr_vals <- igraph::vertex_attr(graph, vertex_attr)
+  } else if (!is.null(edge_attr)) {
+    attr_vals <- igraph::edge_attr(graph, edge_attr)
+  } else {
+    return(get_palette(alpha = alpha))
+  }
   if (is.factor(attr_vals)) {
     n <- nlevels(attr_vals)
     levs <- levels(attr_vals)
@@ -167,4 +202,34 @@ get_palette.graph <- function(graph, attr = "community", alpha = 1) {
   colors <- get_palette(alpha = alpha)[seq_len(n)]
   names(colors) <- levs
   colors
+}
+
+
+#' @export
+set_edge_color <- function(graph, edge_color = NULL) UseMethod("set_edge_color")
+#' @export
+set_edge_color.graph <- function(graph, edge_color = NULL) {
+  set_edge_color.igraph(graph$graph, edge_color = edge_color)
+}
+#' @export
+set_edge_color.igraph <- function(graph, edge_color = NULL) {
+  if (!is.null(edge_color) && edge_color %in% igraph::edge_attr_names(graph)) {
+    edge_vals <- igraph::edge_attr(graph, edge_color)
+    edge_names <- igraph::edge_attr(graph, edge_color)
+    if (is.numeric(edge_vals)) {
+      ord <- order(edge_vals)
+      edge_vals <- edge_vals[ord]
+      edge_names <- edge_names[ord]
+      edge_colors <- scales::col_numeric("Blues", domain = NULL)(edge_vals)
+    } else {
+      pal <- get_palette.igraph(graph, edge_attr = edge_color, alpha = 0.8)
+      edge_colors <- pal[as.character(edge_vals)]
+    }
+  } else {
+    edge_colors <- rep("gray", igraph::ecount(graph))
+    edge_names <- NULL
+  }
+  igraph::E(graph)$color <- edge_colors
+  igraph::E(graph)$edge_name <- edge_names
+  graph
 }
