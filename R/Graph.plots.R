@@ -1,82 +1,38 @@
 #' @export
 plot <- function(graph, ...) UseMethod("plot")
 #' @export
-plot.graph <- function(graph, centrality_method = "degree") {
-  colors <- get_palette(graph, vertex_attr = "community", alpha = 0.6)
-  centrality <- get_centrality(graph, method = centrality_method)
+plot.graph <- function(
+  graph,
+  vertex_color = NULL,
+  vertex_size = NULL,
+  edge_color = NULL,
+  edge_width = "weight",
+  log_edge_width = FALSE,
+  centrality_method = "degree"
+) {
 
-  if (centrality_method == "none") {
-    vertex_size <- 4 * rep(1, igraph::vcount(graph$graph))
-  } else {
-    vertex_size <- 3 + (centrality / max(centrality)) * 10
+  if (!is.null(vertex_size) && vertex_size == "centrality") {
+    graph <- set_centrality(graph, method = centrality_method)
   }
-  igraph::V(graph$graph)$size <- vertex_size
+
+  graph <- graph |>
+    set_vertex_color(vertex_color = vertex_color) |>
+    set_vertex_size(vertex_size = vertex_size) |>
+    set_edge_color(edge_color = edge_color, custom_palette = NULL) |>
+    set_edge_width(edge_width = edge_width, log_edge_width = log_edge_width)
 
   layout_df <- graph$layout
 
   ggraph::ggraph(graph$graph, layout = "manual", x = layout_df$x, y = layout_df$y) +
-    ggraph::geom_edge_link(color = "gray", width = 0.8, alpha = 0.7) +
-    ggraph::geom_node_point(ggplot2::aes(color = community, size = size), show.legend = FALSE) +
-    ggplot2::scale_color_manual(values = colors) +
-    ggplot2::theme_void()
-}
-
-
-#' @export
-plot_cutpoints <- function(graph, ...) UseMethod("plot_cutpoints")
-#' @export
-plot_cutpoints.graph <- function(graph, centrality_method = "degree") {
-  cutpoints <- get_cutpoints(graph)
-  n_cutpoints <- length(cutpoints)
-
-  vertex_colors <- rep(grDevices::adjustcolor("grey", alpha.f = 0.6), igraph::vcount(graph$graph))
-  if (n_cutpoints > 0) {
-    colors <- get_palette(alpha = 1)[seq_len(n_cutpoints)]
-    vertex_colors[as.integer(cutpoints)] <- colors
-  } else {
-    colors <- character(0)
-  }
-  igraph::V(graph$graph)$cutpoint_color <- vertex_colors
-
-  centrality <- get_centrality(graph, method = centrality_method)
-  if (centrality_method == "none") {
-    vertex_size <- 4 * rep(1, igraph::vcount(graph$graph))
-  } else {
-    vertex_size <- 3 + (centrality / max(centrality)) * 10
-  }
-  igraph::V(graph$graph)$size <- vertex_size
-
-  layout_df <- graph$layout
-  rownames(layout_df) <- igraph::V(graph$graph)$name
-
-  p <- ggraph::ggraph(graph$graph, layout = "manual", x = layout_df$x, y = layout_df$y) +
-    ggraph::geom_edge_link(color = "gray", width = 0.8, alpha = 0.7) +
-    ggraph::geom_node_point(ggplot2::aes(color = cutpoint_color, size = size), show.legend = TRUE) +
-    ggplot2::scale_color_identity(guide = "legend",
-                                  labels = names(cutpoints),
-                                  breaks = igraph::V(graph$graph)$cutpoint_color[as.integer(cutpoints)]) +
+    ggraph::geom_edge_link(ggplot2::aes(edge_width = width, edge_color = color),
+                           edge_alpha = 0.7, show.legend = TRUE) +
+    ggraph::geom_node_point(ggplot2::aes(color = color, size = size), show.legend = TRUE) +
+    add_legend(graph$graph, vertex_color, edge_color) +
     ggplot2::theme_void() +
-    ggplot2::theme(legend.position = "bottom", legend.title.position = "top")
-
-  if (n_cutpoints > 0) {
-    legend_df <- data.frame(
-      name = names(cutpoints),
-      color = igraph::V(graph$graph)$cutpoint_color[as.integer(cutpoints)]
-    )
-    p <- p + ggplot2::guides(
-      size = "none",
-      color = ggplot2::guide_legend(
-        ncol = 3,
-        override.aes = list(
-          color = legend_df$color,
-          size = 4
-        ),
-        title = "Cutpoint authors",
-        label.theme = ggplot2::element_text(size = 10)
-      )
-    )
-  }
-  p
+    ggplot2::theme(
+      plot.margin = ggplot2::margin(t = 0, r = 100, b = 0, l = 0)
+    ) +
+    ggplot2::coord_cartesian(clip = "off")
 }
 
 
@@ -88,38 +44,32 @@ plot_top_vertices.graph <- function(
   n = 10,
   edge_color = NULL,
   edge_width = "weight",
+  vertex_color = NULL,
+  vertex_size = NULL,
   log_edge_width = FALSE,
-  custom_palette = NULL
+  custom_palette = NULL,
+  centrality_method = "degree"
 ) {
-  centrality <- get_centrality(graph, method = "degree")
+  centrality <- get_centrality(graph, method = centrality_method)
   if (length(centrality) < n) {
     n <- length(centrality)
   }
   top_vertices <- order(centrality, decreasing = TRUE)[1:n]
   subgraph <- igraph::induced_subgraph(graph$graph, vids = top_vertices)
 
-  comm <- get_communities(graph)
-  top_vertices_communities <- comm[top_vertices]
-  igraph::V(subgraph)$community <- as.factor(top_vertices_communities)
-  colors <- get_palette(graph, vertex_attr = "community", alpha = 0.6)
+  if (!is.null(vertex_color) && vertex_color == "community") {
+    comm <- get_communities(graph)
+    top_vertices_communities <- comm[top_vertices]
+    igraph::V(subgraph)$community <- as.factor(top_vertices_communities)
+  }
 
-  layout_coords <- igraph::layout_in_circle(subgraph)
-  colnames(layout_coords) <- c("x", "y")
-  rownames(layout_coords) <- igraph::V(subgraph)$name
+  layout_df <- get_circle_layout(subgraph)
 
-  layout_df <- as.data.frame(layout_coords)
-  layout_df$name <- rownames(layout_coords)
-  layout_df$label_degree <- -atan2(layout_coords[, 2], layout_coords[, 1])
-  layout_df$label_dist <- 1 + abs(cos(layout_df$label_degree)) * 2
-  layout_df$label_angle <- ifelse(
-    (cos(layout_df$label_degree) > 0 & sin(layout_df$label_degree) > 0) |
-      (cos(layout_df$label_degree) < 0 & sin(layout_df$label_degree) < 0),
-    -45,
-    45
-  )
-
-  subgraph <- set_edge_width(subgraph, edge_width = edge_width, log_edge_width = log_edge_width)
-  subgraph <- set_edge_color(subgraph, edge_color = edge_color, custom_palette = custom_palette)
+  subgraph <- subgraph |>
+    set_edge_width(edge_width = edge_width, log_edge_width = log_edge_width) |>
+    set_edge_color(edge_color = edge_color, custom_palette = custom_palette) |>
+    set_vertex_color(vertex_color = vertex_color) |>
+    set_vertex_size(vertex_size = vertex_size)
 
   ggraph::ggraph(subgraph, layout = "manual", x = layout_df$x, y = layout_df$y) +
     ggraph::geom_edge_arc(
@@ -129,13 +79,7 @@ plot_top_vertices.graph <- function(
       alpha = 0.7,
       show.legend = TRUE
     ) +
-    ggraph::geom_node_point(ggplot2::aes(color = community, size = 6), show.legend = FALSE) +
-    ggplot2::scale_color_manual(values = colors) +
-    ggraph::scale_edge_color_identity(guide = "legend",
-                                      name = edge_color,
-                                      labels = igraph::E(subgraph)$edge_name,
-                                      breaks = igraph::E(subgraph)$color) +
-    ggplot2::scale_size_identity() +
+    ggraph::geom_node_point(ggplot2::aes(color = color, size = size), show.legend = TRUE) +
     ggraph::geom_node_text(
       ggplot2::aes(
         label = format_names(name),
@@ -146,18 +90,42 @@ plot_top_vertices.graph <- function(
       color = "black",
       show.legend = FALSE
     ) +
+    add_legend(graph = subgraph, vertex_color = vertex_color, edge_color = edge_color) +
     ggplot2::theme_void() +
-    ggplot2::guides(
-      color = "none",
-      size = "none",
-      edge_width = "none"
-    ) +
     ggplot2::theme(
-      plot.margin = ggplot2::margin(t = 50, r = 250, b = 50, l = 100),
-      legend.position.inside = c(1.15, 0.5)
+      plot.margin = ggplot2::margin(t = 50, r = 400, b = 50, l = 100),
+      legend.position = c(1.5, 0.5)
     ) +
     ggplot2::coord_cartesian(clip = "off")
 
+}
+
+
+add_legend <- function(graph, vertex_color, edge_color) {
+  list(
+    ggplot2::scale_color_identity(
+      guide = "legend",
+      name = vertex_color,
+      labels = igraph::V(graph)$vertex_name,
+      breaks = igraph::V(graph)$color
+    ),
+    ggraph::scale_edge_color_identity(
+      guide = "legend",
+      name = edge_color,
+      labels = igraph::E(graph)$edge_name,
+      breaks = igraph::E(graph)$color
+    ),
+    ggplot2::guides(
+      color = ggplot2::guide_legend(
+        override.aes = list(size = 6, edge_width = 0)
+      ),
+      edge_color = ggplot2::guide_legend(
+        override.aes = list(size = 0, stroke = 0, edge_width = 3)
+      ),
+      size = "none",
+      edge_width = "none"
+    )
+  )
 }
 
 
@@ -205,10 +173,75 @@ get_palette.igraph <- function(graph, vertex_attr = NULL, edge_attr = NULL, alph
 
 
 #' @export
+set_vertex_color <- function(graph, vertex_color = NULL, custom_palette = NULL) UseMethod("set_vertex_color")
+#' @export
+set_vertex_color.graph <- function(graph, vertex_color = NULL, custom_palette = NULL) {
+  graph$graph <- set_vertex_color.igraph(graph$graph, vertex_color = vertex_color, custom_palette = custom_palette)
+  graph
+}
+#' @export
+set_vertex_color.igraph <- function(graph, vertex_color = NULL, custom_palette = NULL) {
+  if (!is.null(vertex_color) && vertex_color %in% igraph::vertex_attr_names(graph)) {
+    vertex_vals <- igraph::vertex_attr(graph, vertex_color)
+    vertex_names <- igraph::vertex_attr(graph, vertex_color)
+    if (is.numeric(vertex_vals)) {
+      ord <- order(vertex_vals)
+      vertex_vals <- vertex_vals[ord]
+      vertex_names <- vertex_names[ord]
+      vertex_colors <- scales::col_numeric("Blues", domain = NULL)(vertex_vals)
+    } else {
+      if (is.null(custom_palette)) {
+        pal <- get_palette.igraph(graph, vertex_attr = vertex_color, alpha = 0.8)
+        vertex_colors <- pal[as.character(vertex_vals)]
+      } else {
+        pal <- unlist(custom_palette)
+        vertex_colors <- pal[as.character(vertex_vals)]
+        vertex_colors[is.na(vertex_colors)] <- "gray"
+      }
+    }
+  } else {
+    vertex_colors <- rep("gray", igraph::vcount(graph))
+    vertex_names <- rep("", igraph::vcount(graph))
+  }
+  igraph::V(graph)$color <- vertex_colors
+  igraph::V(graph)$vertex_name <- vertex_names
+  graph
+}
+
+
+#' @export
+set_vertex_size <- function(graph, vertex_size = NULL) UseMethod("set_vertex_size")
+#' @export
+set_vertex_size.graph <- function(graph, vertex_size = NULL) {
+  graph$graph <- set_vertex_size.igraph(graph$graph, vertex_size = vertex_size)
+  graph
+}
+#' @export
+set_vertex_size.igraph <- function(graph, vertex_size = NULL) {
+  if (!is.null(vertex_size) && vertex_size %in% igraph::vertex_attr_names(graph)) {
+    vertex_vals <- igraph::vertex_attr(graph, vertex_size)
+    if (is.numeric(vertex_vals)) {
+      vertex_vals <- vertex_vals / max(vertex_vals) * 15
+      igraph::V(graph)$size <- vertex_vals
+    } else {
+      cli::cli_abort(c(
+        "x" = "The `vertex_size` attribute must be numeric.",
+        "i" = "Please provide a numeric attribute for vertex sizes."
+      ))
+    }
+  } else {
+    igraph::V(graph)$size <- 4
+  }
+  graph
+}
+
+
+#' @export
 set_edge_color <- function(graph, edge_color = NULL, custom_palette = NULL) UseMethod("set_edge_color")
 #' @export
 set_edge_color.graph <- function(graph, edge_color = NULL, custom_palette = NULL) {
-  set_edge_color.igraph(graph$graph, edge_color = edge_color, custom_palette = custom_palette)
+  graph$graph <- set_edge_color.igraph(graph$graph, edge_color = edge_color, custom_palette = custom_palette)
+  graph
 }
 #' @export
 set_edge_color.igraph <- function(graph, edge_color = NULL, custom_palette = NULL) {
@@ -244,7 +277,8 @@ set_edge_color.igraph <- function(graph, edge_color = NULL, custom_palette = NUL
 set_edge_width <- function(graph, edge_width = "weight", log_edge_width = FALSE) UseMethod("set_edge_width")
 #' @export
 set_edge_width.graph <- function(graph, edge_width = "weight", log_edge_width = FALSE) {
-  set_edge_width.igraph(graph$graph, edge_width = edge_width, log_edge_width = log_edge_width)
+  graph$graph <- set_edge_width.igraph(graph$graph, edge_width = edge_width, log_edge_width = log_edge_width)
+  graph
 }
 #' @export
 set_edge_width.igraph <- function(graph, edge_width = "weight", log_edge_width = FALSE) {
@@ -267,4 +301,26 @@ set_edge_width.igraph <- function(graph, edge_width = "weight", log_edge_width =
     igraph::E(graph)$width <- 1
   }
   graph
+}
+
+
+#' @export
+get_circle_layout <- function(graph) UseMethod("get_circle_layout")
+#' @export
+get_circle_layout.igraph <- function(graph) {
+  layout_coords <- igraph::layout_in_circle(graph)
+  colnames(layout_coords) <- c("x", "y")
+  rownames(layout_coords) <- igraph::V(graph)$name
+
+  layout_df <- as.data.frame(layout_coords)
+  layout_df$name <- rownames(layout_coords)
+  layout_df$label_degree <- -atan2(layout_coords[, 2], layout_coords[, 1])
+  layout_df$label_dist <- 1 + abs(cos(layout_df$label_degree)) * 2
+  layout_df$label_angle <- ifelse(
+    (cos(layout_df$label_degree) > 0 & sin(layout_df$label_degree) > 0) |
+      (cos(layout_df$label_degree) < 0 & sin(layout_df$label_degree) < 0),
+    -45,
+    45
+  )
+  layout_df
 }

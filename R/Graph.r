@@ -13,14 +13,35 @@ graph <- function(data,
 }
 
 #' @export
-build <- function(graph, ...) UseMethod("build")
+build <- function(x, ...) UseMethod("build")
 #' @export
-build.graph <- function(graph, vertices, edges, edge_attr = NULL) {
-  edges <- get_edges(graph$data, vertices, edges, edge_attr)
-  graph$graph <- igraph::graph_from_data_frame(edges, directed = graph$directed)
-  graph$layout <- get_coords(graph, layout_method = "drl", options = list(simmer.attraction = 0))
+build.graph <- function(x, vertices, edges, edge_attr = NULL) {
+  edges <- get_edges(x$data, vertices, edges, edge_attr)
+  x$graph <- igraph::graph_from_data_frame(edges, directed = x$directed)
+  x$layout <- get_coords(x, layout_method = "drl", options = list(simmer.attraction = 0))
+  x
+}
+
+
+#' @export
+set_vertex_attr <- function(graph, ...) UseMethod("set_vertex_attr")
+#' @export
+#' @importFrom rlang .data
+set_vertex_attr.graph <- function(graph, name, keys, values) {
+  if (is.null(graph$graph)) {
+    cli::cli_abort("Graph has not been built yet. Call {.fn build} first.")
+  }
+  if (length(keys) != length(values)) {
+    cli::cli_abort("Length of keys and values must match.")
+  }
+  vertex_names <- igraph::V(graph$graph)$name
+  attr_vec <- rep(NA, length(vertex_names))
+  match_idx <- match(keys, vertex_names)
+  attr_vec[match_idx[!is.na(match_idx)]] <- values[!is.na(match_idx)]
+  graph$graph <- igraph::set_vertex_attr(graph$graph, name = name, value = attr_vec)
   graph
 }
+
 
 #' @export
 get_coords <- function(graph, ...) UseMethod("get_coords")
@@ -42,6 +63,7 @@ get_coords.igraph <- function(graph, layout_method = "auto", ...) {
   layout_df
 }
 
+
 #' @export
 get_density <- function(graph, ...) UseMethod("get_density")
 #' @export
@@ -49,12 +71,23 @@ get_density.graph <- function(graph) {
   igraph::edge_density(graph$graph)
 }
 
+
 #' @export
 get_transitivity <- function(graph, ...) UseMethod("get_transitivity")
 #' @export
 get_transitivity.graph <- function(graph, type = "global") {
   igraph::transitivity(graph$graph, type = type)
 }
+
+
+#' @export
+set_centrality <- function(graph, ...) UseMethod("set_centrality")
+#' @export
+set_centrality.graph <- function(graph, method = "degree") {
+  centrality <- get_centrality(graph, method = method)
+  set_vertex_attr(graph, name = "centrality", keys = names(centrality), values = centrality)
+}
+
 
 #' @export
 get_centrality <- function(graph, ...) UseMethod("get_centrality")
@@ -67,6 +100,7 @@ get_centrality.graph <- function(graph, method = "degree") {
          NULL)
 }
 
+
 #' @export
 get_diameter <- function(graph, ...) UseMethod("get_diameter")
 #' @export
@@ -74,12 +108,14 @@ get_diameter.graph <- function(graph) {
   igraph::diameter(graph$graph, directed = graph$directed, weights = NULL)
 }
 
+
 #' @export
 get_average_shortest_path <- function(graph, ...) UseMethod("get_average_shortest_path")
 #' @export
 get_average_shortest_path.graph <- function(graph) {
   igraph::mean_distance(graph$graph, directed = igraph::is_directed(graph$graph), unconnected = TRUE)
 }
+
 
 #' @export
 get_reachability <- function(graph, ...) UseMethod("get_reachability")
@@ -92,12 +128,30 @@ get_reachability.graph <- function(graph) {
   reachable_pairs / total_pairs
 }
 
+
+#' @export
+set_cutpoints <- function(graph, ...) UseMethod("set_cutpoints")
+#' @export
+set_cutpoints.graph <- function(graph) {
+  cutpoints <- get_cutpoints(graph)
+  if (length(cutpoints) == 0) {
+    cli::cli_warn("No cutpoints found in the graph.")
+    return(graph)
+  }
+  graph <- set_vertex_attr(graph, name = "cutpoint", keys = names(cutpoints), values = rep(TRUE, length(cutpoints)))
+  igraph::V(graph$graph)$cutpoint[is.na(igraph::V(graph$graph)$cutpoint)] <- FALSE
+  igraph::V(graph$graph)$cutpoint <- ifelse(igraph::V(graph$graph)$cutpoint, igraph::V(graph$graph)$name, "Regular node")
+  graph
+}
+
+
 #' @export
 get_cutpoints <- function(graph, ...) UseMethod("get_cutpoints")
 #' @export
 get_cutpoints.graph <- function(graph) {
   igraph::articulation_points(graph$graph)
 }
+
 
 #' @export
 get_most_central_vertices <- function(graph, ...) UseMethod("get_most_central_vertices")
@@ -106,6 +160,7 @@ get_most_central_vertices.graph <- function(graph, method = "degree", n = 10) {
   centrality <- get_centrality(graph, method = method)
   igraph::V(graph$graph)$name[order(-centrality)[1:n]]
 }
+
 
 #' @export
 set_communities <- function(graph, ...) UseMethod("set_communities")
@@ -116,12 +171,15 @@ set_communities.graph <- function(graph, vertex_attr = NULL) {
     igraph::V(graph$graph)$community <- as.factor(comm$membership)
   } else {
     if (!vertex_attr %in% igraph::vertex_attr_names(graph$graph)) {
-      cli::cli_abort("Vertex attribute {.val {vertex_attr}} not found in graph.")
+      cli::cli_abort(c("x" = "Vertex attribute {.val {vertex_attr}} not found in graph.",
+                       "i" = "Available attributes: {.val {igraph::vertex_attr_names(graph$graph)}}",
+                       "i" = "Call {.fn set_vertex_attr} to set a new attribute."))
     }
     igraph::V(graph$graph)$community <- as.factor(igraph::vertex_attr(graph$graph, vertex_attr))
   }
   graph
 }
+
 
 #' @export
 get_communities <- function(graph, ...) UseMethod("get_communities")
@@ -140,6 +198,7 @@ get_communities.igraph <- function(graph) {
   igraph::V(graph)$community
 }
 
+
 #' @export
 get_most_central_per_community <- function(graph, ...) UseMethod("get_most_central_per_community")
 #' @export
@@ -152,6 +211,7 @@ get_most_central_per_community.graph <- function(graph, method = "degree") {
     igraph::V(graph$graph)$name[most_central]
   })
 }
+
 
 #' @export
 save_centrality_data <- function(graph, ...) UseMethod("save_centrality_data")

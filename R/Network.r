@@ -22,6 +22,14 @@ network <- function(data,
 
 
 #' @export
+build.network <- function(x, edge_attr = NULL, raw = FALSE, directed = FALSE) {
+  data <- if (raw) x$raw else x$filtered
+  graph <- graph(data, directed = directed)
+  build.graph(graph, vertices = x$vertex_column, edges = x$edge_id, edge_attr = edge_attr)
+}
+
+
+#' @export
 unnest_vertex_column <- function(...) UseMethod("unnest_vertex_column")
 #' @export
 unnest_vertex_column.network <- function(network) {
