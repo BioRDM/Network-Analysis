@@ -23,7 +23,7 @@ config <- list(
   min_papers_per_author = NULL,
   from_year = 2019,
   to_year = 2020,
-  split_per_year = 2
+  split_per_year = NULL
 )
 
 # Run the analysis and generate the report using the provided configuration.
