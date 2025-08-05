@@ -16,10 +16,6 @@ plot.graph <- function(
     set_edge_color(edge_color = edge_color, custom_palette = NULL) |>
     set_edge_width(edge_width = edge_width, log_edge_width = log_edge_width)
 
-  if (!is.null(vertex_color) && vertex_color == "cutpoint") {
-    igraph::V(graph$graph)$color[igraph::V(graph$graph)$cutpoint == "Regular node"] <- "grey"
-  }
-
   layout_df <- graph$layout
 
   ggraph::ggraph(graph$graph, layout = "manual", x = layout_df$x, y = layout_df$y) +

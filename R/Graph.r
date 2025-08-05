@@ -139,8 +139,7 @@ set_cutpoints.graph <- function(graph) {
     return(graph)
   }
   graph <- set_vertex_attr(graph, name = "cutpoint", keys = names(cutpoints), values = rep(TRUE, length(cutpoints)))
-  igraph::V(graph$graph)$cutpoint[is.na(igraph::V(graph$graph)$cutpoint)] <- FALSE
-  igraph::V(graph$graph)$cutpoint <- ifelse(igraph::V(graph$graph)$cutpoint, igraph::V(graph$graph)$name, "Regular node")
+  igraph::V(graph$graph)$cutpoint <- ifelse(is.na(igraph::V(graph$graph)$cutpoint), igraph::V(graph$graph)$name, NA)
   graph
 }
 
