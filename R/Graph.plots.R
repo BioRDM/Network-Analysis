@@ -7,19 +7,18 @@ plot.graph <- function(
   vertex_size = NULL,
   edge_color = NULL,
   edge_width = "weight",
-  log_edge_width = FALSE,
-  centrality_method = "degree"
+  log_edge_width = FALSE
 ) {
 
-  if (!is.null(vertex_size) && vertex_size == "centrality") {
-    graph <- set_centrality(graph, method = centrality_method)
-  }
-
   graph <- graph |>
-    set_vertex_color(vertex_color = vertex_color) |>
+    set_vertex_color(vertex_color = vertex_color, custom_palette = NULL) |>
     set_vertex_size(vertex_size = vertex_size) |>
     set_edge_color(edge_color = edge_color, custom_palette = NULL) |>
     set_edge_width(edge_width = edge_width, log_edge_width = log_edge_width)
+
+  if (!is.null(vertex_color) && vertex_color == "cutpoint") {
+    igraph::V(graph$graph)$color[igraph::V(graph$graph)$cutpoint == "Regular node"] <- "grey"
+  }
 
   layout_df <- graph$layout
 
@@ -136,7 +135,7 @@ get_palette.default <- function(alpha = 1) {
   grDevices::adjustcolor(c(
     "#1E90FF", "#008000", "#E31A1C", "#6A3D9A", "#FF7F00",
     "#FFD700", "#87CEEB", "#FB9A99", "#98FB98", "#CAB2D6",
-    "#FDBF6F", "#B3B3B3", "#F0E68C", "#800000", "#DA70D6",
+    "#FDBF6F", "#F0E68C", "#800000", "#DA70D6", "#00BFFF",
     "#FF1493", "#0000FF", "#000000", "#4682B4", "#00CED1",
     "#00FF00", "#808000", "#FFFF00", "#FF8C00", "#A52A2A"
   ), alpha.f = alpha)
@@ -193,6 +192,7 @@ set_vertex_color.igraph <- function(graph, vertex_color = NULL, custom_palette =
       if (is.null(custom_palette)) {
         pal <- get_palette.igraph(graph, vertex_attr = vertex_color, alpha = 0.8)
         vertex_colors <- pal[as.character(vertex_vals)]
+        vertex_colors[is.na(vertex_colors)] <- "gray"
       } else {
         pal <- unlist(custom_palette)
         vertex_colors <- pal[as.character(vertex_vals)]
@@ -257,6 +257,7 @@ set_edge_color.igraph <- function(graph, edge_color = NULL, custom_palette = NUL
       if (is.null(custom_palette)) {
         pal <- get_palette.igraph(graph, edge_attr = edge_color, alpha = 0.8)
         edge_colors <- pal[as.character(edge_vals)]
+        edge_colors[is.na(edge_colors)] <- "gray"
       } else {
         pal <- unlist(custom_palette)
         edge_colors <- pal[as.character(edge_vals)]

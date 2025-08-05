@@ -2,6 +2,7 @@
 get_edges <- function(data, vertices, edges, edge_attr = NULL) {
   group_cols <- c(edges, edge_attr)
   data |>
+    dplyr::mutate("{vertices}" := trimws(.data[[vertices]])) |>
     dplyr::group_by(!!!rlang::syms(group_cols)) |>
     dplyr::filter(dplyr::n() > 1) |>
     dplyr::summarise(
