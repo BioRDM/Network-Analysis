@@ -93,14 +93,15 @@ plot_top_vertices.graph <- function(
     ggplot2::theme_void() +
     ggplot2::theme(
       plot.margin = ggplot2::margin(t = 50, r = 400, b = 50, l = 100),
-      legend.position = c(1.5, 0.5)
+      legend.position = "inside",
+      legend.position.inside = c(1.5, 0.5)
     ) +
     ggplot2::coord_cartesian(clip = "off")
 
 }
 
 
-add_legend <- function(graph, vertex_color, edge_color) {
+add_legend <- function(graph, vertex_color = NULL, edge_color = NULL) {
   list(
     ggplot2::scale_color_identity(
       guide = "legend",
