@@ -191,7 +191,12 @@ graph <- set_cutpoints(graph)
 plot(graph, vertex_color = "cutpoint")
 ```
 This figure builds on Figure 1, with the addition of highlighting cutpoint authors in colour. Cutpoints are authors whose removal would fragment the network, indicating their critical role in maintaining connectivity.  
-The names of these cutpoint authors are listed above.
+The names of these cutpoint authors are listed below.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+cutpoints_table <- matrix(igraph::V(graph$graph)$name[!is.na(igraph::V(graph$graph)$cutpoint)], ncol = 5, byrow = TRUE)
+knitr::kable(cutpoints_table, col.names = c("", "", "", "", ""), format = "markdown")
+```
 
 # Appendix
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of betweenness centrality in the Co-Authorship Network Analysis", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
@@ -203,7 +208,7 @@ The size of each node corresponds to the betweenness centrality of the author, a
 The legend identifies the authors with high betweenness centrality act as bridges, controlling the flow of information between different clusters or groups.
 
 15 most central authors in the network, based on betweenness centrality:
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 top_authors_table <- matrix(get_most_central_vertices(graph, n = 15, method = "betweenness"), ncol = 5, byrow = TRUE)
 knitr::kable(top_authors_table, col.names = c("", "", "", "", ""), format = "markdown")
 ```
@@ -217,7 +222,7 @@ The size of each node corresponds to the harmonic centrality of the author, whic
 The legend identifies the authors with high harmonic centrality that can reach many other nodes quickly, even if some nodes are disconnected.
 
 15 most central authors in the network, based on harmonic centrality:
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 top_authors_table <- matrix(get_most_central_vertices(graph, n = 15, method = "harmonic"), ncol = 5, byrow = TRUE)
 knitr::kable(top_authors_table, col.names = c("", "", "", "", ""), format = "markdown")
 ```
