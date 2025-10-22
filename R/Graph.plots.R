@@ -25,7 +25,7 @@ plot.graph <- function(
     add_legend(graph$graph, vertex_color, edge_color) +
     ggplot2::theme_void() +
     ggplot2::theme(
-      plot.margin = ggplot2::margin(t = 0, r = 100, b = 0, l = 0)
+      plot.margin = ggplot2::margin(t = 0, r = 0, b = 0, l = 0)
     ) +
     ggplot2::coord_cartesian(clip = "off")
 }
@@ -189,15 +189,15 @@ set_vertex_color.igraph <- function(graph, vertex_color = NULL, custom_palette =
       if (is.null(custom_palette)) {
         pal <- get_palette.igraph(graph, vertex_attr = vertex_color, alpha = 0.8)
         vertex_colors <- pal[as.character(vertex_vals)]
-        vertex_colors[is.na(vertex_colors)] <- "gray"
+        vertex_colors[is.na(vertex_colors)] <- grDevices::adjustcolor("gray", alpha.f = 0.2)
       } else {
         pal <- unlist(custom_palette)
         vertex_colors <- pal[as.character(vertex_vals)]
-        vertex_colors[is.na(vertex_colors)] <- "gray"
+        vertex_colors[is.na(vertex_colors)] <- grDevices::adjustcolor("gray", alpha.f = 0.2)
       }
     }
   } else {
-    vertex_colors <- rep("gray", igraph::vcount(graph))
+    vertex_colors <- rep(grDevices::adjustcolor("gray", alpha.f = 0.2), igraph::vcount(graph))
     vertex_names <- rep("", igraph::vcount(graph))
   }
   igraph::V(graph)$color <- vertex_colors

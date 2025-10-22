@@ -35,7 +35,7 @@ for (key in names(metadata)) {
 ```
 Input data: `r paste0(config$input_name, ".csv")`
 
-Date range: `r network$from_year` to `r network$to_year`
+Date range: `r config$from_year` to `r config$to_year`
 
 `r metadata_text`
 
