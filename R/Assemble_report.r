@@ -41,8 +41,23 @@ assemble_report <- function(config, metadata) {
 
     # Build the graph
     graph <- graph(network$filtered, directed = FALSE) |>
-      build(vertices = network$vertex_column, edges = network$edge_id) |>
-      set_communities()
+      build(vertices = network$vertex_column, edges = network$edge_id)
+
+    # If affiliation data is available, add it as a vertex attribute
+    # Otherwise, cluster nodes with igraph's "cluster_louvain" method (communities)
+    if (!is.null(config$affiliations_file_path)) {
+      affiliations <- utils::read.csv(config$affiliations_file_path, stringsAsFactor = FALSE)
+      graph <- set_vertex_attr(graph,
+                               name = "Affiliation",
+                               keys = affiliations[[config$affiliations_Name]],
+                               values = affiliations[[config$affiliations_node_color]])
+      if (all(is.na(igraph::V(graph$graph)$Affiliation))) {
+        cli::cli_alert(c("!" = "No matching affiliations found.",
+                         "i" = "Check that the name format in the affiliations file matches that in the main data."))
+      }
+    } else {
+      graph <- set_communities(graph)
+    }
 
     # Save raw and filtered data
     utils::write.csv(network$raw, paste0(paths$data, "/Raw_data_", date_range, ".csv"), row.names = FALSE)

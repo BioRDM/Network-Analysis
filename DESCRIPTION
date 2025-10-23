@@ -1,6 +1,6 @@
 Package: NetworkAnalysis
 Title: Generate Reports On Publication Networks
-Version: 0.1.0
+Version: 0.1.1
 Authors@R:
     c(
         person("Daniel", "Thedie", , "daniel.thedie@ed.ac.uk", role = c("aut", "cre")),

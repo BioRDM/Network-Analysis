@@ -13,6 +13,11 @@ toc: TRUE
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 raw_stats <- author_stats[author_stats$Data == "raw", ]
 filtered_stats <- author_stats[author_stats$Data == "filtered", ]
+if (!is.null(config$affiliations_file_path)) {
+  vertex_color <- "Affiliation"
+} else {
+  vertex_color <- "community"
+}
 ```
 
 \pagestyle{fancy}
@@ -81,7 +86,7 @@ In total, `r filtered_stats$Total_Papers` papers and `r filtered_stats$Total_Aut
 
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network Analysis", echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
 graph <- set_centrality(graph, method = "degree")
-plot(graph, vertex_color = "community", vertex_size = "centrality")
+plot(graph, vertex_color = vertex_color, vertex_size = "centrality")
 ```
 Each color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the degree centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. Centrality, in this context, reflects an author's influence based on their position in the network — those with higher centrality are more interconnected and play a larger role in facilitating collaboration. 
 The legend identifies the most central authors from each cluster depending on degree centrality, providing insight into key contributors within their respective groups.
@@ -166,7 +171,7 @@ knitr::kable(top_authors_table, col.names = c("", "", "", "", ""), format = "mar
 ```
 
 ```{r, fig.width=14, fig.height=8, fig.pos = 'H', fig.cap = "Direct connections between the 30 most central authors", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-print(plot_top_vertices(graph, vertex_color = "community", n = 30))
+print(plot_top_vertices(graph, vertex_color = vertex_color, n = 30))
 ```
 This figure highlights the direct connections between the 30 most central authors in the network. Nodes positioned around the circle represent these top authors, and the thickness of the connecting lines indicates the strength of their collaboration (thicker lines represent stronger connections). The node colour corresponds to the clustering shown in Figure 1.
 
@@ -201,7 +206,7 @@ knitr::kable(cutpoints_table, col.names = c("", "", "", "", ""), format = "markd
 # Appendix
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of betweenness centrality in the Co-Authorship Network Analysis", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
 graph <- set_centrality(graph, method = "betweenness")
-plot(graph, vertex_color = "community", vertex_size = "centrality")
+plot(graph, vertex_color = vertex_color, vertex_size = "centrality")
 ```
 Each color represents a cluster of authors who are strongly connected within the network.
 The size of each node corresponds to the betweenness centrality of the author, a measure of how often an author appears on the shortest path between two other authors. 
@@ -215,7 +220,7 @@ knitr::kable(top_authors_table, col.names = c("", "", "", "", ""), format = "mar
 
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of harmonic centrality in the Co-Authorship Network Analysis", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
 graph <- set_centrality(graph, method = "harmonic")
-plot(graph, vertex_color = "community", vertex_size = "centrality")
+plot(graph, vertex_color = vertex_color, vertex_size = "centrality")
 ```
 Each color represents a cluster of authors who are strongly connected within the network.
 The size of each node corresponds to the harmonic centrality of the author, which reflects how close a node is to all other nodes in a network
@@ -228,7 +233,7 @@ knitr::kable(top_authors_table, col.names = c("", "", "", "", ""), format = "mar
 ```
 
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network Analysis without centrality indicator", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-plot(graph, vertex_color = "community")
+plot(graph, vertex_color = vertex_color)
 ```
 Each color represents a cluster of authors who are strongly connected within the network, illustrating the distribution of these clusters across the network.
 

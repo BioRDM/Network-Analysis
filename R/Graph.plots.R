@@ -25,6 +25,7 @@ plot.graph <- function(
     add_legend(graph$graph, vertex_color, edge_color) +
     ggplot2::theme_void() +
     ggplot2::theme(
+      legend.position = "right",
       plot.margin = ggplot2::margin(t = 0, r = 0, b = 0, l = 0)
     ) +
     ggplot2::coord_cartesian(clip = "off")
@@ -134,7 +135,12 @@ get_palette.default <- function(alpha = 1) {
     "#FFD700", "#87CEEB", "#FB9A99", "#98FB98", "#CAB2D6",
     "#FDBF6F", "#F0E68C", "#800000", "#DA70D6", "#00BFFF",
     "#FF1493", "#0000FF", "#000000", "#4682B4", "#00CED1",
-    "#00FF00", "#808000", "#FFFF00", "#FF8C00", "#A52A2A"
+    "#00FF00", "#808000", "#FFFF00", "#FF8C00", "#A52A2A",
+    "#B22222", "#20B2AA", "#FF6347", "#7B68EE", "#3CB371",
+    "#B8860B", "#8B008B", "#556B2F", "#FF4500", "#2E8B57",
+    "#D2691E", "#8FBC8F", "#9932CC", "#BDB76B", "#4169E1",
+    "#DC143C", "#00FA9A", "#FFDAB9", "#8B0000", "#E9967A",
+    "#483D8B", "#ADFF2F", "#FFB6C1", "#CD5C5C", "#40E0D0"
   ), alpha.f = alpha)
 }
 #' @export

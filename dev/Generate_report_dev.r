@@ -5,25 +5,28 @@ devtools::load_all()
 metadata <- list(
   Author = "Daniel Thedie",
   Email = "daniel.thedie@ed.ac.uk",
-  Data_description = "Grant applications submitted between 2019 and 2024 at the School of Biological Sciences, University of Edinburgh.",
-  Data_access_date = "3rd April 2025",
-  Data_source = "ERO BiSuite",
-  Data_source_url = "https://research-office.ed.ac.uk/"
+  Data_description = "SBS grant applications from 2019 to 2024",
+  Data_access_date = "01-08-2025",
+  Data_source = "Worktribe",
+  Data_source_url = ""
 )
 
 # Configuration list for the analysis
 config <- list(
-  file_path = "/media/Store/Daniel/Network_Analysis/Data/Grant_application_data/SBS_Research_Applications_RAWdata2019-24.csv",
-  output_path = "/media/Store/Daniel/Network_Analysis/Outputs",
+  file_path = "/media/Store/Daniel/Data_sharing_evaluation/Data/SBS_Pure/SBS_2019-2024_2025-09-24.csv",
+  output_path = "/media/Store/Daniel/Data_sharing_evaluation/Outputs",
   author_delimiter = NULL,
-  author_column_name = "Investigator",
-  edge_id = "Project_ID",
-  year_column_name = "Academic Year",
+  author_column_name = "Internal_Author",
+  edge_id = "Title",
+  year_column_name = "Publication_date",
   max_authors_per_paper = NULL,
   min_papers_per_author = NULL,
   from_year = 2019,
-  to_year = 2020,
-  split_per_year = NULL
+  to_year = 2024,
+  split_per_year = NULL,
+  affiliations_file_path = NULL,
+  affiliations_Name = "Name",
+  affiliations_node_color = "Organisational.unit"
 )
 
 # Run the analysis and generate the report using the provided configuration.
