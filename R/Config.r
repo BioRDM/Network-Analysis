@@ -1,9 +1,9 @@
 #' @export
 read_config <- function(config) {
-  # Replace spaces with dots in column names to match R column names
-  config$author_column_name <- gsub(" ", ".", config$author_column_name)
-  config$year_column_name <- gsub(" ", ".", config$year_column_name)
-  config$edge_id <- gsub(" ", ".", config$edge_id)
+  # Make column names match their R-friendly versions
+  for (nm in c("author_column_name", "year_column_name", "edge_id", "node_name", "node_color")) {
+    config[[nm]] <- make.names(config[[nm]])
+  }
 
   default_config <- list(
     input_name = tools::file_path_sans_ext(basename(config$file_path)),

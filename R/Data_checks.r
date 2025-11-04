@@ -12,8 +12,8 @@ check_split_per_year <- function(split_per_year) {
 check_column <- function(data, column) {
   if (!column %in% colnames(data)) {
     cli::cli_abort(c(
-      "x" = "{.arg column} {.val {column}} not found in the input table.",
-      "i" = "Please check the vertex column name in your table.",
+      "x" = "Column {.val {column}} not found in the input table.",
+      "i" = "Please check the column name in your table.",
       "i" = "Ensure the column name matches case and pluralisation."
     ))
   }

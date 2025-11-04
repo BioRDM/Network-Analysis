@@ -47,6 +47,8 @@ assemble_report <- function(config, metadata) {
     # Otherwise, cluster nodes with igraph's "cluster_louvain" method (communities)
     if (!is.null(config$node_properties_file_path)) {
       node_props <- utils::read.csv(config$node_properties_file_path, stringsAsFactor = FALSE)
+      check_column(node_props, config$node_name)
+      check_column(node_props, config$node_color)
       graph <- set_vertex_attr(graph,
                                name = config$node_color,
                                keys = node_props[[config$node_name]],
