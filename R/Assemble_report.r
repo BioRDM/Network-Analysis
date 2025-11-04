@@ -45,15 +45,15 @@ assemble_report <- function(config, metadata) {
 
     # If affiliation data is available, add it as a vertex attribute
     # Otherwise, cluster nodes with igraph's "cluster_louvain" method (communities)
-    if (!is.null(config$affiliations_file_path)) {
-      affiliations <- utils::read.csv(config$affiliations_file_path, stringsAsFactor = FALSE)
+    if (!is.null(config$node_properties_file_path)) {
+      node_props <- utils::read.csv(config$node_properties_file_path, stringsAsFactor = FALSE)
       graph <- set_vertex_attr(graph,
-                               name = "Affiliation",
-                               keys = affiliations[[config$affiliations_Name]],
-                               values = affiliations[[config$affiliations_node_color]])
-      if (all(is.na(igraph::V(graph$graph)$Affiliation))) {
-        cli::cli_alert(c("!" = "No matching affiliations found.",
-                         "i" = "Check that the name format in the affiliations file matches that in the main data."))
+                               name = config$node_color,
+                               keys = node_props[[config$node_name]],
+                               values = node_props[[config$node_color]])
+      if (all(is.na(igraph::vertex_attr(graph$graph, config$node_color)))) {
+        cli::cli_alert(c("!" = "No match found for node colour.",
+                         "i" = "Check that the name format in the node colour table matches that in the main data."))
       }
     } else {
       graph <- set_communities(graph)

@@ -24,9 +24,9 @@ config <- list(
   from_year = 2019,
   to_year = 2024,
   split_per_year = NULL,
-  affiliations_file_path = NULL,
-  affiliations_Name = "Name",
-  affiliations_node_color = "Organisational.unit"
+  node_properties_file_path = "/media/Store/Daniel/Data_sharing_evaluation/Data/SBS_affiliations/SBS_affiliations_tidy_2.csv",
+  node_name = "Name",
+  node_color = "Organisational.unit"
 )
 
 # Run the analysis and generate the report using the provided configuration.

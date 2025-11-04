@@ -13,8 +13,8 @@ toc: TRUE
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 raw_stats <- author_stats[author_stats$Data == "raw", ]
 filtered_stats <- author_stats[author_stats$Data == "filtered", ]
-if (!is.null(config$affiliations_file_path)) {
-  vertex_color <- "Affiliation"
+if (!is.null(config$node_properties_file_path)) {
+  vertex_color <- config$node_color
 } else {
   vertex_color <- "community"
 }
@@ -89,8 +89,8 @@ graph <- set_centrality(graph, method = "degree")
 plot(graph, vertex_color = vertex_color, vertex_size = "centrality")
 ```
 
-```{r, fig.pos = 'H', fig.cap = NULL, echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-#plot_legend_only(graph, vertex_color = vertex_color)
+```{r, fig.pos = 'H', fig.align='center', fig.cap = NULL, echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, out.width='90%'}
+plot_legend_only(graph, vertex_color = vertex_color)
 ```
 Each color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the degree centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. Centrality, in this context, reflects an author's influence based on their position in the network — those with higher centrality are more interconnected and play a larger role in facilitating collaboration. 
 The legend identifies the most central authors from each cluster depending on degree centrality, providing insight into key contributors within their respective groups.
@@ -200,7 +200,7 @@ graph <- set_cutpoints(graph)
 plot(graph, vertex_color = "cutpoint")
 ```
 This figure builds on Figure 1, with the addition of highlighting cutpoint authors in colour. Cutpoints are authors whose removal would fragment the network, indicating their critical role in maintaining connectivity.  
-The names of these cutpoint authors are listed below.
+There are `r length(unique(igraph::V(graph$graph)$name[!is.na(igraph::V(graph$graph)$cutpoint)]))` cutpoint authors, whose names are listed below.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 cutpoints_table <- matrix(igraph::V(graph$graph)$name[!is.na(igraph::V(graph$graph)$cutpoint)], ncol = 5, byrow = TRUE)
@@ -211,6 +211,9 @@ knitr::kable(cutpoints_table, col.names = c("", "", "", "", ""), format = "markd
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of betweenness centrality in the Co-Authorship Network Analysis", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
 graph <- set_centrality(graph, method = "betweenness")
 plot(graph, vertex_color = vertex_color, vertex_size = "centrality")
+```
+```{r, fig.pos = 'H', fig.align='center', fig.cap = NULL, echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, out.width='90%'}
+plot_legend_only(graph, vertex_color = vertex_color)
 ```
 Each color represents a cluster of authors who are strongly connected within the network.
 The size of each node corresponds to the betweenness centrality of the author, a measure of how often an author appears on the shortest path between two other authors. 

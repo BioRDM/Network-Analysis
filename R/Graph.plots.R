@@ -72,12 +72,18 @@ plot_legend_only <- function(
     ggplot2::scale_color_manual(values = setNames(edge_legend_df$color, edge_legend_df$label), name = edge_color) +
     ggplot2::theme_void()
 
-  cowplot::plot_grid(
-    cowplot::get_legend(vertex_legend_plot),
-    cowplot::get_legend(edge_legend_plot),
-    ncol = 2,
-    rel_heights = c(1, 1)
-  )
+  cowplot::ggdraw(
+    cowplot::plot_grid(
+      cowplot::get_legend(vertex_legend_plot),
+      cowplot::get_legend(edge_legend_plot),
+      ncol = 2,
+      rel_heights = c(1, 1)
+    )
+  ) +
+    ggplot2::theme(
+      plot.margin = ggplot2::margin(t = 0, r = 40, b = 0, l = 40)
+    ) +
+    ggplot2::coord_cartesian(clip = "off")
 }
 
 #' @export
@@ -94,6 +100,12 @@ plot_top_vertices.graph <- function(
   custom_palette = NULL,
   centrality_method = "degree"
 ) {
+  graph <- graph |>
+    set_edge_width(edge_width = edge_width, log_edge_width = log_edge_width) |>
+    set_edge_color(edge_color = edge_color, custom_palette = custom_palette) |>
+    set_vertex_color(vertex_color = vertex_color) |>
+    set_vertex_size(vertex_size = vertex_size)
+
   centrality <- get_centrality(graph, method = centrality_method)
   if (length(centrality) < n) {
     n <- length(centrality)
@@ -108,12 +120,6 @@ plot_top_vertices.graph <- function(
   }
 
   layout_df <- get_circle_layout(subgraph)
-
-  subgraph <- subgraph |>
-    set_edge_width(edge_width = edge_width, log_edge_width = log_edge_width) |>
-    set_edge_color(edge_color = edge_color, custom_palette = custom_palette) |>
-    set_vertex_color(vertex_color = vertex_color) |>
-    set_vertex_size(vertex_size = vertex_size)
 
   ggraph::ggraph(subgraph, layout = "manual", x = layout_df$x, y = layout_df$y) +
     ggraph::geom_edge_arc(
@@ -190,9 +196,9 @@ get_palette.default <- function(alpha = 1, n = NULL) {
     "#DC143C", "#00FA9A", "#FFDAB9", "#8B0000", "#E9967A",
     "#483D8B", "#ADFF2F", "#FFB6C1", "#CD5C5C", "#40E0D0"
   ), alpha.f = alpha)
-  # if (!is.null(n) && n > length(base_cols)) {
-  #   return(grDevices::rainbow(n, s = 0.8, v = 0.9, alpha = alpha))
-  # }
+  if (!is.null(n) && n > length(base_cols)) {
+    return(grDevices::rainbow(n, s = 0.8, v = 0.9, alpha = alpha))
+  }
   base_cols[seq_len(n)]
 }
 #' @export

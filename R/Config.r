@@ -18,6 +18,9 @@ read_config <- function(config) {
     from_year = NULL,
     to_year = NULL,
     split_per_year = NULL,
+    node_properties_file_path = NULL,
+    node_name = NULL,
+    node_color = NULL,
     package_version = as.character(utils::packageVersion("NetworkAnalysis"))
   )
 
