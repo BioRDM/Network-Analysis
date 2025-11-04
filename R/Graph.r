@@ -135,7 +135,7 @@ set_cutpoints <- function(graph, ...) UseMethod("set_cutpoints")
 set_cutpoints.graph <- function(graph) {
   cutpoints <- get_cutpoints(graph)
   if (length(cutpoints) == 0) {
-    cli::cli_warn("No cutpoints found in the graph.")
+    cli::cli_warn(c("!" = "No cutpoints found in the graph."))
     return(graph)
   }
   graph <- set_vertex_attr(graph, name = "cutpoint", keys = names(cutpoints), values = rep(TRUE, length(cutpoints)))
@@ -224,4 +224,20 @@ save_centrality_data.graph <- function(graph, output_file = "output/centrality_d
   rownames(output_data) <- format_names(igraph::V(graph$graph)$name)
   output_data <- output_data[statnet.common::order(-output_data$degree), ]
   utils::write.csv(output_data, output_file, row.names = TRUE)
+}
+
+
+#' @export
+save_cutpoint_names <- function(graph, ...) UseMethod("save_cutpoint_names")
+#' @export
+save_cutpoint_names.graph <- function(graph, output_file = "output/cutpoints.csv") {
+  cutpoints <- get_cutpoints(graph)
+  if (length(cutpoints) == 0) {
+    cli::cli_warn(c("!" = "No cutpoints found in the graph.",
+                    "i" = "No file will be saved."))
+    return(NULL)
+  }
+  cutpoint_names <- format_names(igraph::V(graph$graph)$name[cutpoints])
+  output_data <- data.frame(Cutpoint = cutpoint_names)
+  utils::write.csv(output_data, output_file, row.names = FALSE)
 }

@@ -72,6 +72,12 @@ assemble_report <- function(config, metadata) {
     # Save centrality data as csv
     save_centrality_data(graph, paste0(paths$centrality_data, date_range, ".csv"))
 
+    # Save cutpoint names as csv
+    save_cutpoint_names(
+      graph,
+      output_file = paste0(paths$cutpoints, date_range, ".csv")
+    )
+
     # Compute summary statistics and update summary_stats dataframe
     author_stats <- get_summary_stats(
       graph = graph,

@@ -9,6 +9,7 @@ Paths <- function(config) {
                 data = get_data_path(config),
                 summary_table = get_summary_table_path(config),
                 centrality_data = get_centrality_data_path(config),
+                cutpoints = get_cutpoints_path(config),
                 papers_per_author = get_papers_per_author_path(config),
                 templates = get_templates_path(config))
 
@@ -51,6 +52,10 @@ get_data_path <- function(config) {
 
 get_centrality_data_path <- function(config) {
   paste0(get_data_path(config), "/Centrality_data_")
+}
+
+get_cutpoints_path <- function(config) {
+  paste0(get_data_path(config), "/Cutpoints_")
 }
 
 get_papers_per_author_path <- function(config) {
