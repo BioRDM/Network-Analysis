@@ -18,7 +18,7 @@ read_config <- function(config) {
     from_year = NULL,
     to_year = NULL,
     split_per_year = NULL,
-    package_version = utils::packageVersion("NetworkAnalysis")
+    package_version = as.character(utils::packageVersion("NetworkAnalysis"))
   )
 
   # Merge the provided config with the default config

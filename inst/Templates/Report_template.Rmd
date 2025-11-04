@@ -84,9 +84,13 @@ In total, `r filtered_stats$Total_Papers` papers and `r filtered_stats$Total_Aut
 - Maximum authors per paper: `r filtered_stats$Max_Authors_per_Paper`
 
 
-```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network Analysis", echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
+```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network", echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
 graph <- set_centrality(graph, method = "degree")
 plot(graph, vertex_color = vertex_color, vertex_size = "centrality")
+```
+
+```{r, fig.pos = 'H', fig.cap = NULL, echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
+#plot_legend_only(graph, vertex_color = vertex_color)
 ```
 Each color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the degree centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. Centrality, in this context, reflects an author's influence based on their position in the network — those with higher centrality are more interconnected and play a larger role in facilitating collaboration. 
 The legend identifies the most central authors from each cluster depending on degree centrality, providing insight into key contributors within their respective groups.
@@ -233,7 +237,7 @@ knitr::kable(top_authors_table, col.names = c("", "", "", "", ""), format = "mar
 ```
 
 ```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network Analysis without centrality indicator", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
-plot(graph, vertex_color = vertex_color)
+plot(graph, vertex_color = vertex_color, vertex_size = NULL)
 ```
 Each color represents a cluster of authors who are strongly connected within the network, illustrating the distribution of these clusters across the network.
 

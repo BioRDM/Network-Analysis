@@ -16,21 +16,69 @@ plot.graph <- function(
     set_edge_color(edge_color = edge_color, custom_palette = NULL) |>
     set_edge_width(edge_width = edge_width, log_edge_width = log_edge_width)
 
-  layout_df <- graph$layout
+  comps <- igraph::components(graph$graph)
+  main_comp_vids <- which(comps$membership == which.max(comps$csize))
+  plot_graph <- igraph::induced_subgraph(graph$graph, vids = main_comp_vids)
 
-  ggraph::ggraph(graph$graph, layout = "manual", x = layout_df$x, y = layout_df$y) +
+  ggraph::ggraph(plot_graph,
+    layout = "centrality",
+    centrality = tidygraph::centrality_degree()
+  ) +
     ggraph::geom_edge_link(ggplot2::aes(edge_width = width, edge_color = color),
-                           edge_alpha = 0.7, show.legend = TRUE) +
-    ggraph::geom_node_point(ggplot2::aes(color = color, size = size), show.legend = TRUE) +
+                           edge_alpha = 0.7, show.legend = FALSE) +
+    ggraph::geom_node_point(ggplot2::aes(color = color, size = size),
+                            show.legend = FALSE) +
+    ggplot2::scale_size_identity() +
+    ggplot2::coord_fixed() +
     add_legend(graph$graph, vertex_color, edge_color) +
     ggplot2::theme_void() +
     ggplot2::theme(
-      legend.position = "right",
+      legend.position = "bottom",
       plot.margin = ggplot2::margin(t = 0, r = 0, b = 0, l = 0)
     ) +
     ggplot2::coord_cartesian(clip = "off")
 }
 
+#' @export
+plot_legend_only <- function(graph, ...) UseMethod("plot_legend_only")
+
+#' @export
+plot_legend_only <- function(
+  graph,
+  vertex_color = NULL,
+  edge_color = NULL
+) {
+  graph <- graph |>
+    set_vertex_color(vertex_color = vertex_color, custom_palette = NULL) |>
+    set_edge_color(edge_color = edge_color, custom_palette = NULL)
+
+  vertex_legend_df <- data.frame(
+    label = unique(igraph::V(graph$graph)$vertex_name),
+    color = unique(igraph::V(graph$graph)$color)
+  )
+
+  edge_legend_df <- data.frame(
+    label = unique(igraph::E(graph$graph)$edge_name),
+    color = unique(igraph::E(graph$graph)$color)
+  )
+
+  vertex_legend_plot <- ggplot2::ggplot(vertex_legend_df, ggplot2::aes(x = 1, y = label, color = label)) +
+    ggplot2::geom_point(size = 6) +
+    ggplot2::scale_color_manual(values = setNames(vertex_legend_df$color, vertex_legend_df$label), name = vertex_color) +
+    ggplot2::theme_void()
+
+  edge_legend_plot <- ggplot2::ggplot(edge_legend_df, ggplot2::aes(x = 1, y = label, color = label)) +
+    ggplot2::geom_segment(ggplot2::aes(xend = 2, yend = label), size = 2) +
+    ggplot2::scale_color_manual(values = setNames(edge_legend_df$color, edge_legend_df$label), name = edge_color) +
+    ggplot2::theme_void()
+
+  cowplot::plot_grid(
+    cowplot::get_legend(vertex_legend_plot),
+    cowplot::get_legend(edge_legend_plot),
+    ncol = 2,
+    rel_heights = c(1, 1)
+  )
+}
 
 #' @export
 plot_top_vertices <- function(graph, ...) UseMethod("plot_top_vertices")
@@ -129,8 +177,8 @@ add_legend <- function(graph, vertex_color = NULL, edge_color = NULL) {
 #' @export
 get_palette <- function(...) UseMethod("get_palette")
 #' @export
-get_palette.default <- function(alpha = 1) {
-  grDevices::adjustcolor(c(
+get_palette.default <- function(alpha = 1, n = NULL) {
+  base_cols <- grDevices::adjustcolor(c(
     "#1E90FF", "#008000", "#E31A1C", "#6A3D9A", "#FF7F00",
     "#FFD700", "#87CEEB", "#FB9A99", "#98FB98", "#CAB2D6",
     "#FDBF6F", "#F0E68C", "#800000", "#DA70D6", "#00BFFF",
@@ -142,6 +190,10 @@ get_palette.default <- function(alpha = 1) {
     "#DC143C", "#00FA9A", "#FFDAB9", "#8B0000", "#E9967A",
     "#483D8B", "#ADFF2F", "#FFB6C1", "#CD5C5C", "#40E0D0"
   ), alpha.f = alpha)
+  # if (!is.null(n) && n > length(base_cols)) {
+  #   return(grDevices::rainbow(n, s = 0.8, v = 0.9, alpha = alpha))
+  # }
+  base_cols[seq_len(n)]
 }
 #' @export
 get_palette.graph <- function(graph, vertex_attr = NULL, edge_attr = NULL, alpha = 1) {
@@ -168,7 +220,7 @@ get_palette.igraph <- function(graph, vertex_attr = NULL, edge_attr = NULL, alph
     levs <- sort(unique(attr_vals))
     n <- length(levs)
   }
-  colors <- get_palette(alpha = alpha)[seq_len(n)]
+  colors <- get_palette(alpha = alpha, n = n)
   names(colors) <- levs
   colors
 }
@@ -195,16 +247,16 @@ set_vertex_color.igraph <- function(graph, vertex_color = NULL, custom_palette =
       if (is.null(custom_palette)) {
         pal <- get_palette.igraph(graph, vertex_attr = vertex_color, alpha = 0.8)
         vertex_colors <- pal[as.character(vertex_vals)]
-        vertex_colors[is.na(vertex_colors)] <- grDevices::adjustcolor("gray", alpha.f = 0.2)
+        vertex_colors[is.na(vertex_colors)] <- grDevices::adjustcolor("gray", alpha.f = 0.4)
       } else {
         pal <- unlist(custom_palette)
         vertex_colors <- pal[as.character(vertex_vals)]
-        vertex_colors[is.na(vertex_colors)] <- grDevices::adjustcolor("gray", alpha.f = 0.2)
+        vertex_colors[is.na(vertex_colors)] <- grDevices::adjustcolor("gray", alpha.f = 0.4)
       }
     }
   } else {
-    vertex_colors <- rep(grDevices::adjustcolor("gray", alpha.f = 0.2), igraph::vcount(graph))
-    vertex_names <- rep("", igraph::vcount(graph))
+    vertex_colors <- rep(grDevices::adjustcolor("gray", alpha.f = 0.4), igraph::vcount(graph))
+    vertex_names <- rep("Vertex", igraph::vcount(graph))
   }
   igraph::V(graph)$color <- vertex_colors
   igraph::V(graph)$vertex_name <- vertex_names
@@ -224,7 +276,7 @@ set_vertex_size.igraph <- function(graph, vertex_size = NULL) {
   if (!is.null(vertex_size) && vertex_size %in% igraph::vertex_attr_names(graph)) {
     vertex_vals <- igraph::vertex_attr(graph, vertex_size)
     if (is.numeric(vertex_vals)) {
-      vertex_vals <- vertex_vals / max(vertex_vals) * 15
+      vertex_vals <- (vertex_vals - min(vertex_vals)) / (max(vertex_vals) - min(vertex_vals)) * (6 - 1) + 1
       igraph::V(graph)$size <- vertex_vals
     } else {
       cli::cli_abort(c(
@@ -233,7 +285,7 @@ set_vertex_size.igraph <- function(graph, vertex_size = NULL) {
       ))
     }
   } else {
-    igraph::V(graph)$size <- 4
+    igraph::V(graph)$size <- 2
   }
   graph
 }
@@ -269,7 +321,7 @@ set_edge_color.igraph <- function(graph, edge_color = NULL, custom_palette = NUL
     }
   } else {
     edge_colors <- rep("gray", igraph::ecount(graph))
-    edge_names <- rep("", igraph::ecount(graph))
+    edge_names <- rep("Edge", igraph::ecount(graph))
   }
   igraph::E(graph)$color <- edge_colors
   igraph::E(graph)$edge_name <- edge_names

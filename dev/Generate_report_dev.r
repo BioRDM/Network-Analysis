@@ -5,9 +5,9 @@ devtools::load_all()
 metadata <- list(
   Author = "Daniel Thedie",
   Email = "daniel.thedie@ed.ac.uk",
-  Data_description = "SBS grant applications from 2019 to 2024",
-  Data_access_date = "01-08-2025",
-  Data_source = "Worktribe",
+  Data_description = "SBS publications from 2019 to 2024",
+  Data_access_date = "24-09-2025",
+  Data_source = "Pure",
   Data_source_url = ""
 )
 
@@ -15,11 +15,11 @@ metadata <- list(
 config <- list(
   file_path = "/media/Store/Daniel/Data_sharing_evaluation/Data/SBS_Pure/SBS_2019-2024_2025-09-24.csv",
   output_path = "/media/Store/Daniel/Data_sharing_evaluation/Outputs",
-  author_delimiter = NULL,
+  author_delimiter = ";",
   author_column_name = "Internal_Author",
   edge_id = "Title",
   year_column_name = "Publication_date",
-  max_authors_per_paper = NULL,
+  max_authors_per_paper = 40,
   min_papers_per_author = NULL,
   from_year = 2019,
   to_year = 2024,
