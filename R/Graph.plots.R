@@ -262,6 +262,7 @@ set_vertex_color.graph <- function(graph, vertex_color = NULL, custom_palette = 
 }
 #' @export
 set_vertex_color.igraph <- function(graph, vertex_color = NULL, custom_palette = NULL, custom_order = NULL) {
+  vertex_isna <- rep(FALSE, igraph::vcount(graph))
   if (!is.null(vertex_color) && vertex_color %in% igraph::vertex_attr_names(graph)) {
     vertex_vals <- igraph::vertex_attr(graph, vertex_color)
     vertex_names <- igraph::vertex_attr(graph, vertex_color)
