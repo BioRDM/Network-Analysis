@@ -7,11 +7,13 @@ plot.graph <- function(
   vertex_size = NULL,
   edge_color = NULL,
   edge_width = "weight",
-  log_edge_width = FALSE
+  log_edge_width = FALSE,
+  vertex_order = NULL,
+  vertex_palette = NULL
 ) {
 
   graph <- graph |>
-    set_vertex_color(vertex_color = vertex_color, custom_palette = NULL) |>
+    set_vertex_color(vertex_color = vertex_color, custom_palette = vertex_palette, custom_order = vertex_order) |>
     set_vertex_size(vertex_size = vertex_size) |>
     set_edge_color(edge_color = edge_color, custom_palette = NULL) |>
     set_edge_width(edge_width = edge_width, log_edge_width = log_edge_width)
@@ -46,16 +48,27 @@ plot_legend_only <- function(graph, ...) UseMethod("plot_legend_only")
 plot_legend_only <- function(
   graph,
   vertex_color = NULL,
+  vertex_order = NULL,
+  vertex_palette = NULL,
   edge_color = NULL
 ) {
   graph <- graph |>
-    set_vertex_color(vertex_color = vertex_color, custom_palette = NULL) |>
+    set_vertex_color(vertex_color = vertex_color, custom_palette = vertex_palette, custom_order = vertex_order) |>
     set_edge_color(edge_color = edge_color, custom_palette = NULL)
 
-  vertex_legend_df <- data.frame(
-    label = unique(igraph::V(graph$graph)$vertex_name),
-    color = unique(igraph::V(graph$graph)$color)
-  )
+  vertex_labels <- unique(igraph::V(graph$graph)$vertex_name)
+  if (!is.null(vertex_order)) {
+    vertex_labels <- intersect(vertex_order, vertex_labels)
+    vertex_legend_df <- data.frame(
+      label = factor(vertex_labels, levels = vertex_order),
+      color = igraph::V(graph$graph)$color[match(vertex_labels, igraph::V(graph$graph)$vertex_name)]
+    )
+  } else {
+    vertex_legend_df <- data.frame(
+      label = vertex_labels,
+      color = igraph::V(graph$graph)$color[match(vertex_labels, igraph::V(graph$graph)$vertex_name)]
+    )
+  }
 
   edge_legend_df <- data.frame(
     label = unique(igraph::E(graph$graph)$edge_name),
@@ -97,13 +110,14 @@ plot_top_vertices.graph <- function(
   vertex_color = NULL,
   vertex_size = NULL,
   log_edge_width = FALSE,
-  custom_palette = NULL,
+  vertex_palette = NULL,
+  vertex_order = NULL,
   centrality_method = "degree"
 ) {
   graph <- graph |>
     set_edge_width(edge_width = edge_width, log_edge_width = log_edge_width) |>
-    set_edge_color(edge_color = edge_color, custom_palette = custom_palette) |>
-    set_vertex_color(vertex_color = vertex_color) |>
+    set_edge_color(edge_color = edge_color) |>
+    set_vertex_color(vertex_color = vertex_color, custom_palette = vertex_palette, custom_order = vertex_order) |>
     set_vertex_size(vertex_size = vertex_size)
 
   centrality <- get_centrality(graph, method = centrality_method)
@@ -233,17 +247,22 @@ get_palette.igraph <- function(graph, vertex_attr = NULL, edge_attr = NULL, alph
 
 
 #' @export
-set_vertex_color <- function(graph, vertex_color = NULL, custom_palette = NULL) UseMethod("set_vertex_color")
+set_vertex_color <- function(graph, vertex_color = NULL, custom_palette = NULL, custom_order = NULL) UseMethod("set_vertex_color")
 #' @export
-set_vertex_color.graph <- function(graph, vertex_color = NULL, custom_palette = NULL) {
-  graph$graph <- set_vertex_color.igraph(graph$graph, vertex_color = vertex_color, custom_palette = custom_palette)
+set_vertex_color.graph <- function(graph, vertex_color = NULL, custom_palette = NULL, custom_order = NULL) {
+  graph$graph <- set_vertex_color.igraph(graph$graph, vertex_color = vertex_color, custom_palette = custom_palette, custom_order = custom_order)
   graph
 }
 #' @export
-set_vertex_color.igraph <- function(graph, vertex_color = NULL, custom_palette = NULL) {
+set_vertex_color.igraph <- function(graph, vertex_color = NULL, custom_palette = NULL, custom_order = NULL) {
   if (!is.null(vertex_color) && vertex_color %in% igraph::vertex_attr_names(graph)) {
     vertex_vals <- igraph::vertex_attr(graph, vertex_color)
     vertex_names <- igraph::vertex_attr(graph, vertex_color)
+    if (!is.null(custom_order)) {
+      vertex_vals <- factor(vertex_vals, levels = custom_order)
+    } else {
+      custom_order <- unique(as.character(vertex_vals))
+    }
     if (is.numeric(vertex_vals)) {
       ord <- order(vertex_vals)
       vertex_vals <- vertex_vals[ord]
@@ -255,7 +274,8 @@ set_vertex_color.igraph <- function(graph, vertex_color = NULL, custom_palette =
         vertex_colors <- pal[as.character(vertex_vals)]
         vertex_colors[is.na(vertex_colors)] <- grDevices::adjustcolor("gray", alpha.f = 0.4)
       } else {
-        pal <- unlist(custom_palette)
+        check_palette_length(custom_palette, custom_order)
+        pal <- setNames(unlist(custom_palette), custom_order)
         vertex_colors <- pal[as.character(vertex_vals)]
         vertex_colors[is.na(vertex_colors)] <- grDevices::adjustcolor("gray", alpha.f = 0.4)
       }

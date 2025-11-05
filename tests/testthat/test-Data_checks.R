@@ -29,3 +29,8 @@ test_that("check_year_range works correctly", {
   expect_error(check_year_range(2000, NULL), NA)
   expect_error(check_year_range(NULL, NULL), NA)
 })
+
+test_that("check_palette_length works correctly", {
+  expect_error(check_palette_length(c("red", "blue"), c("A", "B", "C")), "length must match")
+  expect_error(check_palette_length(c("red", "blue", "green"), c("A", "B", "C")), NA)
+})

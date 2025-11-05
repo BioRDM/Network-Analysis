@@ -10,6 +10,12 @@ check_split_per_year <- function(split_per_year) {
 
 #' @export
 check_column <- function(data, column) {
+  if (length(column) == 0 || is.null(column)) {
+    cli::cli_abort(c(
+      "x" = "A required column name is NULL.",
+      "i" = "Please provide a valid column name."
+    ))
+  }
   if (!column %in% colnames(data)) {
     cli::cli_abort(c(
       "x" = "Column {.val {column}} not found in the input table.",
@@ -47,6 +53,18 @@ check_year_range <- function(from_year, to_year) {
     cli::cli_abort(c(
       "x" = "{.arg from_year} must be less than or equal to {.arg to_year}.",
       "i" = "You provided {.arg from_year} = {.val {from_year}} and {.arg to_year} = {.val {to_year}}."
+    ))
+  }
+}
+
+#' @export
+check_palette_length <- function(custom_palette, custom_order) {
+  if (length(custom_palette) != length(custom_order)) {
+    cli::cli_abort(c(
+      "x" = "Palette length must match the number of levels for the variable.",
+      "!" = "If you provided both node_palette and node_order, they must be of the same length.",
+      "!" = "If you provided only node_palette, ensure its length matches the number of unique values in the variable.",
+      "i" = "Node palette has {.val {length(custom_palette)}} values and there are {.val {length(custom_order)}} levels to the variable."
     ))
   }
 }

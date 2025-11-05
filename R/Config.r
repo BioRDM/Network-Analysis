@@ -21,6 +21,8 @@ read_config <- function(config) {
     node_properties_file_path = NULL,
     node_name = NULL,
     node_color = NULL,
+    node_order = NULL,
+    node_palette = NULL,
     package_version = as.character(utils::packageVersion("NetworkAnalysis"))
   )
 
