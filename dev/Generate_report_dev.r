@@ -26,27 +26,27 @@ config <- list(
   split_per_year = NULL,
   node_properties_file_path = "/media/Store/Daniel/Data_sharing_evaluation/Data/SBS_affiliations/SBS_affiliations_tidy_2.csv",
   node_name = "Name",
-  node_color = "Organisational.unit",
-  node_order = c(
-    "Institute of Quantitative Biology, Biochemistry and Biotechnology",
-    "Institute of Ecology and Evolution",
-    "Institute of Cell Biology",
-    "Institute of Molecular Plant Sciences",
-    "Institute for Immunology and Infection Research",
-    "Institute for Stem Cell Research",
-    "Institute of Evolutionary Biology",
-    "SBS"
-  ),
-  node_palette = c(
-    "blue",
-    "green",
-    "purple",
-    "forestgreen",
-    "red",
-    "pink",
-    "orange",
-    "grey"
-  )
+  node_color = "Organisational.unit"
+  # node_order = c(
+  #   "Institute of Quantitative Biology, Biochemistry and Biotechnology",
+  #   "Institute of Ecology and Evolution",
+  #   "Institute of Cell Biology",
+  #   "Institute of Molecular Plant Sciences",
+  #   "Institute for Immunology and Infection Research",
+  #   "Institute for Stem Cell Research",
+  #   "Institute of Evolutionary Biology",
+  #   "SBS"
+  # ),
+  # node_palette = c(
+  #   "blue",
+  #   "green",
+  #   "purple",
+  #   "forestgreen",
+  #   "red",
+  #   "pink",
+  #   "orange",
+  #   "grey"
+  # )
 )
 
 # Run the analysis and generate the report using the provided configuration.

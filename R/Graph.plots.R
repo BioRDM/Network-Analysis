@@ -30,6 +30,13 @@ plot.graph <- function(
                            edge_alpha = 0.7, show.legend = FALSE) +
     ggraph::geom_node_point(ggplot2::aes(color = color, size = size),
                             show.legend = FALSE) +
+    ggraph::geom_node_text(
+      ggplot2::aes(
+        label = ifelse(isna, NA, name)
+      ),
+      size = 2,
+      repel = TRUE
+    ) +
     ggplot2::scale_size_identity() +
     ggplot2::coord_fixed() +
     add_legend(graph$graph, vertex_color, edge_color) +
@@ -272,12 +279,14 @@ set_vertex_color.igraph <- function(graph, vertex_color = NULL, custom_palette =
       if (is.null(custom_palette)) {
         pal <- get_palette.igraph(graph, vertex_attr = vertex_color, alpha = 0.8)
         vertex_colors <- pal[as.character(vertex_vals)]
-        vertex_colors[is.na(vertex_colors)] <- grDevices::adjustcolor("gray", alpha.f = 0.4)
+        vertex_isna <- is.na(vertex_colors)
+        vertex_colors[vertex_isna] <- grDevices::adjustcolor("gray", alpha.f = 0.4)
       } else {
         check_palette_length(custom_palette, custom_order)
         pal <- setNames(unlist(custom_palette), custom_order)
         vertex_colors <- pal[as.character(vertex_vals)]
-        vertex_colors[is.na(vertex_colors)] <- grDevices::adjustcolor("gray", alpha.f = 0.4)
+        vertex_isna <- is.na(vertex_colors)
+        vertex_colors[vertex_isna] <- grDevices::adjustcolor("gray", alpha.f = 0.4)
       }
     }
   } else {
@@ -286,6 +295,7 @@ set_vertex_color.igraph <- function(graph, vertex_color = NULL, custom_palette =
   }
   igraph::V(graph)$color <- vertex_colors
   igraph::V(graph)$vertex_name <- vertex_names
+  igraph::V(graph)$isna <- vertex_isna
   graph
 }
 
