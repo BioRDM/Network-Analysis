@@ -241,3 +241,13 @@ save_cutpoint_names.graph <- function(graph, output_file = "output/cutpoints.csv
   output_data <- data.frame(Cutpoint = cutpoint_names)
   utils::write.csv(output_data, output_file, row.names = FALSE)
 }
+
+#' @export
+save_vertex_attributes <- function(graph, ...) UseMethod("save_vertex_attributes")
+#' @export
+save_vertex_attributes.graph <- function(graph, output_file = "output/vertex_attributes.csv") {
+  graph <- set_communities(graph)
+  vertex_data <- as.data.frame(igraph::vertex_attr(graph$graph))
+
+  utils::write.csv(vertex_data, output_file, row.names = FALSE)
+}

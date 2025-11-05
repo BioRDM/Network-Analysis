@@ -80,6 +80,12 @@ assemble_report <- function(config, metadata) {
       output_file = paste0(paths$cutpoints, date_range, ".csv")
     )
 
+    # Save vertex attributes as csv
+    save_vertex_attributes(
+      graph,
+      output_file = paste0(paths$vertex_attributes, date_range, ".csv")
+    )
+
     # Compute summary statistics and update summary_stats dataframe
     author_stats <- get_summary_stats(
       graph = graph,
