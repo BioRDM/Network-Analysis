@@ -11,16 +11,15 @@ plot.graph <- function(
   vertex_order = NULL,
   vertex_palette = NULL
 ) {
+  comps <- igraph::components(graph$graph)
+  main_comp_vids <- which(comps$membership == which.max(comps$csize))
+  plot_graph <- igraph::induced_subgraph(graph$graph, vids = main_comp_vids)
 
-  graph <- graph |>
+  plot_graph <- plot_graph |>
     set_vertex_color(vertex_color = vertex_color, custom_palette = vertex_palette, custom_order = vertex_order) |>
     set_vertex_size(vertex_size = vertex_size) |>
     set_edge_color(edge_color = edge_color, custom_palette = NULL) |>
     set_edge_width(edge_width = edge_width, log_edge_width = log_edge_width)
-
-  comps <- igraph::components(graph$graph)
-  main_comp_vids <- which(comps$membership == which.max(comps$csize))
-  plot_graph <- igraph::induced_subgraph(graph$graph, vids = main_comp_vids)
 
   ggraph::ggraph(plot_graph,
     layout = "centrality",
@@ -59,6 +58,10 @@ plot_legend_only <- function(
   vertex_palette = NULL,
   edge_color = NULL
 ) {
+  comps <- igraph::components(graph$graph)
+  main_comp_vids <- which(comps$membership == which.max(comps$csize))
+  graph$graph <- igraph::induced_subgraph(graph$graph, vids = main_comp_vids)
+
   graph <- graph |>
     set_vertex_color(vertex_color = vertex_color, custom_palette = vertex_palette, custom_order = vertex_order) |>
     set_edge_color(edge_color = edge_color, custom_palette = NULL)
@@ -121,6 +124,10 @@ plot_top_vertices.graph <- function(
   vertex_order = NULL,
   centrality_method = "degree"
 ) {
+  comps <- igraph::components(graph$graph)
+  main_comp_vids <- which(comps$membership == which.max(comps$csize))
+  graph$graph <- igraph::induced_subgraph(graph$graph, vids = main_comp_vids)
+
   graph <- graph |>
     set_edge_width(edge_width = edge_width, log_edge_width = log_edge_width) |>
     set_edge_color(edge_color = edge_color) |>
@@ -132,13 +139,8 @@ plot_top_vertices.graph <- function(
     n <- length(centrality)
   }
   top_vertices <- order(centrality, decreasing = TRUE)[1:n]
-  subgraph <- igraph::induced_subgraph(graph$graph, vids = top_vertices)
 
-  if (!is.null(vertex_color) && vertex_color == "community") {
-    comm <- get_communities(graph)
-    top_vertices_communities <- comm[top_vertices]
-    igraph::V(subgraph)$community <- as.factor(top_vertices_communities)
-  }
+  subgraph <- igraph::induced_subgraph(graph$graph, vids = top_vertices)
 
   layout_df <- get_circle_layout(subgraph)
 
@@ -241,6 +243,7 @@ get_palette.igraph <- function(graph, vertex_attr = NULL, edge_attr = NULL, alph
     return(get_palette(alpha = alpha))
   }
   if (is.factor(attr_vals)) {
+    attr_vals <- droplevels(attr_vals)
     n <- nlevels(attr_vals)
     levs <- levels(attr_vals)
   } else {
@@ -401,7 +404,12 @@ set_edge_width.igraph <- function(graph, edge_width = "weight", log_edge_width =
 get_circle_layout <- function(graph) UseMethod("get_circle_layout")
 #' @export
 get_circle_layout.igraph <- function(graph) {
-  layout_coords <- igraph::layout_in_circle(graph)
+  if (is.null(igraph::V(graph)$color)) {
+    vertex_order <- igraph::V(graph)$name
+  } else {
+    vertex_order <- igraph::V(graph)$name[order(igraph::V(graph)$color)]
+  }
+  layout_coords <- igraph::layout_in_circle(graph, order = vertex_order)
   colnames(layout_coords) <- c("x", "y")
   rownames(layout_coords) <- igraph::V(graph)$name
 

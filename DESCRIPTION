@@ -31,7 +31,8 @@ Suggests:
     testthat (>= 3.0.0),
     mockery,
     renv,
-    tibble
+    tibble,
+    tinytex
 Depends: 
     R (>= 4.3)
 Config/testthat/edition: 3
