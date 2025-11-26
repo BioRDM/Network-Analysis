@@ -9,29 +9,29 @@ check_split_per_year <- function(split_per_year) {
 }
 
 #' @export
-check_column <- function(data, column) {
+check_column <- function(data, column, call = rlang::caller_env()) {
   if (length(column) == 0 || is.null(column)) {
     cli::cli_abort(c(
       "x" = "A required column name is NULL.",
       "i" = "Please provide a valid column name."
-    ))
+    ), call = call)
   }
   if (!column %in% colnames(data)) {
     cli::cli_abort(c(
       "x" = "Column {.val {column}} not found in the input table.",
       "i" = "Please check the column name in your table.",
       "i" = "Ensure the column name matches case and pluralisation."
-    ))
+    ), call = call)
   }
 }
 
 #' @export
-check_delimiter <- function(delimiter) {
+check_delimiter <- function(delimiter, call = rlang::caller_env()) {
   if (!is.null(delimiter) && (!is.character(delimiter) || nchar(delimiter) == 0)) {
     cli::cli_abort(c(
       "x" = "{.arg delimiter} must be a non-empty string.",
       "i" = "Current delimiter: {.var {delimiter}}."
-    ))
+    ), call = call)
   }
 }
 
