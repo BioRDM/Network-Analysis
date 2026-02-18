@@ -33,7 +33,7 @@ plot.graph <- function(
       ggplot2::aes(
         label = ifelse(isna, NA, name)
       ),
-      size = 2,
+      size = 6,
       repel = TRUE
     ) +
     ggplot2::scale_size_identity() +
@@ -325,7 +325,7 @@ set_vertex_size.igraph <- function(graph, vertex_size = NULL) {
       ))
     }
   } else {
-    igraph::V(graph)$size <- 2
+    igraph::V(graph)$size <- 5
   }
   graph
 }
