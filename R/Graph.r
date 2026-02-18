@@ -105,7 +105,7 @@ get_centrality.graph <- function(graph, method = "degree") {
 get_diameter <- function(graph, ...) UseMethod("get_diameter")
 #' @export
 get_diameter.graph <- function(graph) {
-  igraph::diameter(graph$graph, directed = graph$directed, weights = NULL)
+  igraph::diameter(graph$graph, directed = graph$directed, weights = NA)
 }
 
 
