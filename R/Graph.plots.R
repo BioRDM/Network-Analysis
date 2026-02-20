@@ -370,21 +370,21 @@ set_edge_color.igraph <- function(graph, edge_color = NULL, custom_palette = NUL
 
 
 #' @export
-set_edge_width <- function(graph, edge_width = "weight", log_edge_width = FALSE) UseMethod("set_edge_width")
+set_edge_width <- function(graph, edge_width = "weight", log_edge_width = FALSE, adjust = 1) UseMethod("set_edge_width")
 #' @export
-set_edge_width.graph <- function(graph, edge_width = "weight", log_edge_width = FALSE) {
+set_edge_width.graph <- function(graph, edge_width = "weight", log_edge_width = FALSE, adjust = 1) {
   graph$graph <- set_edge_width.igraph(graph$graph, edge_width = edge_width, log_edge_width = log_edge_width)
   graph
 }
 #' @export
-set_edge_width.igraph <- function(graph, edge_width = "weight", log_edge_width = FALSE) {
+set_edge_width.igraph <- function(graph, edge_width = "weight", log_edge_width = FALSE, adjust = 1) {
   if (!is.null(edge_width) && edge_width %in% igraph::edge_attr_names(graph)) {
     edge_vals <- igraph::edge_attr(graph, edge_width)
     if (is.numeric(edge_vals)) {
       if (log_edge_width) {
         igraph::E(graph)$width <- log2(edge_vals + 0.1)
       } else {
-        edge_vals <- edge_vals / max(edge_vals) * 5
+        edge_vals <- edge_vals / max(edge_vals) * 5 * adjust
         igraph::E(graph)$width <- edge_vals
       }
     } else {
