@@ -25,6 +25,7 @@ Imports:
     stringi,
     tidyr,
     statnet.common,
+    ggrepel (= 0.9.6),
     ggraph,
     ggplot2
 Suggests:
