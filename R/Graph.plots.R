@@ -9,7 +9,8 @@ plot.graph <- function(
   edge_width = "weight",
   log_edge_width = FALSE,
   vertex_order = NULL,
-  vertex_palette = NULL
+  vertex_palette = NULL,
+  display_names = TRUE
 ) {
   comps <- igraph::components(graph$graph)
   main_comp_vids <- which(comps$membership == which.max(comps$csize))
@@ -21,7 +22,7 @@ plot.graph <- function(
     set_edge_color(edge_color = edge_color, custom_palette = NULL) |>
     set_edge_width(edge_width = edge_width, log_edge_width = log_edge_width)
 
-  ggraph::ggraph(plot_graph,
+  p <- ggraph::ggraph(plot_graph,
     layout = "centrality",
     centrality = tidygraph::centrality_degree()
   ) +
@@ -29,13 +30,6 @@ plot.graph <- function(
                            edge_alpha = 0.7, show.legend = FALSE) +
     ggraph::geom_node_point(ggplot2::aes(color = color, size = size),
                             show.legend = FALSE) +
-    ggraph::geom_node_text(
-      ggplot2::aes(
-        label = ifelse(isna, NA, name)
-      ),
-      size = 6,
-      repel = TRUE
-    ) +
     ggplot2::scale_size_identity() +
     ggplot2::coord_fixed() +
     add_legend(graph$graph, vertex_color, edge_color) +
@@ -45,6 +39,16 @@ plot.graph <- function(
       plot.margin = ggplot2::margin(t = 0, r = 0, b = 0, l = 0)
     ) +
     ggplot2::coord_cartesian(clip = "off")
+
+  if (display_names) {
+    p <- p +
+      ggraph::geom_node_text(
+                ggplot2::aes(label = ifelse(isna, NA, name)),
+                size = 2,
+                repel = TRUE
+              )
+  }
+  p
 }
 
 #' @export
@@ -325,7 +329,7 @@ set_vertex_size.igraph <- function(graph, vertex_size = NULL) {
       ))
     }
   } else {
-    igraph::V(graph)$size <- 5
+    igraph::V(graph)$size <- 1
   }
   graph
 }
