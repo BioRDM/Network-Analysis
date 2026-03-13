@@ -95,8 +95,8 @@ get_centrality <- function(graph, ...) UseMethod("get_centrality")
 get_centrality.graph <- function(graph, method = "degree") {
   switch(method,
          "degree" = igraph::degree(graph$graph),
-         "betweenness" = igraph::betweenness(graph$graph),
-         "harmonic" = igraph::harmonic_centrality(graph$graph),
+         "betweenness" = igraph::betweenness(graph$graph, weights = NA),
+         "harmonic" = igraph::harmonic_centrality(graph$graph, weights = NA),
          NULL)
 }
 
@@ -113,7 +113,7 @@ get_diameter.graph <- function(graph) {
 get_average_shortest_path <- function(graph, ...) UseMethod("get_average_shortest_path")
 #' @export
 get_average_shortest_path.graph <- function(graph) {
-  igraph::mean_distance(graph$graph, directed = igraph::is_directed(graph$graph), unconnected = TRUE)
+  igraph::mean_distance(graph$graph, directed = igraph::is_directed(graph$graph), unconnected = TRUE, weights = NA)
 }
 
 
@@ -121,7 +121,7 @@ get_average_shortest_path.graph <- function(graph) {
 get_reachability <- function(graph, ...) UseMethod("get_reachability")
 #' @export
 get_reachability.graph <- function(graph) {
-  dists <- igraph::distances(graph$graph)
+  dists <- igraph::distances(graph$graph, weights = NA)
   n <- igraph::vcount(graph$graph)
   reachable_pairs <- sum(is.finite(dists)) - n
   total_pairs <- n * (n - 1)
