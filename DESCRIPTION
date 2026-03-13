@@ -25,7 +25,7 @@ Imports:
     stringi,
     tidyr,
     statnet.common,
-    ggrepel (= 0.9.6),
+    ggrepel,
     ggraph,
     ggplot2
 Suggests:
@@ -35,5 +35,5 @@ Suggests:
     tibble,
     tinytex
 Depends: 
-    R (>= 4.3)
+    R (>= 4.5)
 Config/testthat/edition: 3
