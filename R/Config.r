@@ -8,6 +8,7 @@ read_config <- function(config) {
   default_config <- list(
     input_name = tools::file_path_sans_ext(basename(config$file_path)),
     output_path = "output",
+    filters = NULL,
     author_column_name = NULL,
     author_delimiter = NULL,
     year_column_name = NULL,
@@ -19,6 +20,8 @@ read_config <- function(config) {
     to_year = NULL,
     split_per_year = NULL,
     node_properties_file_path = NULL,
+    node_filters = NULL,
+    remove_NA_nodes = FALSE,
     node_name = NULL,
     node_color = NULL,
     node_order = NULL,

@@ -11,7 +11,20 @@ assemble_report <- function(config, metadata) {
   write(json_config, file = paste0(paths$dataset, "/config.json"))
 
   df <- utils::read.csv(paths$input_file, stringsAsFactor = FALSE) |>
+    apply_filters(config$filters) |>
     unnest_vertex_column(config$author_column_name, config$author_delimiter)
+
+  if (!is.null(config$node_properties_file_path)) {
+    node_props <- utils::read.csv(config$node_properties_file_path, stringsAsFactor = FALSE) |>
+      apply_filters(config$node_filters)
+
+    check_column(node_props, config$node_name)
+    check_column(node_props, config$node_color)
+
+    if (config$remove_NA_nodes) {
+      df <- subset_df(df, config$author_column_name, node_props, config$node_name)
+    }
+  }
 
   years <- get_years_from_to(df, config)
 
@@ -43,12 +56,9 @@ assemble_report <- function(config, metadata) {
     graph <- graph(network$filtered, directed = FALSE) |>
       build(vertices = network$vertex_column, edges = network$edge_id)
 
-    # If affiliation data is available, add it as a vertex attribute
+    # If node data is available, add it as a vertex attribute
     # Otherwise, cluster nodes with igraph's "cluster_louvain" method (communities)
     if (!is.null(config$node_properties_file_path)) {
-      node_props <- utils::read.csv(config$node_properties_file_path, stringsAsFactor = FALSE)
-      check_column(node_props, config$node_name)
-      check_column(node_props, config$node_color)
       graph <- set_vertex_attr(graph,
                                name = config$node_color,
                                keys = node_props[[config$node_name]],
