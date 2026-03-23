@@ -184,7 +184,7 @@ A known limitation of this network analysis is reflected in cases where authors 
 # Reachability
 Reachability measures the proportion of pairs of nodes that are reachable in the network.
 
-- **Unreachable Pairs**: `r round(get_reachability(graph)*100)`% of all possible pairs of nodes are unreachable in the network.
+- **Unreachable Pairs**: `r round((1 - get_reachability(graph))*100)`% of all possible pairs of nodes are unreachable in the network.
 - **Interpretation**: A high percentage of unreachable pairs may indicate a fragmented network or isolated nodes that are not connected to the main network.
 
 # Cutpoint Authors

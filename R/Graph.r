@@ -123,7 +123,7 @@ get_reachability <- function(graph, ...) UseMethod("get_reachability")
 get_reachability.graph <- function(graph) {
   dists <- igraph::distances(graph$graph, weights = NA)
   n <- igraph::vcount(graph$graph)
-  reachable_pairs <- sum(is.finite(dists)) - n
+  reachable_pairs <- (sum(is.finite(dists)) - n) / 2
   total_pairs <- n * (n - 1)
   reachable_pairs / total_pairs
 }
