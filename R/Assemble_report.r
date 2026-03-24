@@ -11,9 +11,9 @@ assemble_report <- function(config, metadata) {
   write(json_config, file = paste0(paths$dataset, "/config.json"))
 
   df <- utils::read.csv(paths$input_file, stringsAsFactor = FALSE) |>
+    unnest_vertex_column(config$author_column_name, config$author_delimiter) |>
     dplyr::distinct(.data[[config$edge_id]], .data[[config$author_column_name]], .keep_all = TRUE) |>
-    apply_filters(config$filters) |>
-    unnest_vertex_column(config$author_column_name, config$author_delimiter)
+    apply_filters(config$filters)
 
   if (!is.null(config$node_properties_file_path)) {
     node_props <- utils::read.csv(config$node_properties_file_path, stringsAsFactor = FALSE) |>
