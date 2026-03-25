@@ -2,19 +2,24 @@
 plot <- function(graph, ...) UseMethod("plot")
 #' @export
 plot.graph <- function(
-  graph,
-  vertex_color = NULL,
-  vertex_size = NULL,
-  edge_color = NULL,
-  edge_width = "weight",
-  log_edge_width = FALSE,
-  vertex_order = NULL,
-  vertex_palette = NULL,
-  display_names = TRUE
-) {
-  comps <- igraph::components(graph$graph)
-  main_comp_vids <- which(comps$membership == which.max(comps$csize))
-  plot_graph <- igraph::induced_subgraph(graph$graph, vids = main_comp_vids)
+                       graph,
+                       vertex_color = NULL,
+                       vertex_size = NULL,
+                       edge_color = NULL,
+                       edge_width = "weight",
+                       log_edge_width = FALSE,
+                       vertex_order = NULL,
+                       vertex_palette = NULL,
+                       display_names = TRUE,
+                       layout = "centrality"
+                       ) {
+  if (layout == "centrality") {
+    comps <- igraph::components(graph$graph)
+    main_comp_vids <- which(comps$membership == which.max(comps$csize))
+    plot_graph <- igraph::induced_subgraph(graph$graph, vids = main_comp_vids)
+  } else {
+    plot_graph <- graph$graph
+  }
 
   plot_graph <- plot_graph |>
     set_vertex_color(vertex_color = vertex_color, custom_palette = vertex_palette, custom_order = vertex_order) |>
@@ -22,10 +27,15 @@ plot.graph <- function(
     set_edge_color(edge_color = edge_color, custom_palette = NULL) |>
     set_edge_width(edge_width = edge_width, log_edge_width = log_edge_width)
 
-  p <- ggraph::ggraph(plot_graph,
-    layout = "centrality",
-    centrality = tidygraph::centrality_degree()
-  ) +
+  if (layout == "centrality") {
+    p <- ggraph::ggraph(plot_graph,
+                        layout = "centrality",
+                        centrality = tidygraph::centrality_degree())
+  } else if (layout == "auto") {
+    p <- ggraph::ggraph(plot_graph, layout = "auto")
+  }
+
+  p <- p +
     ggraph::geom_edge_link(ggplot2::aes(edge_width = width, edge_color = color),
                            edge_alpha = 0.7, show.legend = FALSE) +
     ggraph::geom_node_point(ggplot2::aes(color = color, size = size),
