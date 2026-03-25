@@ -1,53 +1,59 @@
 #' @export
-read_config <- function(config) {
+read_config <- function(config_path) {
+
+  config <- yaml::read_yaml(config_path)
+
   # Make column names match their R-friendly versions
-  for (nm in c("author_column_name", "year_column_name", "edge_id", "node_name", "node_color")) {
-    config[[nm]] <- make.names(config[[nm]])
+  for (nm in c("node_id", "year_column", "edge_id")) {
+    config$data[[nm]] <- make.names(config$data[[nm]])
+  }
+  for (nm in c("node_id", "color")) {
+    config$node_properties[[nm]] <- make.names(config$node_properties[[nm]])
   }
 
   default_config <- list(
-    input_name = tools::file_path_sans_ext(basename(config$file_path)),
-    output_path = "output",
-    filters = NULL,
-    author_column_name = NULL,
-    author_delimiter = NULL,
-    year_column_name = NULL,
-    edge_id = NULL,
-    max_authors_per_paper = NULL,
-    min_papers_per_author = NULL,
-    directed = FALSE,
-    from_year = NULL,
-    to_year = NULL,
-    split_per_year = NULL,
-    node_properties_file_path = NULL,
-    node_filters = NULL,
-    remove_NA_nodes = FALSE,
-    node_name = NULL,
-    node_color = NULL,
-    node_order = NULL,
-    node_palette = NULL,
-    package_version = as.character(utils::packageVersion("NetworkAnalysis"))
+    metadata = list(
+      Author = "Not provided",
+      Email = "Not provided",
+      "Data description" = "Not provided",
+      "Data access date" = "Not provided",
+      "Data source" = "Not provided",
+      "Data source url" = "",
+      input_name = tools::file_path_sans_ext(basename(config$data$file_path)),
+      package_version = as.character(utils::packageVersion("NetworkAnalysis"))
+    ),
+    data = list(
+      output_path = "output",
+      filters = NULL,
+      node_id = NULL,
+      node_delimiter = NULL,
+      year_column = NULL,
+      edge_id = NULL,
+      max_authors_per_paper = NULL,
+      min_papers_per_author = NULL,
+      directed = FALSE,
+      from_year = NULL,
+      to_year = NULL,
+      split_per_year = NULL
+    ),
+    plot = list(
+      layout = "centrality"
+    ),
+    node_properties = list(
+      file_path = NULL,
+      filters = NULL,
+      remove_NA = FALSE,
+      node_id = NULL,
+      color = NULL,
+      order = NULL,
+      palette = NULL
+    )
   )
 
   # Merge the provided config with the default config
-  utils::modifyList(default_config, config, keep.null = TRUE)
-}
+  config <- utils::modifyList(default_config, config, keep.null = TRUE)
 
-#' @export
-read_metadata <- function(metadata) {
-  default_metadata <- list(
-    Author = "Not provided",
-    Email = "Not provided",
-    Data_description = "Not provided",
-    Data_access_date = "Not provided",
-    Data_source = "Not provided",
-    Data_source_url = ""
-  )
-
-  metadata <- utils::modifyList(default_metadata, metadata, keep.null = TRUE)
-  metadata$Data_source <- paste0("\\href{", metadata$Data_source_url, "}", " {", metadata$Data_source, "}")
-  metadata$Data_source_url <- NULL
-  names(metadata) <- gsub("_", " ", names(metadata))
-
-  metadata
+  config$metadata[["Data source"]] <- paste0("\\href{", config$metadata[["Data source url"]], "}", "{", config$metadata[["Data source"]], "}")
+  config$metadata[["Data source url"]] <- NULL
+  config
 }

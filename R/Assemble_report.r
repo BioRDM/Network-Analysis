@@ -1,29 +1,25 @@
 #' @export
-assemble_report <- function(config, metadata) {
+assemble_report <- function(config_file) {
   summary_stats <- data.frame()
 
-  config <- read_config(config)
-  metadata <- read_metadata(metadata)
-
+  config <- read_config(config_file)
   paths <- Paths(config)
-
-  json_config <- jsonlite::toJSON(config, pretty = TRUE, auto_unbox = TRUE, null = "null")
-  write(json_config, file = paste0(paths$dataset, "/config.json"))
+  file.copy(config_file, paste0(paths$dataset))
 
   df <- utils::read.csv(paths$input_file, stringsAsFactor = FALSE) |>
-    unnest_vertex_column(config$author_column_name, config$author_delimiter) |>
-    dplyr::distinct(.data[[config$edge_id]], .data[[config$author_column_name]], .keep_all = TRUE) |>
-    apply_filters(config$filters)
+    unnest_vertex_column(config$data$node_id, config$data$node_delimiter) |>
+    dplyr::distinct(.data[[config$data$edge_id]], .data[[config$data$node_id]], .keep_all = TRUE) |>
+    apply_filters(config$data$filters)
 
-  if (!is.null(config$node_properties_file_path)) {
-    node_props <- utils::read.csv(config$node_properties_file_path, stringsAsFactor = FALSE) |>
-      apply_filters(config$node_filters)
+  if (!is.null(config$node_properties$file_path)) {
+    node_props <- utils::read.csv(config$node_properties$file_path, stringsAsFactor = FALSE) |>
+      apply_filters(config$node_properties$filters)
 
-    check_column(node_props, config$node_name)
-    check_column(node_props, config$node_color)
+    check_column(node_props, config$node_properties$node_id)
+    check_column(node_props, config$node_properties$color)
 
-    if (config$remove_NA_nodes) {
-      df <- subset_df(df, config$author_column_name, node_props, config$node_name)
+    if (config$node_properties$remove_NA) {
+      df <- subset_df(df, config$data$node_id, node_props, config$node_properties$node_id)
     }
   }
 
@@ -34,23 +30,23 @@ assemble_report <- function(config, metadata) {
     from_year <- years$from[i]
     to_year <- years$to[i]
     date_range <- paste0(from_year, "-", to_year)
-    current_df <- filter_by_year(df, config$year_column_name, from_year, to_year)
+    current_df <- filter_by_year(df, config$data$year_column, from_year, to_year)
     print(paste0("Creating report for the period ", from_year, " to ", to_year))
 
     # Build network data
     network <- network(current_df,
-                       vertex_column = config$author_column_name,
-                       vertex_delimiter = config$author_delimiter,
-                       edge_id = config$edge_id,
-                       year_column = config$year_column_name)
+                       vertex_column = config$data$node_id,
+                       vertex_delimiter = config$data$node_delimiter,
+                       edge_id = config$data$edge_id,
+                       year_column = config$data$year_column)
 
     # Filter the network data
     network <- filter_single_vertices(network)
-    if (!is.null(config$max_authors_per_paper)) {
-      network <- filter_by_vertex_occurrences(network, config$max_authors_per_paper)
+    if (!is.null(config$data$max_authors_per_paper)) {
+      network <- filter_by_vertex_occurrences(network, config$data$max_authors_per_paper)
     }
-    if (!is.null(config$min_papers_per_author)) {
-      network <- filter_infrequent_vertices(network, config$min_papers_per_author)
+    if (!is.null(config$data$min_papers_per_author)) {
+      network <- filter_infrequent_vertices(network, config$data$min_papers_per_author)
     }
 
     # Build the graph
@@ -59,12 +55,12 @@ assemble_report <- function(config, metadata) {
 
     # If node data is available, add it as a vertex attribute
     # Otherwise, cluster nodes with igraph's "cluster_louvain" method (communities)
-    if (!is.null(config$node_properties_file_path)) {
+    if (!is.null(config$node_properties$file_path)) {
       graph <- set_vertex_attr(graph,
-                               name = config$node_color,
-                               keys = node_props[[config$node_name]],
-                               values = node_props[[config$node_color]])
-      if (all(is.na(igraph::vertex_attr(graph$graph, config$node_color)))) {
+                               name = config$node_properties$color,
+                               keys = node_props[[config$node_properties$node_id]],
+                               values = node_props[[config$node_properties$color]])
+      if (all(is.na(igraph::vertex_attr(graph$graph, config$node_properties$color)))) {
         cli::cli_alert(c("!" = "No match found for node colour.",
                          "i" = "Check that the name format in the node colour table matches that in the main data."))
       }
@@ -113,7 +109,7 @@ assemble_report <- function(config, metadata) {
       quiet = TRUE,
       params = list(
         config = config,
-        metadata = metadata,
+        metadata = config$metadata,
         date_range = date_range,
         network = network,
         graph = graph,

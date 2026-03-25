@@ -20,10 +20,10 @@ Paths <- function(config) {
 }
 
 create_output_paths <- function(config) {
-  if (!dir.exists(config$output_path)) {
-    dir.create(config$output_path)
+  if (!dir.exists(config$data$output_path)) {
+    dir.create(config$data$output_path)
   }
-  config$output_path <- get_output_path(config)
+  config$data$output_path <- get_output_path(config)
   dataset_path <- get_dataset_path(config)
   if (!dir.exists(dataset_path)) {
     dir.create(dataset_path, recursive = TRUE)
@@ -36,15 +36,15 @@ create_output_paths <- function(config) {
 }
 
 get_input_path <- function(config) {
-  normalizePath(config$file_path, winslash = "/")
+  normalizePath(config$data$file_path, winslash = "/")
 }
 
 get_output_path <- function(config) {
-  normalizePath(config$output_path, winslash = "/")
+  normalizePath(config$data$output_path, winslash = "/")
 }
 
 get_dataset_path <- function(config) {
-  paste0(config$output_path, "/", config$input_name)
+  paste0(config$data$output_path, "/", config$metadata$input_name)
 }
 
 get_data_path <- function(config) {

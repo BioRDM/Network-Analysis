@@ -1,16 +1,16 @@
 #' @export
 get_years_from_to <- function(data, config) {
-  year_col <- config$year_column_name
+  year_col <- config$data$year_column
 
-  check_split_per_year(config$split_per_year)
+  check_split_per_year(config$data$split_per_year)
   check_column(data, year_col)
 
   data[[year_col]] <- parse_year(data[[year_col]])
 
-  year_from <- max(min(data[[year_col]]), config$from_year)
-  year_to <- min(max(data[[year_col]]), config$to_year)
-  if (!is.null(config$split_per_year)) {
-    years_from <- seq(year_from, year_to, by = config$split_per_year)
+  year_from <- max(min(data[[year_col]]), config$data$from_year)
+  year_to <- min(max(data[[year_col]]), config$data$to_year)
+  if (!is.null(config$data$split_per_year)) {
+    years_from <- seq(year_from, year_to, by = config$data$split_per_year)
     years_to <- c(years_from[-1] - 1, year_to)
   } else {
     years_from <- year_from
