@@ -1,3 +1,10 @@
+apply_filters <- function(...) UseMethod("apply_filters")
+
+apply_filters.network <- function(network, filters) {
+  network$filtered <- apply_filters(network$filtered, filters)
+  network
+}
+
 #' @export
 filter_by_year <- function(...) UseMethod("filter_by_year")
 #' @export

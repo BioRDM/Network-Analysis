@@ -33,16 +33,18 @@ This report presents the results of a Co-Authorship Social Network Analysis (SNA
 ## About this data
 ```{r, echo=FALSE}
 metadata_text <- ""
-for (key in names(metadata)) {
-  value <- metadata[[key]]
+for (key in names(config$metadata)) {
+  value <- config$metadata[[key]]
   metadata_text <- paste0(metadata_text, key, ": ", value, "\n\n")
 }
 ```
-Input data: `r paste0(metadata$input_name, ".csv")`
+Input data: `r paste0(config$.meta$input_name, ".csv")`
 
 Date range: `r config$data$from_year` to `r config$data$to_year`
 
 `r metadata_text`
+
+Package Version: `r config$.meta$package_version`
 
 # Data filtering
 ```{r, echo=FALSE}
@@ -98,7 +100,8 @@ plot(graph,
 plot_legend_only(graph,
                  vertex_color = vertex_color,
                  vertex_order = config$node_properties$order,
-                 vertex_palette = config$node_properties$palette)
+                 vertex_palette = config$node_properties$palette,
+                 layout = config$plot$layout)
 ```
 Each color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the degree centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. Centrality, in this context, reflects an author's influence based on their position in the network — those with higher centrality are more interconnected and play a larger role in facilitating collaboration. 
 The legend identifies the most central authors from each cluster depending on degree centrality, providing insight into key contributors within their respective groups.

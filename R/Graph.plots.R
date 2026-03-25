@@ -33,6 +33,8 @@ plot.graph <- function(
                         centrality = tidygraph::centrality_degree())
   } else if (layout == "auto") {
     p <- ggraph::ggraph(plot_graph, layout = "auto")
+  } else if (layout == "circular") {
+    p <- ggraph::ggraph(plot_graph, layout = "linear", circular = TRUE)
   }
 
   p <- p +
@@ -66,15 +68,18 @@ plot_legend_only <- function(graph, ...) UseMethod("plot_legend_only")
 
 #' @export
 plot_legend_only <- function(
-  graph,
-  vertex_color = NULL,
-  vertex_order = NULL,
-  vertex_palette = NULL,
-  edge_color = NULL
-) {
-  comps <- igraph::components(graph$graph)
-  main_comp_vids <- which(comps$membership == which.max(comps$csize))
-  graph$graph <- igraph::induced_subgraph(graph$graph, vids = main_comp_vids)
+                             graph,
+                             vertex_color = NULL,
+                             vertex_order = NULL,
+                             vertex_palette = NULL,
+                             edge_color = NULL,
+                             layout = "centrality"
+                             ) {
+  if (layout == "centrality") {
+    comps <- igraph::components(graph$graph)
+    main_comp_vids <- which(comps$membership == which.max(comps$csize))
+    graph$graph <- igraph::induced_subgraph(graph$graph, vids = main_comp_vids)
+  }
 
   graph <- graph |>
     set_vertex_color(vertex_color = vertex_color, custom_palette = vertex_palette, custom_order = vertex_order) |>

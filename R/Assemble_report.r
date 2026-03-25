@@ -1,15 +1,15 @@
 #' @export
 assemble_report <- function(config_file) {
-  summary_stats <- data.frame()
-
   config <- read_config(config_file)
+  print(paste0("Running NetworkAnalysis package version ", config$.meta$package_version))
   paths <- Paths(config)
-  file.copy(config_file, paste0(paths$dataset))
+  file.copy(config_file, paste0(paths$dataset), overwrite = TRUE)
+
+  summary_stats <- data.frame()
 
   df <- utils::read.csv(paths$input_file, stringsAsFactor = FALSE) |>
     unnest_vertex_column(config$data$node_id, config$data$node_delimiter) |>
-    dplyr::distinct(.data[[config$data$edge_id]], .data[[config$data$node_id]], .keep_all = TRUE) |>
-    apply_filters(config$data$filters)
+    dplyr::distinct(.data[[config$data$edge_id]], .data[[config$data$node_id]], .keep_all = TRUE)
 
   if (!is.null(config$node_properties$file_path)) {
     node_props <- utils::read.csv(config$node_properties$file_path, stringsAsFactor = FALSE) |>
@@ -30,7 +30,8 @@ assemble_report <- function(config_file) {
     from_year <- years$from[i]
     to_year <- years$to[i]
     date_range <- paste0(from_year, "-", to_year)
-    current_df <- filter_by_year(df, config$data$year_column, from_year, to_year)
+    current_df <- df |>
+      filter_by_year(config$data$year_column, from_year, to_year)
     print(paste0("Creating report for the period ", from_year, " to ", to_year))
 
     # Build network data
@@ -41,6 +42,7 @@ assemble_report <- function(config_file) {
                        year_column = config$data$year_column)
 
     # Filter the network data
+    network <- apply_filters(network, config$data$filters)
     network <- filter_single_vertices(network)
     if (!is.null(config$data$max_authors_per_paper)) {
       network <- filter_by_vertex_occurrences(network, config$data$max_authors_per_paper)
@@ -109,7 +111,6 @@ assemble_report <- function(config_file) {
       quiet = TRUE,
       params = list(
         config = config,
-        metadata = config$metadata,
         date_range = date_range,
         network = network,
         graph = graph,

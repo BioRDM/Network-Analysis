@@ -12,18 +12,21 @@ read_config <- function(config_path) {
   }
 
   default_config <- list(
+    .meta = list(
+      input_name = tools::file_path_sans_ext(basename(config$data$file_path)),
+      package_version = as.character(utils::packageVersion("NetworkAnalysis"))
+    ),
     metadata = list(
       Author = "Not provided",
       Email = "Not provided",
       "Data description" = "Not provided",
       "Data access date" = "Not provided",
       "Data source" = "Not provided",
-      "Data source url" = "",
-      input_name = tools::file_path_sans_ext(basename(config$data$file_path)),
-      package_version = as.character(utils::packageVersion("NetworkAnalysis"))
+      "Data source url" = ""
     ),
     data = list(
       output_path = "output",
+      output_suffix = NULL,
       filters = NULL,
       node_id = NULL,
       node_delimiter = NULL,

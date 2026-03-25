@@ -3,8 +3,10 @@ test_that("get_years_from_to works correctly with split_per_year", {
     Year = c(2000, 2002, 2004, 2006, 2008, 2010)
   )
   config <- list(
-    year_column_name = "Year",
-    split_per_year = 2
+    data = list(
+      year_column = "Year",
+      split_per_year = 2
+    )
   )
 
   result <- get_years_from_to(data, config)
@@ -17,10 +19,12 @@ test_that("get_years_from_to works correctly without split_per_year", {
     Year = c(2000, 2002, 2004, 2006, 2008, 2010)
   )
   config <- list(
-    year_column_name = "Year",
-    from_year = 2002,
-    to_year = 2006,
-    split_per_year = NULL
+    data = list(
+      year_column = "Year",
+      from_year = 2002,
+      to_year = 2006,
+      split_per_year = NULL
+    )
   )
 
   result <- get_years_from_to(data, config)
@@ -33,8 +37,10 @@ test_that("get_years_from_to handles invalid split_per_year", {
     Year = c(2000, 2002, 2004, 2006, 2008, 2010)
   )
   config <- list(
-    year_column_name = "Year",
-    split_per_year = "two"
+    data = list(
+      year_column_name = "Year",
+      split_per_year = "two"
+    )
   )
 
   expect_error(get_years_from_to(data, config), "must be an integer value or NULL.")
@@ -45,10 +51,12 @@ test_that("get_years_from_to handles all-NULL input", {
     Year = c(2000, 2002, 2004, 2006, 2008, 2010)
   )
   config <- list(
-    year_column_name = "Year",
-    from_year = NULL,
-    to_year = NULL,
-    split_per_year = NULL
+    data = list(
+      year_column_name = "Year",
+      from_year = NULL,
+      to_year = NULL,
+      split_per_year = NULL
+    )
   )
 
   result <- get_years_from_to(data, config)

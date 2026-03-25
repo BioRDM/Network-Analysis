@@ -44,7 +44,10 @@ get_output_path <- function(config) {
 }
 
 get_dataset_path <- function(config) {
-  paste0(config$data$output_path, "/", config$metadata$input_name)
+  paste0(config$data$output_path,
+         "/",
+         config$.meta$input_name,
+         config$data$output_suffix)
 }
 
 get_data_path <- function(config) {
