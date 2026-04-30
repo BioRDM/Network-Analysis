@@ -27,13 +27,14 @@ Imports:
     statnet.common,
     ggrepel,
     ggraph,
-    ggplot2
+    ggplot2,
+    cowplot,
+    tinytex
 Suggests:
     testthat (>= 3.0.0),
     mockery,
     renv,
-    tibble,
-    tinytex
+    tibble
 Depends: 
     R (>= 4.5)
 Config/testthat/edition: 3

@@ -13,8 +13,8 @@ Input data: `r config$input_name`
 
 ```{r, echo=FALSE}
 metadata_text <- ""
-for (key in names(metadata)) {
-  value <- metadata[[key]]
+for (key in names(config$metadata)) {
+  value <- config$metadata[[key]]
   metadata_text <- paste0(metadata_text, key, ": ", value, "\n\n")
 }
 ```

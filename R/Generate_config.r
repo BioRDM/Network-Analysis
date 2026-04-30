@@ -13,7 +13,7 @@ data:
   node_delimiter:
   edge_id: Title
   year_column: Earliest published date
-  filters:
+  filters:  # list
     - Type == 'Article'
   max_authors_per_paper:
   min_papers_per_author:
@@ -26,15 +26,12 @@ plot:
 
 node_properties:
   file_path: /path/to/SBS_BPS_affiliations_tidy.csv
-  filters:
-    -
+  filters:  # list
   remove_NA: FALSE
   node_id: Full.name
   color: Department
-  order:
-    -
-  palette:
-    -
+  order:  # list
+  palette:  # list
 "
 
 #' Generate a config file for the Network Analysis pipeline
