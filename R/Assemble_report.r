@@ -102,23 +102,30 @@ assemble_report <- function(config_file) {
     )
     summary_stats <- rbind(summary_stats, author_stats[author_stats$Data == "filtered", ])
 
-    # Generate the pdf report
-    print("Exporting PDF...")
-    rmarkdown::render(
-      paste0(paths$templates, "/Report_template.Rmd"),
-      output_file = paste0(paths$dataset, "/Report_", date_range, ".pdf"),
-      output_format = "pdf_document",
-      quiet = TRUE,
-      params = list(
-        config = config,
-        date_range = date_range,
-        network = network,
-        graph = graph,
-        author_stats = author_stats
-      )
-    )
-    print("PDF exported successfully!")
+                                        # Save plots in the plots folder
+    if (!config$data$skip_plots) {
+      suppressMessages(save_plots(graph, config, paths, date_range))
+    }
+    
+    if (!config$data$skip_report) {
+                                        # Generate the pdf report
+      print("Exporting PDF...")
+      rmarkdown::render(
+                   paste0(paths$templates, "/Report_template.Rmd"),
+                   output_file = paste0(paths$dataset, "/Report_", date_range, ".pdf"),
+                   output_format = "pdf_document",
+                   quiet = TRUE,
+                   params = list(
+                     config = config,
+                     date_range = date_range,
+                     network = network,
+                     graph = graph,
+                     author_stats = author_stats
+                   )
+                 )
+      print("PDF exported successfully!")
 
+    }
   }
 
   # Save summary statistics to a CSV file

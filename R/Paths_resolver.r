@@ -7,6 +7,7 @@ Paths <- function(config) {
                 output = get_output_path(config),
                 dataset = get_dataset_path(config),
                 data = get_data_path(config),
+                plots = get_plots_path(config),
                 summary_table = get_summary_table_path(config),
                 centrality_data = get_centrality_data_path(config),
                 cutpoints = get_cutpoints_path(config),
@@ -32,6 +33,10 @@ create_output_paths <- function(config) {
   if (!dir.exists(data_path)) {
     dir.create(data_path, recursive = TRUE)
   }
+  plots_path <- get_plots_path(config)
+  if (!dir.exists(plots_path)) {
+    dir.create(plots_path, recursive = TRUE)
+  }
   config
 }
 
@@ -53,6 +58,11 @@ get_dataset_path <- function(config) {
 get_data_path <- function(config) {
   paste0(get_dataset_path(config), "/data")
 }
+
+get_plots_path <- function(config) {
+  paste0(get_dataset_path(config), "/plots")
+}
+
 
 get_centrality_data_path <- function(config) {
   paste0(get_data_path(config), "/Centrality_data_")
