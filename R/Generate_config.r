@@ -9,6 +9,7 @@
 data:
   file_path: /path/to/SBS_2019-2024_2025-03-24.csv
   output_path: /path/to/Outputs
+  output_suffix: 
   skip_report: FALSE
   skip_plots: FALSE
   node_id: Name

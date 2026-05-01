@@ -11,7 +11,7 @@ config <- list(
   )
 )
 
-test_that("Paths function works correctly", {
+test_that("Paths works correctly", {
   paths <- Paths(config)
 
   expect_equal(class(paths), "Paths")
@@ -22,50 +22,56 @@ test_that("Paths function works correctly", {
                                      config$.meta$input_name,
                                      config$data$output_suffix))
   expect_equal(paths$data, paste0(paths$dataset, "/data"))
+  expect_equal(paths$plots, paste0(paths$dataset, "/plots"))
   expect_equal(paths$summary_table, paste0(paths$data, "/Summary_statistics.csv"))
   expect_equal(paths$centrality_data, paste0(paths$data, "/Centrality_data_"))
   expect_equal(paths$templates, system.file("Templates", package = "NetworkAnalysis"))
 })
 
-test_that("create_output_paths function works correctly", {
+test_that("create_output_paths works correctly", {
   config <- create_output_paths(config)
 
   expect_true(dir.exists(config$data$output_path))
-  expect_true(dir.exists(paste0(config$data$output_path, "/", config$.meta$input_name)))
-  expect_true(dir.exists(paste0(config$data$output_path, "/", config$.meta$input_name, "/data")))
+  expect_true(dir.exists(paste0(config$data$output_path, "/", config$.meta$input_name, config$data$output_suffix)))
+  expect_true(dir.exists(paste0(config$data$output_path, "/", config$.meta$input_name, config$data$output_suffix, "/data")))
+  expect_true(dir.exists(paste0(config$data$output_path, "/", config$.meta$input_name, config$data$output_suffix, "/plots")))
 })
 
-test_that("get_input_path function works correctly", {
+test_that("get_input_path works correctly", {
   expect_equal(get_input_path(config), tools::file_path_as_absolute(config$data$file_path))
 })
 
-test_that("get_output_path function works correctly", {
+test_that("get_output_path works correctly", {
   expect_equal(get_output_path(config), tools::file_path_as_absolute(config$data$output_path))
 })
 
-test_that("get_dataset_path function works correctly", {
+test_that("get_dataset_path works correctly", {
   expect_equal(get_dataset_path(config), paste0(config$data$output_path,
                                                 "/",
                                                 config$.meta$input_name,
                                                 config$data$output_suffix))
 })
 
-test_that("get_data_path function works correctly", {
+test_that("get_data_path works correctly", {
   expect_equal(get_data_path(config), paste0(get_dataset_path(config), "/data"))
 })
 
-test_that("get_centrality_data_path function works correctly", {
+test_that("get_plots_path works correctly", {
+  expect_equal(get_plots_path(config), paste0(get_dataset_path(config), "/plots"))
+})
+
+test_that("get_centrality_data_path works correctly", {
   expect_equal(get_centrality_data_path(config), paste0(get_data_path(config), "/Centrality_data_"))
 })
 
-test_that("get_papers_per_author_path function works correctly", {
+test_that("get_papers_per_author_path works correctly", {
   expect_equal(get_papers_per_author_path(config), paste0(get_data_path(config), "/Papers_per_author_"))
 })
 
-test_that("get_summary_table_path function works correctly", {
+test_that("get_summary_table_path works correctly", {
   expect_equal(get_summary_table_path(config), paste0(get_data_path(config), "/Summary_statistics.csv"))
 })
 
-test_that("get_templates_path function works correctly", {
+test_that("get_templates_path works correctly", {
   expect_equal(get_templates_path(config), system.file("Templates", package = "NetworkAnalysis"))
 })
