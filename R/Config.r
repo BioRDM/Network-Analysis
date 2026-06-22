@@ -27,6 +27,8 @@ read_config <- function(config_path) {
     data = list(
       output_path = "output",
       output_suffix = NULL,
+      save_report = TRUE,
+      save_plots = TRUE,
       filters = NULL,
       node_id = NULL,
       node_delimiter = NULL,
@@ -40,7 +42,8 @@ read_config <- function(config_path) {
       split_per_year = NULL
     ),
     plot = list(
-      layout = "centrality"
+      layout = "centrality",
+      formats = "png"
     ),
     node_properties = list(
       file_path = NULL,

@@ -76,8 +76,8 @@ This section contains the main parameters for data processing.
 | file_path             | The full path to the input data                                                                                                                                                                                                                                                       |
 | output_path           | The path to the output folder                                                                                                                                                                                                                                                         |
 | output_suffix         | A suffix to be added to the folder name for the report                                                                                                                                                                                                                                |
-| skip_report           | Skip the report output (for speed)                                                                                                                                                                                                                                                    |
-| skip_plots            | Skip the plots output (for speed)                                                                                                                                                                                                                                                     |
+| save_report           | Save the report output                                                                                                                                                                                                                                                                |
+| save_plots            | Save the plots output                                                                                                                                                                                                                                                                 |
 | node_id               | Column name for the node IDs in the input data (e.g. author names)                                                                                                                                                                                                                    |
 | node_delimiter        | If there are several nodes per table row, how are they delimited (e.g. ; or //)                                                                                                                                                                                                       |
 | edge_id               | Column name for the edge IDs in the input data (e.g. article title)                                                                                                                                                                                                                   |
@@ -93,9 +93,10 @@ This section contains the main parameters for data processing.
 
 This section contains options to customise the report plots.
 
-| Parameter | Description                                                                    |
-|-----------|--------------------------------------------------------------------------------|
-| layout    | The layout of the graph. Can be `centrality` (default), `auto`, or `circular`. |
+| Parameter | Description                                                                                                                                                                                   |
+|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| layout    | The layout of the graph. Can be `centrality` (default), `auto`, or `circular`.                                                                                                                |
+| formats   | Formats to save plots (if save_plots is true). Can be a single value, or a list (plots will be saved in all requested formats). Possible values: `png` (default), `jpeg`, `svg`, `pdf`, `eps` |
 
 #### node_properties
 
@@ -130,6 +131,6 @@ This folder contains .csv tables with raw data extracted from the analysis
 - `Raw_data_YYYY-YYYY.csv`: the raw data used to create the report (prior to filtering)
 - `Vertex_attributes_YYYY-YYYY.csv`: the vertex attributes that were used to color the nodes in the report. The "community" column shows an automated clustering of the nodes using the `igraph` "cluster_louvain" method.
 3. `plots` folder
-This folder contains all the plots from the report, in png format
+This folder contains all the plots from the report, in the specified formats (default: png)
 4. `Summary.pdf`: a table listing the main report statistics, with one line per date range (as defined by the `split_per_year` option)
 5. The yaml config file used to create the report.

@@ -10,8 +10,8 @@ data:
   file_path: /path/to/SBS_2019-2024_2025-03-24.csv
   output_path: /path/to/Outputs
   output_suffix: 
-  skip_report: FALSE
-  skip_plots: FALSE
+  save_report: TRUE
+  save_plots: TRUE
   node_id: Name
   node_delimiter:
   edge_id: Title
@@ -26,6 +26,8 @@ data:
 
 plot:
   layout: centrality  # centrality or auto
+  formats:            # png, jpeg, svg, pdf, eps (list of formats)
+    - png
 
 node_properties:
   file_path: /path/to/SBS_BPS_affiliations_tidy.csv

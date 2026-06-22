@@ -1,8 +1,7 @@
 #' @export
 plot <- function(graph, ...) UseMethod("plot")
 #' @export
-plot.graph <- function(
-                       graph,
+plot.graph <- function(graph,
                        vertex_color = NULL,
                        vertex_size = NULL,
                        edge_color = NULL,
@@ -55,10 +54,10 @@ plot.graph <- function(
   if (display_names) {
     p <- p +
       ggraph::geom_node_text(
-                ggplot2::aes(label = ifelse(isna, NA, name)),
-                size = 2,
-                repel = TRUE
-              )
+        ggplot2::aes(label = ifelse(isna, NA, name)),
+        size = 2,
+        repel = TRUE
+      )
   }
   p
 }
@@ -67,8 +66,7 @@ plot.graph <- function(
 plot_legend_only <- function(graph, ...) UseMethod("plot_legend_only")
 
 #' @export
-plot_legend_only <- function(
-                             graph,
+plot_legend_only <- function(graph,
                              vertex_color = NULL,
                              vertex_order = NULL,
                              vertex_palette = NULL,
@@ -132,17 +130,17 @@ plot_legend_only <- function(
 plot_top_vertices <- function(graph, ...) UseMethod("plot_top_vertices")
 #' @export
 plot_top_vertices.graph <- function(
-  graph,
-  n = 10,
-  edge_color = NULL,
-  edge_width = "weight",
-  vertex_color = NULL,
-  vertex_size = NULL,
-  log_edge_width = FALSE,
-  vertex_palette = NULL,
-  vertex_order = NULL,
-  centrality_method = "degree"
-) {
+                                    graph,
+                                    n = 10,
+                                    edge_color = NULL,
+                                    edge_width = "weight",
+                                    vertex_color = NULL,
+                                    vertex_size = NULL,
+                                    log_edge_width = FALSE,
+                                    vertex_palette = NULL,
+                                    vertex_order = NULL,
+                                    centrality_method = "degree"
+                                    ) {
   comps <- igraph::components(graph$graph)
   main_comp_vids <- which(comps$membership == which.max(comps$csize))
   graph$graph <- igraph::induced_subgraph(graph$graph, vids = main_comp_vids)
@@ -437,10 +435,10 @@ get_circle_layout.igraph <- function(graph) {
   layout_df$label_degree <- -atan2(layout_coords[, 2], layout_coords[, 1])
   layout_df$label_dist <- 1 + abs(cos(layout_df$label_degree)) * 2
   layout_df$label_angle <- ifelse(
-    (cos(layout_df$label_degree) > 0 & sin(layout_df$label_degree) > 0) |
-      (cos(layout_df$label_degree) < 0 & sin(layout_df$label_degree) < 0),
-    -45,
-    45
+  (cos(layout_df$label_degree) > 0 & sin(layout_df$label_degree) > 0) |
+  (cos(layout_df$label_degree) < 0 & sin(layout_df$label_degree) < 0),
+  -45,
+  45
   )
   layout_df
 }
