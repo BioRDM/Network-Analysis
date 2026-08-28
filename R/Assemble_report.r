@@ -112,8 +112,15 @@ assemble_report <- function(config_file) {
     if (config$data$save_report) {
       # Generate the pdf report
       print("Exporting PDF...")
+
+      if (config$data$anonymise_report) {
+        template <- "/Report_anonymised_template.Rmd"
+      } else {
+        template <- "/Report_template.Rmd"
+      }
+
       rmarkdown::render(
-        paste0(paths$templates, "/Report_template.Rmd"),
+        paste0(paths$templates, template),
         output_file = paste0(paths$dataset, "/Report_", date_range, ".pdf"),
         output_format = "pdf_document",
         quiet = TRUE,
