@@ -10,8 +10,8 @@ plot.graph <- function(graph,
                        vertex_order = NULL,
                        vertex_palette = NULL,
                        display_names = TRUE,
-                       layout = "centrality"
-                       ) {
+                       layout = "centrality",
+                       show_communities = FALSE) {
   if (layout == "centrality") {
     comps <- igraph::components(graph$graph)
     main_comp_vids <- which(comps$membership == which.max(comps$csize))
@@ -27,13 +27,33 @@ plot.graph <- function(graph,
     set_edge_width(edge_width = edge_width, log_edge_width = log_edge_width)
 
   if (layout == "centrality") {
-    p <- ggraph::ggraph(plot_graph,
-                        layout = "centrality",
-                        centrality = tidygraph::centrality_degree())
+    layout_df <- ggraph::create_layout(plot_graph,
+                                       layout = "centrality",
+                                       centrality = tidygraph::centrality_degree())
   } else if (layout == "auto") {
-    p <- ggraph::ggraph(plot_graph, layout = "auto")
+    layout_df <- ggraph::create_layout(plot_graph, layout = "auto")
   } else if (layout == "circular") {
-    p <- ggraph::ggraph(plot_graph, layout = "linear", circular = TRUE)
+    layout_df <- ggraph::create_layout(plot_graph, layout = "linear", circular = TRUE)
+  }
+
+  p <- ggraph::ggraph(layout_df)
+
+  if (show_communities && "community" %in% names(layout_df)) {
+    layout_df <- layout_df |>
+      dplyr::group_by(community) |>
+      dplyr::mutate(community_size = sum(!isna)) |>
+      dplyr::ungroup()
+
+    p <- p +
+      ggforce::geom_mark_hull(data = layout_df,
+                              mapping = ggplot2::aes(x = x,
+                                                     y = y,
+                                                     fill = factor(community),
+                                                     filter = community_size >= 10),
+                              concavity = 4,
+                              colour = NA,
+                              alpha = 0.15,
+                              show.legend = FALSE)
   }
 
   p <- p +
@@ -71,8 +91,7 @@ plot_legend_only <- function(graph,
                              vertex_order = NULL,
                              vertex_palette = NULL,
                              edge_color = NULL,
-                             layout = "centrality"
-                             ) {
+                             layout = "centrality") {
   if (layout == "centrality") {
     comps <- igraph::components(graph$graph)
     main_comp_vids <- which(comps$membership == which.max(comps$csize))

@@ -57,7 +57,6 @@ assemble_report <- function(config_file) {
       build(vertices = network$vertex_column, edges = network$edge_id)
 
     # If node data is available, add it as a vertex attribute
-    # Otherwise, cluster nodes with igraph's "cluster_louvain" method (communities)
     if (!is.null(config$node_properties$file_path)) {
       graph <- set_vertex_attr(graph,
                                name = config$node_properties$color,
@@ -67,9 +66,8 @@ assemble_report <- function(config_file) {
         cli::cli_alert(c("!" = "No match found for node colour.",
                          "i" = "Check that the name format in the node colour table matches that in the main data."))
       }
-    } else {
-      graph <- set_communities(graph)
     }
+    graph <- set_communities(graph)
 
     # Save raw and filtered data
     utils::write.csv(network$raw, paste0(paths$data, "/Raw_data_", date_range, ".csv"), row.names = FALSE)

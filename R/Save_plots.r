@@ -87,4 +87,16 @@ save_report_plots <- function(graph, config, paths, date_range) {
             display_names = FALSE,
             layout = config$plot$layout)
   save_plot(p, path = paths$plots, title = "Network_no_names", date_range = date_range, formats = config$plot$formats)
+
+  # No names + communities highlighted
+  graph <- set_centrality(graph, method = "degree")
+  p <- plot(graph,
+            vertex_color = vertex_color,
+            vertex_size = "centrality",
+            vertex_order = config$node_properties$order,
+            vertex_palette = config$node_properties$palette,
+            display_names = FALSE,
+            layout = config$plot$layout,
+            show_communities = TRUE)
+  save_plot(p, path = paths$plots, title = "Network_communities_", date_range = date_range, formats = config$plot$formats)
 }
