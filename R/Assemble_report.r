@@ -9,7 +9,8 @@ assemble_report <- function(config_file) {
 
   df <- utils::read.csv(paths$input_file, stringsAsFactor = FALSE) |>
     unnest_vertex_column(config$data$node_id, config$data$node_delimiter) |>
-    dplyr::distinct(.data[[config$data$edge_id]], .data[[config$data$node_id]], .keep_all = TRUE)
+    dplyr::distinct(.data[[config$data$edge_id]], .data[[config$data$node_id]], .keep_all = TRUE) |>
+    dplyr::filter(.data[[config$data$year_column]] != "")
 
   if (!is.null(config$node_properties$file_path)) {
     node_props <- utils::read.csv(config$node_properties$file_path, stringsAsFactor = FALSE) |>
@@ -109,8 +110,15 @@ assemble_report <- function(config_file) {
     if (config$data$save_report) {
       # Generate the pdf report
       print("Exporting PDF...")
+
+      if (config$data$anonymise_report) {
+        template <- "/Report_anonymised_template.Rmd"
+      } else {
+        template <- "/Report_template.Rmd"
+      }
+
       rmarkdown::render(
-        paste0(paths$templates, "/Report_template.Rmd"),
+        paste0(paths$templates, template),
         output_file = paste0(paths$dataset, "/Report_", date_range, ".pdf"),
         output_format = "pdf_document",
         quiet = TRUE,

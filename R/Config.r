@@ -39,7 +39,8 @@ read_config <- function(config_path) {
       directed = FALSE,
       from_year = NULL,
       to_year = NULL,
-      split_per_year = NULL
+      split_per_year = NULL,
+      anonymise_report = FALSE
     ),
     plot = list(
       layout = "centrality",

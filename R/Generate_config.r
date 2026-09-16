@@ -23,6 +23,7 @@ data:
   from_year: 2019
   to_year: 2024
   split_per_year:
+  anonymise_report: TRUE
 
 plot:
   layout: centrality  # centrality or auto

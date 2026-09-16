@@ -148,8 +148,7 @@ plot_legend_only <- function(graph,
 #' @export
 plot_top_vertices <- function(graph, ...) UseMethod("plot_top_vertices")
 #' @export
-plot_top_vertices.graph <- function(
-                                    graph,
+plot_top_vertices.graph <- function(graph,
                                     n = 10,
                                     edge_color = NULL,
                                     edge_width = "weight",
@@ -158,8 +157,8 @@ plot_top_vertices.graph <- function(
                                     log_edge_width = FALSE,
                                     vertex_palette = NULL,
                                     vertex_order = NULL,
-                                    centrality_method = "degree"
-                                    ) {
+                                    centrality_method = "degree",
+                                    display_names = TRUE) {
   comps <- igraph::components(graph$graph)
   main_comp_vids <- which(comps$membership == which.max(comps$csize))
   graph$graph <- igraph::induced_subgraph(graph$graph, vids = main_comp_vids)
@@ -180,7 +179,7 @@ plot_top_vertices.graph <- function(
 
   layout_df <- get_circle_layout(subgraph)
 
-  ggraph::ggraph(subgraph, layout = "manual", x = layout_df$x, y = layout_df$y) +
+  p <- ggraph::ggraph(subgraph, layout = "manual", x = layout_df$x, y = layout_df$y) +
     ggraph::geom_edge_arc(
       ggplot2::aes(circular = TRUE,
                    edge_width = width,
@@ -189,16 +188,6 @@ plot_top_vertices.graph <- function(
       show.legend = TRUE
     ) +
     ggraph::geom_node_point(ggplot2::aes(color = color, size = size), show.legend = TRUE) +
-    ggraph::geom_node_text(
-      ggplot2::aes(
-        label = format_names(name),
-        angle = layout_df$label_angle,
-        hjust = ifelse(layout_df$label_degree > pi / 2 | layout_df$label_degree < -pi / 2, 1.2, -0.2)
-      ),
-      size = 3,
-      color = "black",
-      show.legend = FALSE
-    ) +
     add_legend(graph = subgraph, vertex_color = vertex_color, edge_color = edge_color) +
     ggplot2::theme_void() +
     ggplot2::theme(
@@ -208,6 +197,20 @@ plot_top_vertices.graph <- function(
     ) +
     ggplot2::coord_cartesian(clip = "off")
 
+  if (display_names) {
+    p <- p +
+      ggraph::geom_node_text(
+        ggplot2::aes(
+          label = format_names(name),
+          angle = layout_df$label_angle,
+          hjust = ifelse(layout_df$label_degree > pi / 2 | layout_df$label_degree < -pi / 2, 1.2, -0.2)
+        ),
+        size = 3,
+        color = "black",
+        show.legend = FALSE
+      )
+  }
+  p
 }
 
 

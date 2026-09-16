@@ -1,0 +1,260 @@
+---
+title: 'Network Analysis Report'
+date: \today
+output:
+  pdf_document:
+    latex_engine: xelatex
+    extra_dependencies: ['fontspec', 'float', 'fancyhdr']
+fontsize: 12pt
+urlcolor: blue
+toc: TRUE
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+raw_stats <- author_stats[author_stats$Data == "raw", ]
+filtered_stats <- author_stats[author_stats$Data == "filtered", ]
+if (!is.null(config$node_properties$file_path)) {
+  vertex_color <- config$node_properties$color
+} else {
+  vertex_color <- "community"
+}
+```
+
+\pagestyle{fancy}
+\fancyhead[]{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[LEO]{`r escape_latex(date_range)`}
+\fancyfoot[ROE]{Network Analysis Report}
+\pagebreak
+
+# Introduction
+This report presents the results of a Co-Authorship Social Network Analysis (SNA), focusing on the collaborative relationships among researchers. By constructing a co-authorship network — where nodes represent authors and edges signify co-authored publications — this analysis reveals the structure of academic collaboration within the dataset. 
+
+## About this data
+```{r, echo=FALSE}
+metadata_text <- ""
+for (key in names(config$metadata)) {
+  value <- config$metadata[[key]]
+  metadata_text <- paste0(metadata_text, key, ": ", value, "\n\n")
+}
+```
+Input data: `r paste0(config$.meta$input_name, ".csv")`
+
+Date range: `r config$data$from_year` to `r config$data$to_year`
+
+`r metadata_text`
+
+Package Version: `r config$.meta$package_version`
+
+# Data filtering
+```{r, echo=FALSE}
+max_authors_text <- if (is.null(config$data$max_authors_per_paper)) {
+  "No limit on the number of authors per paper was applied."
+} else if (network$n_too_many_vertices > 0) {
+  paste0(network$n_too_many_vertices, " papers were removed from the dataset due to having more than ", config$data$max_authors_per_paper, " authors.")
+} else {
+  paste0("All papers in the dataset had less than ", config$data$max_authors_per_paper, " authors and were included in the network analysis.")
+}
+min_papers_text <- if (is.null(config$data$min_papers_per_author)) {
+  "No limit on the minimum number of papers per author was applied."
+} else if (network$n_infrequent_vertices_removed > 0) {
+  paste0(network$n_infrequent_vertices_removed, " authors were removed from the dataset because they appeared in less than ", config$data$min_papers_per_author, " papers.")
+} else {
+  paste0("All authors in the dataset appeared in at least ", config$data$min_papers_per_author, " papers and were included in the network analysis.")
+}
+```
+The initial dataset contained `r raw_stats$Total_Papers` papers and `r raw_stats$Total_Authors` authors from `r raw_stats$Start_year` to `r raw_stats$End_year`.
+
+`r network$n_too_few_vertices` papers were removed from the dataset because they had only one author.
+
+`r max_authors_text`
+
+`r min_papers_text`
+
+In total, `r filtered_stats$Total_Papers` papers and `r filtered_stats$Total_Authors` authors were included in the network analysis.
+
+## Before filtering
+- Average authors per paper: `r round(raw_stats$Average_Authors_per_Paper)`
+- Median authors per paper: `r raw_stats$Median_Authors_per_Paper`
+- Minimum authors per paper: `r raw_stats$Min_Authors_per_Paper`
+- Maximum authors per paper: `r raw_stats$Max_Authors_per_Paper`
+
+## After filtering
+- Average authors per paper: `r round(filtered_stats$Average_Authors_per_Paper)`
+- Median authors per paper: `r filtered_stats$Median_Authors_per_Paper`
+- Minimum authors per paper: `r filtered_stats$Min_Authors_per_Paper`
+- Maximum authors per paper: `r filtered_stats$Max_Authors_per_Paper`
+
+
+```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network", echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
+graph <- set_centrality(graph, method = "degree")
+plot(graph,
+     vertex_color = vertex_color,
+     vertex_size = "centrality",
+     vertex_order = config$node_properties$order,
+     vertex_palette = config$node_properties$palette,
+     layout = config$plot$layout,
+     display_names = FALSE)
+```
+
+```{r, fig.pos = 'H', fig.align='center', fig.cap = NULL, echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, out.width='90%'}
+plot_legend_only(graph,
+                 vertex_color = vertex_color,
+                 vertex_order = config$node_properties$order,
+                 vertex_palette = config$node_properties$palette,
+                 layout = config$plot$layout)
+```
+Each color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the degree centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. Centrality, in this context, reflects an author's influence based on their position in the network — those with higher centrality are more interconnected and play a larger role in facilitating collaboration. 
+The legend identifies the most central authors from each cluster depending on degree centrality, providing insight into key contributors within their respective groups.
+
+# Network Description
+```{r, echo=FALSE}
+network_direction_text <- if (graph$directed) {
+  "**Directed**: The network is directed, meaning edges have a direction (e.g., A → B but not necessarily B → A). Examples include citation networks or hierarchical structures."
+} else if (!graph$directed) {
+  "**Undirected**: The network is undirected, meaning all connections are mutual. This is common in co-authorship or collaboration networks. In an undirected network, connections do not have a direction (e.g., if A is connected to B, then B is also connected to A by definition)."
+} else {
+  "**Unknown directionality**: This could be due to an error in the data or the data is not available."
+}
+```
+
+## Network Type
+- `r network_direction_text`
+
+# Density and Transitivity
+## Density
+The density measures the proportion of realised connections compared to all possible connections. It is calculated as:
+
+`Density = Number of Edges/(Number of Possible Edges) = Actual Edges/[nx(n-1)/2]`
+
+- **Value**: `r round(filtered_stats$Density * 100, digits = 2)`%
+- **Interpretation**: The value of Density is in percentage. High Density: Close to 100%, nodes are connected to most of the other nodes. This indicates a highly cohesive network. Low Density: low percentage, nodes are only connected to few other nodes in the network. Sparse networks with low density are common in real-world systems.
+
+## Transitivity
+Transitivity, or the clustering coefficient, measures the tendency of nodes to form triangles (e.g., the probability of A -- B, given B -- C and A -- C). (In other words, the likelihood that if two nodes are connected to a common third node, they are also connected to each other). It is calculated as:
+
+`Transitivity = Number of Triangles/Number of Connected Triplets`
+
+- **Value**: `r round(filtered_stats$Transitivity * 100, digits = 0)`%
+- **Interpretation**: The value of Transitivity is in percentage. High Transitivity: Close to 100%, indicating a high level of clustering. Nodes tend to form tight-knit groups. Low Transitivity: low percentage, indicating a lack of clustering. A higher Transitivity value suggests that networks tend to collaborate in groups, forming cohesive communities.
+
+# Node Centrality
+## Degree Centrality
+Degree centrality measures the number of direct connections each node has in the network. Nodes with higher degree centrality are likely to be influential or well-connected individuals/entities.
+
+- **The least connected node has (Min)**: `r round(min(get_centrality(graph, "degree")))`
+- **The most connected node has (Max)**: `r round(max(get_centrality(graph, "degree")))`
+- **On average, nodes have about (Mean)**: `r round(mean(get_centrality(graph, "degree")))`
+- **Half of the nodes have more connection than (Median)**: `r round(median(get_centrality(graph, "degree")))`
+
+## Betweenness Centrality
+Betweenness centrality quantifies how often a node acts as a bridge in the shortest path between other nodes. Nodes with high betweenness are critical connectors in the network. Removing them could significantly disrupt the flow of information.
+
+- **Min**: `r round(min(get_centrality(graph, "betweenness")))`
+- **Max**: `r round(max(get_centrality(graph, "betweenness")))` (the node with the highest betweenness value is a critical bridge in the network, controlling the flow of information).
+- **Mean**: `r round(mean(get_centrality(graph, "betweenness")))`
+- **Median**: `r round(median(get_centrality(graph, "betweenness")))`
+
+## Harmonic Centrality
+Harmonic centrality measures how close a node is to all other nodes in a network. A node with high harmonic centrality can reach many other nodes quickly, even if some nodes are disconnected. Low harmonic centrality means the node is either far from others or isolated.
+
+- **Min**: `r round(min(get_centrality(graph, "harmonic")), digits = 2)` (The most distant node, or those in isolated groups with few reachable neighbors)
+- **Max**: `r round(max(get_centrality(graph, "harmonic")), digits = 2)` (The most central node, can quickly reach others)
+- **Mean**: `r round(mean(get_centrality(graph, "harmonic")), digits = 2)` (If the mean is high, the network is compact and well-connected. A low mean suggests the graph is fragmented, with many weakly connected groups.)
+- **Median**: `r round(median(get_centrality(graph, "harmonic")), digits = 2)`
+
+## Network diameter
+The network diameter is a measure of the largest distance between any two nodes in the network. Specifically, it represents the longest of all the shortest paths — the maximum number of steps needed to connect the two most distant nodes (authors) through their co-authorship links.
+
+- In our network: **the diameter is `r get_diameter(graph)`**, This means that the greatest distance between any two authors, using the shortest possible path, spans `r get_diameter(graph)` steps.
+
+- Practically speaking, the two most distantly connected authors can be linked through a path involving `r get_diameter(graph) - 1` intermediates (co-authors).
+
+- The average shortest path between two authors in the network is `r round(get_average_shortest_path(graph), digits = 1)` steps.
+
+## Centrality Data CSV outcome:
+Alongside this report, there is a CSV file titled centrality_data.csv. This file contains information about the centrality metrics for each author (node) in the network.
+
+- **Author Name:** The name of the author (node).
+- **Degree Centrality:** A number representing how many direct connections (edges) the author has with others. Higher values mean the author has many direct connections, suggesting popularity or influence in their immediate circle.
+- **Betweenness Centrality:** A measure of how often the author appears on the shortest paths between other pairs of nodes. A high betweenness score indicates the author plays a bridge role, connecting different parts of the network.
+- **Harmonic Centrality:** A centrality measure that accounts for the distance to all other reachable nodes, giving partial credit to distant nodes (reflects how close an author is to all others in the network, even accounting for unreachable nodes). Higher scores suggest the author can efficiently interact with many others, even in fragmented networks.
+
+```{r, fig.width=14, fig.height=8, fig.pos = 'H', fig.cap = "Direct connections between the 30 most central authors", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
+plot_top_vertices(graph,
+                  vertex_color = vertex_color,
+                  n = 30,
+                  vertex_order = config$node_properties$order,
+                  vertex_palette = config$node_properties$palette,
+                  display_names = FALSE)
+```
+This figure highlights the direct connections between the 30 most central authors in the network. Nodes positioned around the circle represent these top authors, and the thickness of the connecting lines indicates the strength of their collaboration (thicker lines represent stronger connections). The node colour corresponds to the clustering shown in Figure 1.
+
+A known limitation of this network analysis is reflected in cases where authors share the same last name and first initial, leading to duplicate entries being treated as a single node (in this figure, it might look like the authors connected to themselves). This issue arises when the dataset lacks full names or unique identifiers, resulting in potential misrepresentation of distinct authors as one.
+
+# Reachability
+Reachability measures the proportion of pairs of nodes that are reachable in the network.
+
+- **Unreachable Pairs**: `r round((1 - get_reachability(graph))*100)`% of all possible pairs of nodes are unreachable in the network.
+- **Interpretation**: A high percentage of unreachable pairs may indicate a fragmented network or isolated nodes that are not connected to the main network.
+
+# Cutpoint Authors
+## Definition
+Cutpoint authors, also known as 'articulation points,' are critical nodes in the co-authorship network. If a cutpoint author is removed, the network would break into disconnected components, meaning the collaboration structure would become fragmented. These authors act as bridges, connecting different clusters or groups of researchers, and their presence is essential for maintaining the overall connectivity of the network.
+
+## Importance
+Identifying cutpoint authors helps us understand who plays a pivotal role in sustaining collaboration across the network. Their removal could disrupt communication and collaboration between research groups, highlighting their strategic importance in the network's structure.
+
+## List of cutpoint authors
+```{r, fig.pos = 'H', fig.cap = "Visualisation of the Author network with cutpoints highlighted", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
+graph <- set_cutpoints(graph)
+plot(graph, vertex_color = "cutpoint", layout = config$plot$layout, display_names = FALSE)
+```
+This figure builds on Figure 1, with the addition of highlighting cutpoint authors in colour. Cutpoints are authors whose removal would fragment the network, indicating their critical role in maintaining connectivity.  
+There are `r length(unique(igraph::V(graph$graph)$name[!is.na(igraph::V(graph$graph)$cutpoint)]))` cutpoint authors.
+
+# Appendix
+```{r, fig.pos = 'H', fig.cap = "Visualisation of betweenness centrality in the Co-Authorship Network Analysis", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
+graph <- set_centrality(graph, method = "betweenness")
+plot(graph,
+     vertex_color = vertex_color,
+     vertex_size = "centrality",
+     vertex_order = config$node_properties$order,
+     vertex_palette = config$node_properties$palette,
+     layout = config$plot$layout,
+     display_names = FALSE)
+```
+```{r, fig.pos = 'H', fig.align='center', fig.cap = NULL, echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, out.width='90%'}
+plot_legend_only(graph,
+                 vertex_color = vertex_color,
+                 vertex_order = config$node_properties$order,
+                 vertex_palette = config$node_properties$palette,
+                 layout = config$plot$layout)
+```
+The size of each node corresponds to the betweenness centrality of the author, a measure of how often an author appears on the shortest path between two other authors. 
+The legend identifies the authors with high betweenness centrality act as bridges, controlling the flow of information between different clusters or groups.
+
+```{r, fig.pos = 'H', fig.cap = "Visualisation of harmonic centrality in the Co-Authorship Network Analysis", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
+graph <- set_centrality(graph, method = "harmonic")
+plot(graph,
+     vertex_color = vertex_color,
+     vertex_size = "centrality",
+     vertex_order = config$node_properties$order,
+     vertex_palette = config$node_properties$palette,
+     layout = config$plot$layout,
+     display_names = FALSE)
+```
+The size of each node corresponds to the harmonic centrality of the author, which reflects how close a node is to all other nodes in a network
+The legend identifies the authors with high harmonic centrality that can reach many other nodes quickly, even if some nodes are disconnected.
+
+
+```{r, fig.pos = 'H', fig.cap = "Visualisation of the Co-Authorship Network Analysis without centrality indicator", echo=FALSE, message=FALSE, warning=FALSE, out.width='100%'}
+plot(graph,
+     vertex_color = vertex_color,
+     vertex_size = NULL,
+     vertex_order = config$node_properties$order,
+     vertex_palette = config$node_properties$palette,
+     layout = config$plot$layout,
+     display_names = FALSE)
+```
+In this visualisation, all nodes are of equal size and do not reflect any centrality metrics. However, the legend highlights the most central authors from each cluster based on degree centrality, without the node size conveying any additional significance.
