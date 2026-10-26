@@ -10,7 +10,6 @@ Description: The package reads .csv files containing lists of publications (e.g.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
 Imports: 
     rlang,
     dplyr,
@@ -38,3 +37,4 @@ Suggests:
 Depends: 
     R (>= 4.5)
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0
