@@ -3,6 +3,7 @@
 #' @param df The dataframe to be filtered
 #' @param filters A set of filters in a vector, like c("col1 == TRUE", "col2 > 20")
 #' @returns The filtered dataframe
+#' @export
 apply_filters.data.frame <- function(df, filters) {
   if (is.null(filters)) {
     return(df)

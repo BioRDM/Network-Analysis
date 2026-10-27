@@ -1,5 +1,7 @@
+#' @export
 apply_filters <- function(...) UseMethod("apply_filters")
 
+#' @export
 apply_filters.network <- function(network, filters) {
   network$filtered <- apply_filters(network$filtered, filters)
   network

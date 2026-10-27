@@ -29,8 +29,8 @@ Installing this package requires an R version >= 4.5.
 Run the following commands in R to install the package:
 
 ```r
-install.packages("devtools")
-devtools::install_github("BioRDM/Network-Analysis")
+install.packages("pak")
+pak::pak("BioRDM/Network-Analysis")
 ```
 
 ### 3. Generating the report
@@ -38,7 +38,7 @@ devtools::install_github("BioRDM/Network-Analysis")
 Generate a config file in R:
 
 ```r
-library(Network-Analysis)
+library(NetworkAnalysis)
 
 generate_config("path/to/file/config.yaml")
 ```
@@ -49,9 +49,9 @@ Open the config file (in RStudio or any text editor) and edit the parameters for
 Run the report script:
 
 ```r
-library(Network-Analysis)
+library(NetworkAnalysis)
 
-assemble_report(config_path)
+assemble_report("path/to/file/config.yaml")
 ```
 
 #### metadata
