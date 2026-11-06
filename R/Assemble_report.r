@@ -1,5 +1,7 @@
 #' @export
 assemble_report <- function(config_file) {
+  .ensure_tinytex()
+
   config <- read_config(config_file)
   print(paste0("Running NetworkAnalysis package version ", config$.meta$package_version))
   paths <- Paths(config)
