@@ -106,6 +106,29 @@ plot_legend_only(graph,
 Each color represents a cluster of authors who are strongly connected within the network. The size of each node corresponds to the degree centrality of the author, with larger nodes indicating higher centrality and stronger connections within the network. Centrality, in this context, reflects an author's influence based on their position in the network — those with higher centrality are more interconnected and play a larger role in facilitating collaboration. 
 The legend identifies the most central authors from each cluster depending on degree centrality, providing insight into key contributors within their respective groups.
 
+```{r, echo=FALSE}
+data_sharing_text <- if (config$.meta$add_sharing_info) {
+  "# Data Sharing Statistics\nThese are data sharing statistics computed on all authors in the network."
+} else {
+  ""
+}
+```
+
+`r data_sharing_text`
+
+```{r echo=FALSE, warning=FALSE}
+if (config$.meta$add_sharing_info) {
+  sharing_table <- get_sharing_stats(graph)
+  knitr::kable(sharing_table, format = "latex", booktabs = TRUE, row.names = FALSE)
+}
+```
+
+```{r, fig.pos = 'H', fig.align='center', fig.cap = NULL, echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, out.width='80%'}
+if (config$.meta$add_sharing_info) {
+  plot_sharing_scores(graph)
+}
+```
+
 # Network Description
 ```{r, echo=FALSE}
 network_direction_text <- if (graph$directed) {

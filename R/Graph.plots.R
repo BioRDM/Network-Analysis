@@ -213,6 +213,32 @@ plot_top_vertices.graph <- function(graph,
   p
 }
 
+plot_sharing_scores <- function(graph) {
+  values <- igraph::V(graph$graph)$sharing_score
+  breaks_vec <- c(-0.0001, 0.0001, 0.20, 0.40, 0.60, 0.80, 0.99, 1.0001)
+
+  labels <- c("0", "1-20%", "21-40%", "41-60%", "61-80%", "81-99%", "100%")
+
+  bins <- cut(values,
+              breaks = breaks_vec,
+              labels = labels,
+              include.lowest = TRUE,
+              right = TRUE)
+
+  df <- data.frame(bin = bins)
+  df <- df[!is.na(df$bin), , drop = FALSE]
+  df$bin <- factor(df$bin, levels = labels)
+
+  ggplot2::ggplot(df, ggplot2::aes(x = bin, fill = bin)) +
+    ggplot2::geom_bar() +
+    ggplot2::labs(title = "Distribution of data sharing frequencies",
+                  x = "",
+                  y = "Number of Authors") +
+    ggplot2::theme_minimal(base_size = 18) +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+                   legend.position = "none")
+}
+
 
 add_legend <- function(graph, vertex_color = NULL, edge_color = NULL) {
   list(

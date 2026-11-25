@@ -68,3 +68,19 @@ check_palette_length <- function(custom_palette, custom_order) {
     ))
   }
 }
+
+#'@export
+check_sharing_score <- function(sharing_score) {
+  if (is.null(sharing_score)) {
+    cli::cli_warn(c(
+      "x" = "Could not find sharing score column",
+      "i" = "Check your config file"
+    ))
+  } else if (!all(is.numeric(sharing_score))) {
+    cli::cli_abort(c(
+      "x" = "sharing score column is not numerical",
+      "i" = "Make sure the column you indicated in your config contains numerical values (not categories)",
+      "i" = "Leave sharing_score_id empty if you do not want to see mean data sharing and the data sharing histogram"
+    ))
+  }
+}

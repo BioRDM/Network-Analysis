@@ -102,15 +102,16 @@ This section contains options to customise the report plots.
 
 This section allows the user to provide information about the nodes (authors) from a separate file, e.g. academic affiliations. The table given here as input must have one row per author (missing values are ok).
 
-| Parameter | Description                                                                                                     |
-|-----------|-----------------------------------------------------------------------------------------------------------------|
-| file_path | The path to the node properties file. If it is empty, this whole section will be ignored.                       |
-| filters   | Filters for the node properties table, defined as in the data section.                                          |
-| remove_NA | TRUE/FALSE Whether to include nodes that are missing (or been filtered out) from this table in the final graph. |
-| node_id   | Column name for the node IDs (name format must match with the node_id column provided under data)               |
-| color     | Column name to color the nodes by.                                                                              |
-| order     | A list that provides the order in which legend entries should be displayed                                      |
-| palette   | A list with custom colors (e.g. color names or hex codes) for the different levels in "color"                   |
+| Parameter        | Description                                                                                                                                               |
+|------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| file_path        | The path to the node properties file. If it is empty, this whole section will be ignored.                                                                 |
+| filters          | Filters for the node properties table, defined as in the data section.                                                                                    |
+| remove_NA        | TRUE/FALSE Whether to include nodes that are missing (or been filtered out) from this table in the final graph.                                           |
+| node_id          | Column name for the node IDs (name format must match with the node_id column provided under data)                                                         |
+| color            | Column name to color the nodes by.                                                                                                                        |
+| order            | A list that provides the order in which legend entries should be displayed                                                                                |
+| palette          | A list with custom colors (e.g. color names or hex codes) for the different levels in "color"                                                             |
+| sharing_score_id | Optional: column name for the author's sharing score (must be numerical values). If provided, the report will contain summary statistics on data sharing. |
 
 ## Generated outcomes
 

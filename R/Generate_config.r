@@ -38,6 +38,7 @@ node_properties:
   color: Department
   order:  # list
   palette:  # list
+  sharing_score_id:
 "
 
 #' Generate a config file for the Network Analysis pipeline

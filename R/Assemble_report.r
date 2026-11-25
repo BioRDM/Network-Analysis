@@ -24,6 +24,11 @@ assemble_report <- function(config_file) {
     if (config$node_properties$remove_NA) {
       df <- subset_df(df, config$data$node_id, node_props, config$node_properties$node_id)
     }
+
+    if (!is.null(config$node_properties$sharing_score_id)) {
+      check_sharing_score(node_props[[config$node_properties$sharing_score_id]])
+      config$.meta$add_sharing_info <- TRUE
+    }
   }
 
   years <- get_years_from_to(df, config)
@@ -68,6 +73,12 @@ assemble_report <- function(config_file) {
       if (all(is.na(igraph::vertex_attr(graph$graph, config$node_properties$color)))) {
         cli::cli_alert(c("!" = "No match found for node colour.",
                          "i" = "Check that the name format in the node colour table matches that in the main data."))
+      }
+      if (config$.meta$add_sharing_info) {
+        graph <- set_vertex_attr(graph,
+                                 name = "sharing_score",
+                                 keys = node_props[[config$node_properties$node_id]],
+                                 values = node_props[[config$node_properties$sharing_score_id]])
       }
     }
     graph <- set_communities(graph)
@@ -129,7 +140,8 @@ assemble_report <- function(config_file) {
           date_range = date_range,
           network = network,
           graph = graph,
-          author_stats = author_stats
+          author_stats = author_stats,
+          sharing_stats = sharing_stats
         )
       )
       print("PDF exported successfully!")

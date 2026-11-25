@@ -14,7 +14,8 @@ read_config <- function(config_path) {
   default_config <- list(
     .meta = list(
       input_name = tools::file_path_sans_ext(basename(config$data$file_path)),
-      package_version = as.character(utils::packageVersion("NetworkAnalysis"))
+      package_version = as.character(utils::packageVersion("NetworkAnalysis")),
+      add_sharing_info = FALSE
     ),
     metadata = list(
       Author = "Not provided",
@@ -53,7 +54,8 @@ read_config <- function(config_path) {
       node_id = NULL,
       color = NULL,
       order = NULL,
-      palette = NULL
+      palette = NULL,
+      sharing_score_id = NULL
     )
   )
 

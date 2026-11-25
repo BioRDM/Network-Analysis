@@ -251,3 +251,16 @@ save_vertex_attributes.graph <- function(graph, output_file = "output/vertex_att
 
   utils::write.csv(vertex_data, output_file, row.names = FALSE)
 }
+
+#' @export
+get_sharing_stats <- function(graph, ...) UseMethod("get_sharing_stats")
+#' @export
+get_sharing_stats.graph <- function(graph) {
+  scores <- igraph::V(graph$graph)$sharing_score
+  data.frame(
+    Mean = paste0(mean(scores, na.rm = TRUE) * 100, "%"),
+    Median = paste0(median(scores, na.rm = TRUE) * 100, "%"),
+    Min = paste0(min(scores, na.rm = TRUE) * 100, "%"),
+    Max = paste0(max(scores, na.rm = TRUE) * 100, "%")
+  )
+}
